@@ -1,11 +1,12 @@
-import { Search, User, Heart, ShoppingCart, Menu, X } from 'lucide-react';
+import { Search, User, ShoppingCart, Menu, X } from 'lucide-react';
+/* import { Heart} from 'lucide-react'; */
 import { useState } from 'react';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white/80 backdrop-blur-sm text-gray-800 absolute top-0 left-0 right-0 z-50 shadow-md">
+    <header className="bg-gray-200 text-gray-800 top-0 left-0 right-0 z-50 shadow-md">
       {/* Top Banner */}
       <div className="bg-gray-100 text-gray-800 text-sm py-2">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
@@ -14,14 +15,10 @@ const Header = () => {
         </div>
       </div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top Bar */}
-        <div className="flex items-center justify-between h-24">
-          {/* Logo */}
+        <div className="flex items-center justify-between py-3">
           <div className="text-3xl font-bold text-gray-800">
             <span className="text-red-500">REPUESTOS</span>ORIENTE
           </div>
-
-          {/* Search Bar */}
           <div className="hidden lg:flex flex-1 mx-8 max-w-3xl">
             <div className="relative w-full">
               <input 
