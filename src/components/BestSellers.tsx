@@ -1,14 +1,14 @@
 import { useState, useMemo } from 'react';
-import { List, Grid2X2, Grid3X3, X, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { List, Grid2X2, Grid3X3, Star } from 'lucide-react';
 import { products } from '../data/products';
 import ProductCard from './ProductCard';
 import useStore from '../states/global';
 
 const BestSellers = () => {
+  const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
   const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
@@ -42,16 +42,6 @@ const BestSellers = () => {
     }
   };
 
-  const openImageModal = (imageSrc: string) => {
-    setSelectedImage(imageSrc);
-    setIsModalOpen(true);
-  };
-
-  const closeImageModal = () => {
-    setIsModalOpen(false);
-    setSelectedImage(null);
-  };
-
   const { addToCart, cart } = useStore();
 
   const handleAddToCart = (product: any) => {
@@ -71,7 +61,7 @@ const BestSellers = () => {
           src={product.image}
           alt={product.name}
           className="w-full h-full object-cover cursor-pointer"
-          onClick={() => openImageModal(product.image)}
+          onClick={() => navigate(`/producto/${product.id}`)}
         />
         <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
       </div>
@@ -170,28 +160,8 @@ const BestSellers = () => {
         ) : (
           <div className={`grid ${getGridClasses()} gap-8`}>
             {filteredProducts.map(product => (
-              <ProductCard key={product.id} product={product} onImageClick={openImageModal} />
+              <ProductCard key={product.id} product={product} />
             ))}
-          </div>
-        )}
-
-        {/* Image Modal */}
-        {isModalOpen && selectedImage && (
-          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={closeImageModal}>
-            <div className="relative max-w-4xl max-h-full p-4">
-              <img
-                src={selectedImage}
-                alt="Product"
-                className="max-w-full max-h-full object-contain"
-                onClick={(e) => e.stopPropagation()}
-              />
-              <button
-                onClick={closeImageModal}
-                className="absolute top-2 right-2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 transition-colors"
-              >
-                <X size={24} className="text-gray-800" />
-              </button>
-            </div>
           </div>
         )}
       </div>

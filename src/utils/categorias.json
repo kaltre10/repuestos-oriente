@@ -1,0 +1,143 @@
+{
+  "categorias": [
+    {
+      "nombre": "Motor",
+      "subcategorias": [
+        "Pistones",
+        "Anillos",
+        "Cigüeñal",
+        "Bielas",
+        "Árbol de levas",
+        "Válvulas",
+        "Culata",
+        "Juntas",
+        "Bloque del motor"
+      ]
+    },
+    {
+      "nombre": "Transmisión y Embrague",
+      "subcategorias": [
+        "Caja de cambios",
+        "Embrague",
+        "Volante",
+        "Palanca",
+        "Ejes de transmisión"
+      ]
+    },
+    {
+      "nombre": "Suspensión y Dirección",
+      "subcategorias": [
+        "Amortiguadores",
+        "Resortes",
+        "Brazos de suspensión",
+        "Rótulas",
+        "Caja de dirección",
+        "Bomba hidráulica"
+      ]
+    },
+    {
+      "nombre": "Frenos",
+      "subcategorias": [
+        "Pastillas",
+        "Discos",
+        "Tambores",
+        "Zapatas",
+        "Líquido de frenos",
+        "Cilindros"
+      ]
+    },
+    {
+      "nombre": "Sistema Eléctrico y Electrónico",
+      "subcategorias": [
+        "Alternador",
+        "Batería",
+        "Motor de arranque",
+        "Sensores",
+        "Fusibles",
+        "Relés",
+        "ECU"
+      ]
+    },
+    {
+      "nombre": "Sistema de Combustible",
+      "subcategorias": [
+        "Bomba de gasolina",
+        "Inyectores",
+        "Carburador",
+        "Filtros de combustible",
+        "Tanque"
+      ]
+    },
+    {
+      "nombre": "Refrigeración y Calefacción",
+      "subcategorias": [
+        "Radiador",
+        "Termostato",
+        "Bomba de agua",
+        "Ventilador",
+        "Mangueras",
+        "Calefactor"
+      ]
+    },
+    {
+      "nombre": "Escape",
+      "subcategorias": [
+        "Múltiple de escape",
+        "Catalizador",
+        "Silenciador",
+        "Tubos"
+      ]
+    },
+    {
+      "nombre": "Filtros",
+      "subcategorias": [
+        "Filtro de aceite",
+        "Filtro de aire",
+        "Filtro de combustible",
+        "Filtro de cabina"
+      ]
+    },
+    {
+      "nombre": "Carrocería y Accesorios Externos",
+      "subcategorias": [
+        "Puertas",
+        "Capó",
+        "Parachoques",
+        "Guardabarros",
+        "Espejos",
+        "Faros",
+        "Lunas"
+      ]
+    },
+    {
+      "nombre": "Interior y Confort",
+      "subcategorias": [
+        "Asientos",
+        "Tablero",
+        "Cinturones",
+        "Alfombras",
+        "Aire acondicionado",
+        "Calefacción"
+      ]
+    },
+    {
+      "nombre": "Neumáticos y Ruedas",
+      "subcategorias": [
+        "Llantas",
+        "Neumáticos",
+        "Rines",
+        "Válvulas",
+        "Tapas"
+      ]
+    },
+    {
+      "nombre": "Lubricantes y Líquidos",
+      "subcategorias": [
+        "Aceite de motor",
+        "Líquido de frenos",
+        "Refrigerante",
+        "Líquido de dirección"
+      ]
+    }
+  ]
+}

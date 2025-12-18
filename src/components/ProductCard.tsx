@@ -1,4 +1,5 @@
 import { Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import useStore from '../states/global';
 
 interface ProductCardProps {
@@ -15,6 +16,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onImageClick }) => {
+  const navigate = useNavigate();
   const { addToCart, cart } = useStore();
 
   const isInCart = cart.some(item => item.id === product.id);
@@ -26,9 +28,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onImageClick }) => {
   };
 
   const handleImageClick = () => {
-    if (onImageClick) {
-      onImageClick(product.image);
-    }
+  
+      navigate(`/producto/${product.id}`);
+    
   };
 
   return (

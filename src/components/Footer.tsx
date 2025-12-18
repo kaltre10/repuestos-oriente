@@ -12,15 +12,15 @@ export default function Footer() {
         
         {/* Columna 1 */}
         <div>
-          <h3 className="text-red-600 uppercase font-semibold mb-4">Automize</h3>
+          <h3 className="text-red-600 uppercase font-semibold mb-4">REPUESTOS ORIENTE</h3>
           <p className="text-gray-400 mb-4">
-            We provide high-quality Japanese vehicles with reliable service and customer support.
+            Proporcionamos repuestos automotrices de alta calidad con servicio confiable y soporte al cliente.
           </p>
 
           <ul className="space-y-1 text-gray-400 mb-4">
-            <li>📞 +123-456-789</li>
-            <li>📧 info@domain.com</li>
-            <li>🕘 Mon–Fri, 9:00–18:00 (EEST)</li>
+            <li>📞 +58-412-123-4567</li>
+            <li>📧 info@repuestosoriente.com</li>
+            <li>🕘 Lun–Vie, 8:00–17:00 (VET)</li>
           </ul>
 
           <div className="flex space-x-4 text-gray-400">
@@ -33,47 +33,47 @@ export default function Footer() {
 
         {/* Columna 2 */}
         <div>
-          <h3 className="text-red-600 uppercase font-semibold mb-4">Help & Support</h3>
+          <h3 className="text-red-600 uppercase font-semibold mb-4">Ayuda y Soporte</h3>
           <ul className="space-y-2">
-            <li>Shipping Info</li>
-            <li>Returns</li>
-            <li>How to Order</li>
-            <li>How to Track</li>
-            <li>Size Guide</li>
+            <li>Información de Envío</li>
+            <li>Devoluciones</li>
+            <li>Cómo Ordenar</li>
+            <li>Cómo Rastrear</li>
+            <li>Guía de Tallas</li>
           </ul>
         </div>
 
         {/* Columna 3 */}
         <div>
-          <h3 className="text-red-600 uppercase font-semibold mb-4">Company Info</h3>
+          <h3 className="text-red-600 uppercase font-semibold mb-4">Información de la Empresa</h3>
           <ul className="space-y-2">
-            <li>About Us</li>
-            <li>Our Blog</li>
-            <li>Careers</li>
-            <li>Store Locations</li>
-            <li>Testimonials</li>
+            <li>Sobre Nosotros</li>
+            <li>Nuestro Blog</li>
+            <li>Carreras</li>
+            <li>Ubicaciones de Tiendas</li>
+            <li>Testimonios</li>
           </ul>
         </div>
 
         {/* Columna 4 */}
         <div>
-          <h3 className="text-red-600 uppercase font-semibold mb-4">Customer Care</h3>
+          <h3 className="text-red-600 uppercase font-semibold mb-4">Atención al Cliente</h3>
           <ul className="space-y-2">
-            <li>FAQs</li>
-            <li>Terms of Service</li>
-            <li>Privacy Policy</li>
-            <li>Contact Us</li>
-            <li>Gift Card</li>
+            <li>Preguntas Frecuentes</li>
+            <li>Términos de Servicio</li>
+            <li>Política de Privacidad</li>
+            <li>Contáctanos</li>
+            <li>Tarjeta de Regalo</li>
           </ul>
         </div>
       </div>
 
       <div className="border-t border-gray-700 pt-4 flex flex-col md:flex-row justify-between items-center text-gray-400">
-        <p>© 2023 Vroomtheme. All rights reserved.</p>
+        <p>© 2025 Repuestos Oriente. Todos los derechos reservados.</p>
 
         <div className="flex items-center space-x-4 mt-4 md:mt-0">
-          <span>🌐 English</span>
-          <span>💲 USD</span>
+          <span>🌐 Español</span>
+          <span>💲 VES</span>
         </div>
       </div>
     </footer>
