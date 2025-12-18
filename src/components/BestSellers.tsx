@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
-import { List, Grid2X2, Grid3X3, X } from 'lucide-react';
+import { List, Grid2X2, Grid3X3, X, Star } from 'lucide-react';
 import { products } from '../data/products';
 import ProductCard from './ProductCard';
+import useStore from '../states/global';
 
 const BestSellers = () => {
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
@@ -50,6 +51,60 @@ const BestSellers = () => {
     setIsModalOpen(false);
     setSelectedImage(null);
   };
+
+  const { addToCart, cart } = useStore();
+
+  const handleAddToCart = (product: any) => {
+    if (!cart.some(item => item.id === product.id)) {
+      addToCart(product);
+    }
+  };
+
+  const isInCart = (productId: number) => {
+    return cart.some(item => item.id === productId);
+  };
+
+  const renderListItem = (product: any) => (
+    <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md flex">
+      <div className="relative w-48 h-48 flex-shrink-0">
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-cover cursor-pointer"
+          onClick={() => openImageModal(product.image)}
+        />
+        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
+      </div>
+      <div className="flex-1 p-6 relative">
+        <p className="text-gray-500 text-sm mb-1">{product.category}</p>
+        <h3 className="font-semibold text-lg mb-2 text-gray-800">{product.name}</h3>
+        <div className="flex items-center mb-3">
+          <div className="flex text-yellow-400 mr-2">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} size={16} fill={i < product.rating ? 'currentColor' : 'none'} />
+            ))}
+          </div>
+          <span className="text-gray-500 text-sm">{product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'}</span>
+        </div>
+
+        {/* Price in top-right corner */}
+        <p className="absolute top-6 right-6 text-red-500 font-bold text-xl">${product.price.toFixed(2)}</p>
+
+        {/* Add to cart button in bottom-right corner */}
+        <button
+          onClick={() => handleAddToCart(product)}
+          disabled={isInCart(product.id)}
+          className={`absolute bottom-6 right-6 px-4 py-2 rounded transition-colors ${
+            isInCart(product.id)
+              ? 'bg-red-700 cursor-not-allowed opacity-75 text-white'
+              : 'bg-red-600 hover:bg-red-700 cursor-pointer text-white'
+          }`}
+        >
+          {isInCart(product.id) ? 'Agregado' : 'Agregar al carrito'}
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="bg-gray-100 py-16 mt-4">
@@ -108,11 +163,17 @@ const BestSellers = () => {
           </div>
         </div>
 
-        <div className={`grid ${getGridClasses()} gap-8`}>
-          {filteredProducts.map(product => (
-            <ProductCard key={product.id} product={product} onImageClick={openImageModal} />
-          ))}
-        </div>
+        {gridLayout === '1' ? (
+          <div className="space-y-6">
+            {filteredProducts.map(product => renderListItem(product))}
+          </div>
+        ) : (
+          <div className={`grid ${getGridClasses()} gap-8`}>
+            {filteredProducts.map(product => (
+              <ProductCard key={product.id} product={product} onImageClick={openImageModal} />
+            ))}
+          </div>
+        )}
 
         {/* Image Modal */}
         {isModalOpen && selectedImage && (
