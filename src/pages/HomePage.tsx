@@ -14,9 +14,9 @@ const HomePage: React.FC = () => {
   return (
     <>
       <Header />
-      <CartModal />
       <Hero />
       <BestSellers />
+      <CartModal />
       <Footer />
     </>
   );

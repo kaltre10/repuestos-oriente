@@ -23,7 +23,7 @@ const Header = () => {
               srcSet="https://flagcdn.com/w80/ve.png 2x"
               width="25"
               alt="Venezuela"></img>
-           Precio del dólar BCV: 275 Bs
+            Precio del dólar BCV: 275 Bs
           </span>
         </div>
       </div>
@@ -36,7 +36,7 @@ const Header = () => {
             <div className="relative w-full">
               <input
                 type="text"
-                placeholder="Escribe lo que buscas..."
+                placeholder="Escribe lo que buscas...."
                 className="w-full bg-white text-black rounded-full py-3 pl-6 pr-12 focus:outline-none"
               />
               <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-400" />
@@ -56,8 +56,14 @@ const Header = () => {
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="lg:hidden">
+          {/* Mobile Header Icons */}
+          <div className="lg:hidden flex items-center space-x-4">
+            <button onClick={toggleCart} className="relative hover:text-red-500 transition-colors">
+              <ShoppingCart size={24} />
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {getCartCount()}
+              </span>
+            </button>
             <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
@@ -74,44 +80,42 @@ const Header = () => {
         </div>
       </div>
 
+
       {/* Mobile Menu */}
-      <div
-        className={`lg:hidden absolute top-full left-0 right-0 bg-white/80 backdrop-blur-sm shadow-md transition-all duration-300 ease-in-out ${isMenuOpen
-            ? 'opacity-100 translate-y-0'
-            : 'opacity-0 -translate-y-4 pointer-events-none'
-          }`}
-      >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-          <div className="mt-8 mx-auto max-w-sm">
-            <div className="relative w-full">
-              <input
-                type="text"
-                placeholder="Escribe lo que buscas..."
-                className="w-full bg-white text-black rounded-full py-3 pl-6 pr-12 focus:outline-none"
-              />
-              <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-400" />
+      {isMenuOpen && (
+        <div
+          className={`bg-gray-100 menu-mobile p-5 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`}
+        >
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+            <div className="mt-8 mx-auto max-w-sm">
+              <div className="relative w-full">
+                <input
+                  type="text"
+                  placeholder="Escribe lo que buscas..."
+                  className="w-full bg-white text-black rounded-full py-3 pl-6 pr-12 focus:outline-none"
+                />
+                <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-400" />
+              </div>
+            </div>
+            <nav className="flex flex-col items-center space-y-6 text-lg mt-8">
+              <Link to="/" className="hover:text-red-500 transition-colors">INICIO</Link>
+              <Link to="/productos" className="hover:text-red-500 transition-colors">PRODUCTOS</Link>
+              <Link to="/ofertas" className="hover:text-red-500 transition-colors">OFERTAS</Link>
+            </nav>
+            <div className="flex justify-center items-center space-x-8 mt-8">
+              <a href="#" className="hover:text-red-500 transition-colors">
+                <User size={24} />
+              </a>
+              <button onClick={toggleCart} className="relative hover:text-red-500 transition-colors">
+                <ShoppingCart size={24} />
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {getCartCount()}
+                </span>
+              </button>
             </div>
           </div>
-          <nav className="flex flex-col items-center space-y-6 text-lg mt-8">
-            <Link to="/" className="hover:text-red-500 transition-colors">INICIO</Link>
-            <Link to="/colecciones" className="hover:text-red-500 transition-colors">COLECCIONES</Link>
-            <Link to="/productos" className="hover:text-red-500 transition-colors">PRODUCTOS</Link>
-            <Link to="/ofertas" className="hover:text-red-500 transition-colors">OFERTAS</Link>
-            <Link to="/blog" className="hover:text-red-500 transition-colors">BLOG</Link>
-          </nav>
-          <div className="flex justify-center items-center space-x-8 mt-8">
-            <a href="#" className="hover:text-red-500 transition-colors">
-              <User size={24} />
-            </a>
-            <button onClick={toggleCart} className="relative hover:text-red-500 transition-colors">
-              <ShoppingCart size={24} />
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {getCartCount()}
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
+        </div>)}
+
     </header>
   );
 };

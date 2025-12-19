@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { List, Grid2X2, Grid3X3, Star } from 'lucide-react';
+import { List, Grid2X2, Grid3X3, Star, Plus, Minus } from 'lucide-react';
 import { products } from '../data/products';
 import ProductCard from '../components/ProductCard';
 import ProductFilters from '../components/ProductFilters';
@@ -15,11 +15,26 @@ const ProductsPage = () => {
     const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
     const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
 
+    // Load saved grid layout from localStorage on component mount
+    useEffect(() => {
+        const savedLayout = localStorage.getItem('products-grid-layout');
+        if (savedLayout && ['1', '3', '4'].includes(savedLayout)) {
+            setGridLayout(savedLayout as '1' | '3' | '4');
+        }
+    }, []);
+
+    // Save grid layout to localStorage when it changes
+    const handleGridLayoutChange = (layout: '1' | '3' | '4') => {
+        setGridLayout(layout);
+        localStorage.setItem('products-grid-layout', layout);
+    };
+
     // Filter states
     const [selectedYear, setSelectedYear] = useState('');
     const [selectedBrand, setSelectedBrand] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedSubcategory, setSelectedSubcategory] = useState('');
+    const [filtersExpanded, setFiltersExpanded] = useState(false);
 
     const filteredProducts = useMemo(() => {
         let filtered = [...products];
@@ -104,18 +119,18 @@ const ProductsPage = () => {
 
     const renderListItem = (product: any) => (
         <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md flex">
-            <div className="relative w-48 h-48 flex-shrink-0">
+            <div onClick={() => navigate(`/producto/${product.id}`)} className="cursor-pointer relative w-48 h-48 flex-shrink-0">
                 <img
                     src={product.image}
                     alt={product.name}
                     className="w-full h-full object-cover cursor-pointer"
-                    onClick={() => navigate(`/producto/${product.id}`)}
+
                 />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
             </div>
             <div className="flex-1 p-6 relative">
                 <p className="text-gray-500 text-sm mb-1">{product.category}</p>
-                <h3 className="font-semibold text-lg mb-2 text-gray-800">{product.name}</h3>
+                <h3 onClick={() => navigate(`/producto/${product.id}`)} className="cursor-pointer hover:underline font-semibold text-lg mb-2 text-gray-800">{product.name}</h3>
                 <div className="flex items-center mb-3">
                     <div className="flex text-yellow-400 mr-2">
                         {[...Array(5)].map((_, i) => (
@@ -132,11 +147,10 @@ const ProductsPage = () => {
                 <button
                     onClick={() => handleAddToCart(product)}
                     disabled={isInCart(product.id)}
-                    className={`absolute bottom-6 right-6 px-4 py-2 rounded transition-colors ${
-                        isInCart(product.id)
-                            ? 'bg-red-700 cursor-not-allowed opacity-75 text-white'
-                            : 'bg-red-600 hover:bg-red-700 cursor-pointer text-white'
-                    }`}
+                    className={`absolute bottom-6 right-6 px-4 py-2 rounded transition-colors ${isInCart(product.id)
+                        ? 'bg-red-700 cursor-not-allowed opacity-75 text-white'
+                        : 'bg-red-600 hover:bg-red-700 cursor-pointer text-white'
+                        }`}
                 >
                     {isInCart(product.id) ? 'Agregado' : 'Agregar al carrito'}
                 </button>
@@ -165,26 +179,61 @@ const ProductsPage = () => {
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <h1 className="text-4xl font-bold text-gray-800 text-center mb-8">NUESTROS PRODUCTOS</h1>
 
-                    <div className="flex flex-col lg:flex-row gap-8">
-                        {/* Sidebar with filters */}
-                        <div className="lg:w-80 flex-shrink-0 lg:sticky lg:top-8 lg:self-start lg:max-h-screen lg:overflow-y-auto">
-                            <ProductFilters
-                                selectedYear={selectedYear}
-                                selectedBrand={selectedBrand}
-                                selectedCategory={selectedCategory}
-                                selectedSubcategory={selectedSubcategory}
-                                onYearChange={setSelectedYear}
-                                onBrandChange={setSelectedBrand}
-                                onCategoryChange={setSelectedCategory}
-                                onSubcategoryChange={setSelectedSubcategory}
-                                onClearFilters={clearFilters}
-                            />
+                    {/* Filters Toggle Button - Only visible on mobile */}
+                    <div className="mb-6 lg:hidden">
+                        <button
+                            onClick={() => setFiltersExpanded(!filtersExpanded)}
+                            className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                        >
+                            <span className="font-medium text-gray-700">Filtros</span>
+                            {filtersExpanded ? <Minus size={20} /> : <Plus size={20} />}
+                        </button>
+                    </div>
+
+                    {/* Filters Section - Always visible on desktop, toggleable on mobile */}
+
+
+                    {/* Main content */}
+                    <div className="grid grid-cols-12 gap-4">
+                        
+                        <div className={'block md:hidden'}>
+                            <div className={`${filtersExpanded ? 'block' : 'hidden'} lg:block w-full mb-8`}>
+                                <ProductFilters
+                                    selectedYear={selectedYear}
+                                    selectedBrand={selectedBrand}
+                                    selectedCategory={selectedCategory}
+                                    selectedSubcategory={selectedSubcategory}
+                                    onYearChange={setSelectedYear}
+                                    onBrandChange={setSelectedBrand}
+                                    onCategoryChange={setSelectedCategory}
+                                    onSubcategoryChange={setSelectedSubcategory}
+                                    onClearFilters={clearFilters}
+                                />
+
+                            </div>
                         </div>
 
-                        {/* Main content */}
-                        <div className="flex-1">
-                            {/* Sorting and Grid Controls */}
-                            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+                        <div className={'hidden md:block col-span-4'}>
+                            <div className={`${filtersExpanded ? 'block' : 'hidden'} lg:block w-full mb-8`}>
+                                <ProductFilters
+                                    selectedYear={selectedYear}
+                                    selectedBrand={selectedBrand}
+                                    selectedCategory={selectedCategory}
+                                    selectedSubcategory={selectedSubcategory}
+                                    onYearChange={setSelectedYear}
+                                    onBrandChange={setSelectedBrand}
+                                    onCategoryChange={setSelectedCategory}
+                                    onSubcategoryChange={setSelectedSubcategory}
+                                    onClearFilters={clearFilters}
+                                />
+
+                            </div>
+                        </div>
+                        
+                        {/* Sorting and Grid Controls */}
+                        <div className="col-span-12 md:col-span-8">
+                            <div className='flex items-center justify-between mb-6 p-4'>
+
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm font-medium text-gray-700">Ordenar por:</span>
                                     <select
@@ -202,7 +251,7 @@ const ProductsPage = () => {
                                     <span className="text-sm font-medium text-gray-700">Vista:</span>
                                     <div className="flex gap-1">
                                         <button
-                                            onClick={() => setGridLayout('1')}
+                                            onClick={() => handleGridLayoutChange('1')}
                                             className={`px-3 py-1 border rounded-md text-sm transition-colors ${gridLayout === '1'
                                                 ? 'bg-red-500 text-white border-red-500'
                                                 : 'border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -211,7 +260,7 @@ const ProductsPage = () => {
                                             <List size={16} />
                                         </button>
                                         <button
-                                            onClick={() => setGridLayout('3')}
+                                            onClick={() => handleGridLayoutChange('3')}
                                             className={`px-3 py-1 border rounded-md text-sm transition-colors ${gridLayout === '3'
                                                 ? 'bg-red-500 text-white border-red-500'
                                                 : 'border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -220,7 +269,7 @@ const ProductsPage = () => {
                                             <Grid2X2 size={16} />
                                         </button>
                                         <button
-                                            onClick={() => setGridLayout('4')}
+                                            onClick={() => handleGridLayoutChange('4')}
                                             className={`px-3 py-1 border rounded-md text-sm transition-colors ${gridLayout === '4'
                                                 ? 'bg-red-500 text-white border-red-500'
                                                 : 'border-gray-300 text-gray-700 hover:bg-gray-50'

@@ -17,7 +17,7 @@ const CartModal = () => {
       />
 
       {/* Modal */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-[40%] bg-white shadow-xl flex flex-col">
+      <div className="fixed right-0 top-0 h-full w-full max-w-[80%] lg:max-w-[40%] bg-white shadow-xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-800">Carrito de Compras</h2>
