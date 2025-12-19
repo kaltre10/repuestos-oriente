@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { List, Grid2X2, Grid3X3, Star } from 'lucide-react';
 import { products } from '../data/products';
@@ -10,6 +10,20 @@ const BestSellers = () => {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
   const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
+
+  // Load saved grid layout from localStorage on component mount
+  useEffect(() => {
+    const savedLayout = localStorage.getItem('bestsellers-grid-layout');
+    if (savedLayout && ['1', '3', '4'].includes(savedLayout)) {
+      setGridLayout(savedLayout as '1' | '3' | '4');
+    }
+  }, []);
+
+  // Save grid layout to localStorage when it changes
+  const handleGridLayoutChange = (layout: '1' | '3' | '4') => {
+    setGridLayout(layout);
+    localStorage.setItem('bestsellers-grid-layout', layout);
+  };
 
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
@@ -67,7 +81,7 @@ const BestSellers = () => {
       </div>
       <div className="flex-1 p-6 relative">
         <p className="text-gray-500 text-sm mb-1">{product.category}</p>
-        <h3 onClick={() => alert()} className="hover:underline cursor-pointer font-semibold text-lg mb-2 text-gray-800">{product.name}</h3>
+        <h3 onClick={() => navigate(`/producto/${product.id}`)} className="hover:underline cursor-pointer font-semibold text-lg mb-2 text-gray-800">{product.name}</h3>
         <div className="flex items-center mb-3">
           <div className="flex text-yellow-400 mr-2">
             {[...Array(5)].map((_, i) => (
@@ -107,7 +121,7 @@ const BestSellers = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'popular' | 'price-low' | 'price-high')}
-              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="px-3 cursor-pointer py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
             >
               <option value="popular">Más popular</option>
               <option value="price-low">Precio menor</option>
@@ -119,8 +133,8 @@ const BestSellers = () => {
             <span className="text-sm font-medium text-gray-700">Vista:</span>
             <div className="flex gap-1">
               <button
-                onClick={() => setGridLayout('1')}
-                className={`px-3 py-1 border rounded-md text-sm transition-colors ${gridLayout === '1'
+                onClick={() => handleGridLayoutChange('1')}
+                className={`cursor-pointer px-3 py-1 border rounded-md text-sm transition-colors ${gridLayout === '1'
                     ? 'bg-red-500 text-white border-red-500'
                     : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                   }`}
@@ -128,8 +142,8 @@ const BestSellers = () => {
                 <List size={16} />
               </button>
               <button
-                onClick={() => setGridLayout('3')}
-                className={`px-3 py-1 border rounded-md text-sm transition-colors ${gridLayout === '3'
+                onClick={() => handleGridLayoutChange('3')}
+                className={`cursor-pointer px-3 py-1 border rounded-md text-sm transition-colors ${gridLayout === '3'
                     ? 'bg-red-500 text-white border-red-500'
                     : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                   }`}
@@ -137,8 +151,8 @@ const BestSellers = () => {
                 <Grid2X2 size={16} />
               </button>
               <button
-                onClick={() => setGridLayout('4')}
-                className={`px-3 py-1 border rounded-md text-sm transition-colors ${gridLayout === '4'
+                onClick={() => handleGridLayoutChange('4')}
+                className={`cursor-pointer px-3 py-1 border rounded-md text-sm transition-colors ${gridLayout === '4'
                     ? 'bg-red-500 text-white border-red-500'
                     : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                   }`}

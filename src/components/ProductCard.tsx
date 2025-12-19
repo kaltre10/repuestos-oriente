@@ -41,11 +41,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           alt={product.name}
           className="w-full h-56 object-cover cursor-pointer"
         />
-        <div onClick={handleImageClick} className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
+        <div onClick={handleImageClick} className="cursor-pointer absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
       </div>
       <div className="p-4">
         <p className="text-gray-500 text-sm">{product.category}</p>
-        <h3 className="font-semibold mt-1 truncate text-gray-800">{product.name}</h3>
+        <h3 onClick={handleImageClick} className="hover:underline cursor-pointer font-semibold mt-1 truncate text-gray-800">{product.name}</h3>
         <div className="flex items-center mt-2">
           <div className="flex text-yellow-400">
             {[...Array(5)].map((_, i) => (
