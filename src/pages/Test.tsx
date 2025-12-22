@@ -1,12 +1,12 @@
 import Header from "../components/Header"
-import HomeButtonInfo from "../components/homeButtonInfo"
+import HomeButtonInfo from "../components/HomeButtonInfo"
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import slides from '../utils/slides.json'
-
+//manueltest123456
 const Test = () => {
     return (<>
         <div className="h-screen flex flex-col">

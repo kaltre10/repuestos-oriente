@@ -4,7 +4,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import slides from '../utils/slides.json'
-import HomeButtonInfo from './homeButtonInfo';
+import HomeButtonInfo from './HomeButtonInfo';
 
 const Hero = () => {
   return (
