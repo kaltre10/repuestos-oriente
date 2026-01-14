@@ -29,8 +29,9 @@ const Header = () => {
       </div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-3">
-          <div className="text-3xl font-bold text-gray-800">
-            <span className="text-red-500">REPUESTOS</span>ORIENTE
+          <div className="text-3xl font-bold text-gray-800 flex items-center">
+            <img className='logo' src="./logo.png" alt="" />
+            <span className="text-red-500">REPUESTOS</span>PICHA
           </div>
           <div className="hidden lg:flex flex-1 mx-8 max-w-3xl">
             <div className="relative w-full">
