@@ -58,45 +58,49 @@ const AuthPage = () => {
     setError('');
 
     try {
-      // Initialize Google Sign-In
       if (!window.google) {
-        throw new Error('Google Sign-In not loaded');
+        setLoading(false);
+        setError('Google Sign-In not loaded');
+        return;
       }
 
-      const handleCredentialsResponse = async (response: { credential?: string; error?: string }) => {
-        if (response.error) throw new Error('Google authentication failed');
-        
-        const res = await fetch('http://localhost:3001/api/v1/auth/google', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ token: response.credential }),
-        })
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.message || 'Authentication failed');
-        }
-
-        console.log(data);
-
-        // Store user data and token
-        localStorage.setItem('token', data.token);
-        setUser(data.user);
-        navigate('/');
-      };
-
-      // Initialize Google Identity Services for authentication
       window.google.accounts.id.initialize({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        callback: handleCredentialsResponse,
         use_fedcm_for_prompt: true,
+        callback: async (response) => {
+          try {
+            if (response.error) throw new Error('Google authentication failed');
+
+            const res = await fetch('http://localhost:3001/api/v1/auth/google', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ token: response.credential }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+              throw new Error(data.message || 'Authentication failed');
+            }
+
+            localStorage.setItem('token', data.token);
+            setUser(data.user);
+            navigate('/');
+          } catch (err) {
+            setError(err instanceof Error ? err.message : 'Authentication failed');
+          } finally {
+            setLoading(false);
+          }
+        },
       });
 
-      // Prompt the user to sign in
-      window.google.accounts.id.prompt();
+      window.google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          setLoading(false);
+        }
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Google authentication failed');
       setLoading(false);
