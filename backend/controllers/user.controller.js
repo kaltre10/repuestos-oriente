@@ -19,6 +19,7 @@ const googleAuth = asyncHandler(async (req, res) => {
   }
 
   const user = await userService.authenticateWithGoogle(token);
+  const jwtToken = userService.generateToken(user);
 
   responser.success({
     res,
@@ -30,6 +31,7 @@ const googleAuth = asyncHandler(async (req, res) => {
         name: user.name,
         profilePicture: user.profilePicture,
       },
+      token: jwtToken,
     },
   });
 });
@@ -101,8 +103,70 @@ const deleteUser = asyncHandler(async (req, res) => {
   });
 });
 
+// Login with email and password
+const login = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return responser.error({
+      res,
+      message: 'Email and password are required',
+      status: 400,
+    });
+  }
+
+  const user = await userService.login(email, password);
+  const token = userService.generateToken(user);
+
+  responser.success({
+    res,
+    message: 'Login successful',
+    body: {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        profilePicture: user.profilePicture,
+      },
+      token,
+    },
+  });
+});
+
+// Register with email and password
+const register = asyncHandler(async (req, res) => {
+  const { email, password, name } = req.body;
+
+  if (!email || !password || !name) {
+    return responser.error({
+      res,
+      message: 'Email, password, and name are required',
+      status: 400,
+    });
+  }
+
+  const user = await userService.register(email, password, name);
+  const token = userService.generateToken(user);
+
+  responser.success({
+    res,
+    message: 'Registration successful',
+    body: {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        profilePicture: user.profilePicture,
+      },
+      token,
+    },
+  });
+});
+
 export {
   googleAuth,
+  login,
+  register,
   getUser,
   updateUser,
   deleteUser,

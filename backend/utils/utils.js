@@ -10,7 +10,7 @@ export const startServer = async (app) => {
     try {
         await connectDB();
 
-        await sequelize.sync({ alter: true });
+        await sequelize.sync();
 
         const PORT = process.env.PORT || 3001;
         

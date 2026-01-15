@@ -46,9 +46,9 @@ const Header = () => {
 
           {/* Icons */}
           <div className="hidden lg:flex items-center space-x-6">
-            <a href="#" className="hover:text-red-500 transition-colors">
+            <Link to="/auth" className="hover:text-red-500 transition-colors">
               <User size={24} />
-            </a>
+            </Link>
             <button onClick={toggleCart} className="relative hover:text-red-500 transition-colors">
               <ShoppingCart size={24} />
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -104,9 +104,9 @@ const Header = () => {
               <Link to="/ofertas" className="hover:text-red-500 transition-colors">OFERTAS</Link>
             </nav>
             <div className="flex justify-center items-center space-x-8 mt-8">
-              <a href="#" className="hover:text-red-500 transition-colors">
+              <Link to="/auth" className="hover:text-red-500 transition-colors">
                 <User size={24} />
-              </a>
+              </Link>
               <button onClick={toggleCart} className="relative hover:text-red-500 transition-colors">
                 <ShoppingCart size={24} />
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">

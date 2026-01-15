@@ -1,5 +1,5 @@
 import express from 'express';
-import { googleAuth, getUser, updateUser, deleteUser, getUsers } from '../controllers/user.controller.js';
+import { googleAuth, login, register, getUser, updateUser, deleteUser, getUsers } from '../controllers/user.controller.js';
 import responser from '../controllers/responser.js';
 
 const router = express.Router();
@@ -9,6 +9,8 @@ router.get('/', (_req, res) => {
 });
 
 router.post('/auth/google', googleAuth);
+router.post('/auth/login', login);
+router.post('/auth/register', register);
 
 router.get('/users', getUsers);
 

@@ -1,4 +1,6 @@
 import { OAuth2Client } from 'google-auth-library';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import models from '../models/index.js';
 const { User } = models;
 
@@ -108,6 +110,62 @@ class UserService {
     } catch (error) {
       throw new Error(`Failed to delete user: ${error.message}`);
     }
+  }
+
+  // Register user with email and password
+  async register(email, password, name) {
+    try {
+      // Check if user already exists
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        throw new Error('User already exists with this email');
+      }
+
+      // Hash password
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+      // Create user
+      const user = await User.create({
+        email,
+        password: hashedPassword,
+        name,
+      });
+
+      return user;
+    } catch (error) {
+      throw new Error(`Registration failed: ${error.message}`);
+    }
+  }
+
+  // Login user with email and password
+  async login(email, password) {
+    try {
+      // Find user by email
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        throw new Error('Invalid email or password');
+      }
+
+      // Check password
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        throw new Error('Invalid email or password');
+      }
+
+      return user;
+    } catch (error) {
+      throw new Error(`Login failed: ${error.message}`);
+    }
+  }
+
+  // Generate JWT token
+  generateToken(user) {
+    return jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '7d' }
+    );
   }
 }
 

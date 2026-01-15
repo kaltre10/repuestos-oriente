@@ -1,5 +1,11 @@
 import { Sequelize } from 'sequelize';
 import User from './User.js';
+import Brand from './Brand.js';
+import Category from './Category.js';
+import Model from './Model.js';
+import Product from './Product.js';
+import Config from './Config.js';
+import Sale from './Sale.js';
 
 import 'dotenv/config';
 
@@ -25,7 +31,24 @@ const sequelize = new Sequelize(
 // Initialize models
 const models = {
   User: User(sequelize),
+  Brand: Brand(sequelize),
+  Category: Category(sequelize),
+  Model: Model(sequelize),
+  Product: Product(sequelize),
+  Config: Config(sequelize),
+  Sale: Sale(sequelize),
 };
+
+// Define associations
+models.Sale.belongsTo(models.Product, {
+  foreignKey: 'productId',
+  as: 'product'
+});
+
+models.Product.hasMany(models.Sale, {
+  foreignKey: 'productId',
+  as: 'sales'
+});
 
 // Define associations if any
 Object.keys(models).forEach((modelName) => {

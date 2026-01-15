@@ -15,9 +15,17 @@ interface CartItem extends Product {
   quantity: number;
 }
 
+interface User {
+  id: number;
+  email: string;
+  name: string;
+  profilePicture?: string;
+}
+
 interface StoreState {
   cart: CartItem[];
   isCartOpen: boolean;
+  user: User | null;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: number) => void;
   incrementQuantity: (productId: number) => void;
@@ -25,11 +33,14 @@ interface StoreState {
   toggleCart: () => void;
   getCartTotal: () => number;
   getCartCount: () => number;
+  setUser: (user: User | null) => void;
+  logout: () => void;
 }
 
 const useStore = create<StoreState>((set, get) => ({
   cart: [],
   isCartOpen: false,
+  user: null,
   addToCart: (product) => set((state) => {
     const existingItem = state.cart.find(item => item.id === product.id);
     if (existingItem) {
@@ -71,6 +82,11 @@ const useStore = create<StoreState>((set, get) => ({
   getCartCount: () => {
     const { cart } = get();
     return cart.reduce((count, item) => count + item.quantity, 0);
+  },
+  setUser: (user) => set({ user }),
+  logout: () => {
+    localStorage.removeItem('token');
+    set({ user: null });
   },
 }))
 
