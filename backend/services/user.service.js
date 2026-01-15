@@ -112,8 +112,36 @@ class UserService {
     }
   }
 
+  // Create user (admin)
+  async createUser({ email, password, name, phone, address }) {
+    try {
+      // Check if user already exists
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        throw new Error('User already exists with this email');
+      }
+
+      // Hash password
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+      // Create user
+      const user = await User.create({
+        email,
+        password: hashedPassword,
+        name,
+        phone,
+        address,
+      });
+
+      return user;
+    } catch (error) {
+      throw new Error(`User creation failed: ${error.message}`);
+    }
+  }
+
   // Register user with email and password
-  async register(email, password, name) {
+  async register({email, password, name}) {
     try {
       // Check if user already exists
       const existingUser = await User.findOne({ where: { email } });

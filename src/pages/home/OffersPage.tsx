@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
 import { List, Grid2X2, Grid3X3, Tag } from 'lucide-react';
-import { products } from '../data/products';
-import ProductCard from '../components/ProductCard';
-import Header from '../components/Header';
-import CartModal from '../components/CartModal';
-import Footer from '../components/Footer';
+import { products } from '../../data/products';
+import ProductCard from '../../components/ProductCard';
+import Header from '../../components/Header';
+import CartModal from '../../components/CartModal';
+import Footer from '../../components/Footer';
 
 // Simulated offers data - in a real app this would come from an API
 const offersData = products.slice(0, 8).map(product => ({
@@ -55,7 +55,6 @@ const OffersPage = () => {
 
   return (
     <>
-      <Header />
       <CartModal />
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -148,7 +147,6 @@ const OffersPage = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useStore from '../states/global';
+import request from '../utils/request';
+import { apiUrl } from '../utils/utils';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,8 +13,29 @@ const AuthPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [rememberCredentials, setRememberCredentials] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useStore();
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('savedEmail');
+    const savedPassword = localStorage.getItem('savedPassword');
+    const savedRememberCredentials = localStorage.getItem('rememberCredentials') === 'true';
+
+    setRememberCredentials(savedRememberCredentials);
+
+    if (savedRememberCredentials && savedEmail && savedPassword) {
+      setFormData(prev => ({
+        ...prev,
+        email: savedEmail,
+        password: savedPassword,
+      }));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('rememberCredentials', rememberCredentials.toString());
+  }, [rememberCredentials]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -26,26 +49,29 @@ const AuthPage = () => {
     setLoading(true);
     setError('');
 
+    // Save credentials to localStorage if remember is checked
+    if (rememberCredentials) {
+      localStorage.setItem('savedEmail', formData.email);
+      localStorage.setItem('savedPassword', formData.password);
+    } else {
+      localStorage.removeItem('savedEmail');
+      localStorage.removeItem('savedPassword');
+    }
+
     try {
-      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-      const response = await fetch(`http://localhost:3001/api/v1${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const endpoint = isLogin ? '/auth/login' : '/auth/register';
+      const response = await request.post(`${apiUrl}${endpoint}`, formData);
 
-      const data = await response.json();
+      const data = await response.data;
 
-      if (!response.ok) {
+      if (!response) {
         throw new Error(data.message || 'Authentication failed');
       }
 
       // Store user data and token
-          localStorage.setItem('token', data.token);
-          setUser(data.user);
-          navigate('/clients');
+      localStorage.setItem('token', data.token);
+      setUser(data.user);
+      navigate('/clients');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -54,62 +80,58 @@ const AuthPage = () => {
   };
 
   const handleGoogleAuth = async () => {
-  setLoading(true);
-  setError('');
+    setLoading(true);
+    setError('');
 
-  try {
-    if (!window.google) {
-      setLoading(false);
-      setError('Google Sign-In not loaded');
-      return;
-    }
+    try {
+      if (!window.google) {
+        setLoading(false);
+        setError('Google Sign-In not loaded');
+        return;
+      }
 
-    window.google.accounts.id.initialize({
-      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-      // 1. Confirmamos el uso de FedCM explícitamente
-      use_fedcm_for_prompt: true, 
-      callback: async (response) => {
-        try {
-          if (response.error) throw new Error('Google authentication failed');
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        // 1. Confirmamos el uso de FedCM explícitamente
+        use_fedcm_for_prompt: true,
+        callback: async (response) => {
+          try {
+            if (response.error) throw new Error('Google authentication failed');
 
-          const res = await fetch('http://localhost:3001/api/v1/auth/google', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ token: response.credential }),
-          });
+            const res = await request.post(`${apiUrl}/auth/google`,
+              JSON.stringify({ token: response.credential }),
+            );
 
-          const data = await res.json();
+            const data = await res.data;
 
-          if (!res.ok) {
-            throw new Error(data.message || 'Authentication failed');
+            if (!res) {
+              throw new Error(data.message || 'Authentication failed');
+            }
+
+            localStorage.setItem('token', data.token);
+            setUser(data.user);
+            navigate('/clients');
+          } catch (err) {
+            setError(err instanceof Error ? err.message : 'Authentication failed');
+          } finally {
+            setLoading(false);
           }
+        },
+      });
 
-          localStorage.setItem('token', data.token);
-          setUser(data.user);
-          navigate('/clients');
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'Authentication failed');
-        } finally {
+      // 2. Google recomienda no depender demasiado de los callbacks de notificación 
+      // en FedCM, pero puedes mantenerlo así para el loading:
+      window.google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
           setLoading(false);
         }
-      },
-    });
+      });
 
-    // 2. Google recomienda no depender demasiado de los callbacks de notificación 
-    // en FedCM, pero puedes mantenerlo así para el loading:
-    window.google.accounts.id.prompt((notification) => {
-      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        setLoading(false);
-      }
-    });
-
-  } catch (err) {
-    setError(err instanceof Error ? err.message : 'Google authentication failed');
-    setLoading(false);
-  }
-};
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Google authentication failed');
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -178,6 +200,20 @@ const AuthPage = () => {
                   placeholder="Tu contraseña"
                 />
               </div>
+            </div>
+
+            <div className="flex items-center">
+              <input
+                id="remember-credentials"
+                name="remember-credentials"
+                type="checkbox"
+                checked={rememberCredentials}
+                onChange={(e) => setRememberCredentials(e.target.checked)}
+                className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+              />
+              <label htmlFor="remember-credentials" className="ml-2 block text-sm text-gray-900">
+                Recordar credenciales
+              </label>
             </div>
 
             {error && (

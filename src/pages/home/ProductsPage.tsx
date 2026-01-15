@@ -2,13 +2,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { List, Grid2X2, Grid3X3, Star, Plus, Minus } from 'lucide-react';
-import { products } from '../data/products';
-import ProductCard from '../components/ProductCard';
-import ProductFilters from '../components/ProductFilters';
-import Header from '../components/Header';
-import CartModal from '../components/CartModal';
-import Footer from '../components/Footer';
-import useStore from '../states/global';
+import { products } from '../../data/products';
+import ProductCard from '../../components/ProductCard';
+import ProductFilters from '../../components/ProductFilters';
+import Header from '../../components/Header';
+import CartModal from '../../components/CartModal';
+import Footer from '../../components/Footer';
+import useStore from '../../states/global';
 
 const ProductsPage = () => {
     const navigate = useNavigate();
@@ -173,7 +173,6 @@ const ProductsPage = () => {
 
     return (
         <>
-            <Header />
             <CartModal />
             <div className="min-h-screen bg-gray-50">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -314,7 +313,6 @@ const ProductsPage = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
         </>
     );
 };

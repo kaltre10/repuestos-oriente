@@ -8,6 +8,7 @@ const asyncHandler = (fn) => (req, res, next) => {
 
 const getProducts = asyncHandler(async (req, res) => {
   const products = await productService.getAllProducts();
+  console.log('Fetching all products');
   responser.success({
     res,
     body: { products },

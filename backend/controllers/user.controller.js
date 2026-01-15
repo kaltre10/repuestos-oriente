@@ -44,6 +44,38 @@ const getUsers = asyncHandler(async (req, res) => {
   });
 });
 
+// Create new user (admin)
+const createUser = asyncHandler(async (req, res) => {
+  const { email, password, name, phone, address } = req.body;
+
+  if (!email || !password || !name) {
+    return responser.error({
+      res,
+      message: 'Email, password, and name are required',
+      status: 400,
+    });
+  }
+
+  const user = await userService.createUser({ email, password, name, phone, address });
+
+  responser.success({
+    res,
+    message: 'User created successfully',
+    body: {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        phone: user.phone,
+        address: user.address,
+        profilePicture: user.profilePicture,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+    },
+  });
+});
+
 // Get user by ID
 const getUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -137,6 +169,8 @@ const login = asyncHandler(async (req, res) => {
 const register = asyncHandler(async (req, res) => {
   const { email, password, name } = req.body;
 
+  console.log(req.body);
+
   if (!email || !password || !name) {
     return responser.error({
       res,
@@ -145,7 +179,7 @@ const register = asyncHandler(async (req, res) => {
     });
   }
 
-  const user = await userService.register(email, password, name);
+  const user = await userService.register({email, password, name});
   const token = userService.generateToken(user);
 
   responser.success({
@@ -170,5 +204,6 @@ export {
   getUser,
   updateUser,
   deleteUser,
-  getUsers
+  getUsers,
+  createUser
 };

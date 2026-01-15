@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CopyBtn from '../components/CopyBtn';
-import useStore from '../states/global';
-import Header from '../components/Header';
+import CopyBtn from '../../components/CopyBtn';
+import useStore from '../../states/global';
+import Header from '../../components/Header';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -47,7 +47,6 @@ const CheckoutPage = () => {
   }
 
   return (<>
-    <Header />
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-gray-800 mb-8">Checkout</h1>

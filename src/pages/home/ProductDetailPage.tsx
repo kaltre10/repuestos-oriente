@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, ArrowLeft, ShoppingCart, Heart, Share2 } from 'lucide-react';
-import { products } from '../data/products';
-import Header from '../components/Header';
-import CartModal from '../components/CartModal';
-import Footer from '../components/Footer';
-import useStore from '../states/global';
+import { products } from '../../data/products';
+import Header from '../../components/Header';
+import CartModal from '../../components/CartModal';
+import Footer from '../../components/Footer';
+import useStore from '../../states/global';
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -50,7 +50,6 @@ const ProductDetailPage = () => {
 
   return (
     <>
-      <Header />
       <CartModal />
 
       <div className="min-h-screen bg-gray-50">
@@ -242,7 +241,6 @@ const ProductDetailPage = () => {
         </div>
       </div>
 
-      <Footer />
     </>
   );
 };

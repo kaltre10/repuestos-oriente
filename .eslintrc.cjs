@@ -9,6 +9,7 @@ module.exports = {
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
   plugins: ['react-refresh'],
+  '@typescript-eslint/no-explicit-any': 'off',
   rules: {
     'react-refresh/only-export-components': [
       'warn',
@@ -16,3 +17,4 @@ module.exports = {
     ],
   },
 }
+    
