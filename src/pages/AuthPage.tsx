@@ -43,9 +43,9 @@ const AuthPage = () => {
       }
 
       // Store user data and token
-      localStorage.setItem('token', data.token);
-      setUser(data.user);
-      navigate('/');
+          localStorage.setItem('token', data.token);
+          setUser(data.user);
+          navigate('/clients');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -88,7 +88,7 @@ const AuthPage = () => {
 
           localStorage.setItem('token', data.token);
           setUser(data.user);
-          navigate('/');
+          navigate('/clients');
         } catch (err) {
           setError(err instanceof Error ? err.message : 'Authentication failed');
         } finally {

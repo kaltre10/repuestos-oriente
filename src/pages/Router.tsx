@@ -6,6 +6,7 @@ import ProductsPage from "./ProductsPage"
 import OffersPage from "./OffersPage"
 import ProductDetailPage from "./ProductDetailPage"
 import AuthPage from "./AuthPage"
+import ClientsPage from "./ClientsPage"
 
 const Router = () => {
     return <Routes>
@@ -14,6 +15,7 @@ const Router = () => {
         <Route path="/producto/:id" element={<ProductDetailPage />} />
         <Route path="/ofertas" element={<OffersPage />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/clients" element={<ClientsPage />} />
         <Route path="/test" element={<Test />} />
         <Route path="/checkout" element={<CheckoutPage />} />
     </Routes>
