@@ -80,6 +80,8 @@ const AuthPage = () => {
           throw new Error(data.message || 'Authentication failed');
         }
 
+        console.log(data);
+
         // Store user data and token
         localStorage.setItem('token', data.token);
         setUser(data.user);
