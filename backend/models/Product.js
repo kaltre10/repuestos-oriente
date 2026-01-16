@@ -15,6 +15,18 @@ export default (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    model: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    brandId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    modelId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     productBrand: {
       type: DataTypes.STRING,
       allowNull: false,

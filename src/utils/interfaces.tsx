@@ -21,6 +21,9 @@ export interface Product {
   id: number;
   name: string;
   brand: string;
+  model?: string;
+  brandId?: number;
+  modelId?: number;
   productBrand: string;
   categories: string;
   years: string;
@@ -36,7 +39,10 @@ export interface Product {
 
 export interface ProductFormData {
   name: string;
+  brandId: string;
+  modelId: string;
   brand: string;
+  model: string;
   productBrand: string;
   categories: string;
   years: string;
@@ -50,8 +56,6 @@ export interface ProductFormData {
 
 export interface ProductStoreState {
   // Data state
-  products: Product[];
-  loading: boolean;
   error: string | null;
 
   // Form and modal state
@@ -60,14 +64,15 @@ export interface ProductStoreState {
   formData: ProductFormData;
   formLoading: boolean;
   formError: string | null;
-
+  fieldErrors: Record<string, string>;
+  products: Product[];
   // State setters
   setProducts: (products: Product[]) => void;
-  setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setEditingProduct: (product: Product | null) => void;
   setShowForm: (show: boolean) => void;
   setFormData: (data: ProductFormData) => void;
   setFormLoading: (loading: boolean) => void;
   setFormError: (error: string | null) => void;
+  setFieldErrors: (errors: Record<string, string>) => void;
 }

@@ -24,17 +24,17 @@ const getModel = asyncHandler(async (req, res) => {
 });
 
 const createModel = asyncHandler(async (req, res) => {
-  const { model } = req.body;
+  const { model, brandId } = req.body;
 
-  if (!model) {
+  if (!model || !brandId) {
     return responser.error({
       res,
-      message: 'Model name is required',
+      message: 'Model name and brandId are required',
       status: 400,
     });
   }
 
-  const newModel = await modelService.createModel({ model });
+  const newModel = await modelService.createModel({ model, brandId });
   responser.success({
     res,
     message: 'Model created successfully',
@@ -44,17 +44,17 @@ const createModel = asyncHandler(async (req, res) => {
 
 const updateModel = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { model } = req.body;
+  const { model, brandId } = req.body;
 
-  if (!model) {
+  if (!model || !brandId) {
     return responser.error({
       res,
-      message: 'Model name is required',
+      message: 'Model name and brandId are required',
       status: 400,
     });
   }
 
-  const updatedModel = await modelService.updateModel(id, { model });
+  const updatedModel = await modelService.updateModel(id, { model, brandId });
   responser.success({
     res,
     message: 'Model updated successfully',

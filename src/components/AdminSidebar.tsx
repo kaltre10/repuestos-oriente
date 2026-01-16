@@ -1,16 +1,23 @@
 import { Link, useLocation } from 'react-router-dom';
-import { FaUsers, FaBox, FaChartLine, FaCog } from 'react-icons/fa';
+import { FaUsers, FaBox, FaChartLine, FaCog, FaDollarSign } from 'react-icons/fa';
+import { useDollarRate } from '../hooks/useDollarRate';
 
 const AdminSidebar = () => {
   const location = useLocation();
+  const { dollarRate } = useDollarRate();
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
   return (
-    <div className="w-64 bg-black shadow-lg">
-      <div className="p-6 text-center">
-        <h1 className="font-bold text-gray-200">Administrativo</h1>
+    <div className="w-64 bg-black shadow-lg h-screen overflow-y-auto">
+      <div className="p-6 text-center border-b border-gray-800">
+        <h1 className="font-bold text-gray-200 text-xl mb-2">Administrativo</h1>
+        <div className="flex items-center justify-center text-green-500 bg-green-500/10 py-2 px-3 rounded-lg border border-green-500/20">
+          <FaDollarSign className="mr-1 text-xs" />
+          <span className="text-xs font-medium uppercase mr-1">Tasa del día:</span>
+          <span className="text-sm font-bold">Bs. {dollarRate}</span>
+        </div>
       </div>
       <nav className="mt-6">
         <Link

@@ -17,27 +17,38 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const { setUser } = useStore();
 
-  useEffect(() => {
-    const savedEmail = localStorage.getItem('savedEmail');
-    const savedPassword = localStorage.getItem('savedPassword');
-    const savedRememberCredentials = localStorage.getItem('rememberCredentials') === 'true';
-
-    setRememberCredentials(savedRememberCredentials);
-
-    if (savedRememberCredentials && savedEmail && savedPassword) {
-      setFormData(prev => ({
-        ...prev,
-        email: savedEmail,
-        password: savedPassword,
-      }));
+  const handleRemember = (state: boolean) => {
+    setRememberCredentials(state)
+    if (state) {
+      localStorage.setItem('savedEmail', formData.email)
+      localStorage.setItem('savedPassword', formData.password)
+    } else {
+      localStorage.removeItem('savedEmail')
+      localStorage.removeItem('savedPassword')
     }
+    localStorage.setItem('remember', String(state))
+  }
+
+  useEffect(() => {
+
+    const remember = localStorage.getItem('remember') || 'false';
+    const r = remember === 'true' ? true : false
+
+    if (r) {
+      const savedEmail = localStorage.getItem('savedEmail');
+      const savedPassword = localStorage.getItem('savedPassword');
+      if (savedEmail) setFormData(prev => ({ ...prev, email: savedEmail }));
+      if (savedPassword) setFormData(prev => ({ ...prev, password: savedPassword }));
+    }
+    setRememberCredentials(r)
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('rememberCredentials', rememberCredentials.toString());
-  }, [rememberCredentials]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.name === 'email' && rememberCredentials) {
+      localStorage.setItem('savedEmail', e.target.value)
+    } else if (e.target.name === 'password' && rememberCredentials) {
+      localStorage.setItem('savedPassword', e.target.value)
+    }
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -208,7 +219,7 @@ const AuthPage = () => {
                 name="remember-credentials"
                 type="checkbox"
                 checked={rememberCredentials}
-                onChange={(e) => setRememberCredentials(e.target.checked)}
+                onChange={(e) => handleRemember(e.target.checked)}
                 className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
               />
               <label htmlFor="remember-credentials" className="ml-2 block text-sm text-gray-900">
@@ -233,7 +244,7 @@ const AuthPage = () => {
             </div>
           </form>
 
-          <div className="mt-6">
+          {/*  <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300" />
@@ -258,7 +269,7 @@ const AuthPage = () => {
                 Continuar con Google
               </button>
             </div>
-          </div>
+          </div> */}
 
           <div className="mt-6 text-center">
             <button

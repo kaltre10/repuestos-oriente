@@ -1,14 +1,19 @@
 import models from '../models/index.js';
-const { Model } = models;
+const { Model, Brand } = models;
 
 class ModelService {
 
   async getAllModels() {
     try {
-      const models = await Model.findAll({
+      const allModels = await Model.findAll({
+        include: [{
+          model: Brand,
+          as: 'brand',
+          attributes: ['brand']
+        }],
         order: [['createdAt', 'DESC']]
       });
-      return models;
+      return allModels;
     } catch (error) {
       throw new Error(`Failed to get models: ${error.message}`);
     }
@@ -16,7 +21,13 @@ class ModelService {
 
   async getModelById(id) {
     try {
-      const model = await Model.findByPk(id);
+      const model = await Model.findByPk(id, {
+        include: [{
+          model: Brand,
+          as: 'brand',
+          attributes: ['brand']
+        }]
+      });
       if (!model) {
         throw new Error('Model not found');
       }
@@ -29,7 +40,14 @@ class ModelService {
   async createModel(modelData) {
     try {
       const model = await Model.create(modelData);
-      return model;
+      const createdModel = await Model.findByPk(model.id, {
+        include: [{
+          model: Brand,
+          as: 'brand',
+          attributes: ['brand']
+        }]
+      });
+      return createdModel;
     } catch (error) {
       throw new Error(`Failed to create model: ${error.message}`);
     }
@@ -43,7 +61,15 @@ class ModelService {
       }
 
       await model.update(updateData);
-      return model;
+      
+      const updatedModel = await Model.findByPk(id, {
+        include: [{
+          model: Brand,
+          as: 'brand',
+          attributes: ['brand']
+        }]
+      });
+      return updatedModel;
     } catch (error) {
       throw new Error(`Failed to update model: ${error.message}`);
     }

@@ -11,6 +11,10 @@ export default (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    brandId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
@@ -23,6 +27,13 @@ export default (sequelize) => {
     tableName: 'models',
     timestamps: true,
   });
+
+  Model.associate = (models) => {
+    Model.belongsTo(models.Brand, {
+      foreignKey: 'brandId',
+      as: 'brand',
+    });
+  };
 
   return Model;
 };

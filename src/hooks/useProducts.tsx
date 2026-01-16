@@ -7,15 +7,20 @@ import useProductStore from '../states/useProductStore';
 export const useProducts = () => {
 
   const [loading, setLoading] = useState(false)
-  const [products, setProducts] = useState([])
 
   const {
+    products, setProducts,
     setShowForm, setFormError,
     setFormLoading, editingProduct,
     error, showForm,
-    formLoading, formError,
-    formData, setEditingProduct,
-    setFormData, setError
+    formLoading,
+    formError,
+    fieldErrors,
+    formData,
+    setEditingProduct,
+    setFormData,
+    setError,
+    setFieldErrors,
   } = useProductStore();
 
 
@@ -23,9 +28,9 @@ export const useProducts = () => {
     try {
       setLoading(true)
       const response = await request.get(`${apiUrl}/products`)
-      const products = response.data.body.products
-      setProducts(products)
-      console.log("obteniendo productos: ,", products)
+      const fetchedProducts = response.data.body.products
+      setProducts(fetchedProducts)
+      console.log("obteniendo productos: ,", fetchedProducts)
 
     } catch (error) {
       console.log(error)
@@ -88,7 +93,10 @@ export const useProducts = () => {
     setEditingProduct(product);
     setFormData({
       name: product.name,
+      brandId: (product as any).brandId?.toString() || '',
+      modelId: (product as any).modelId?.toString() || '',
       brand: product.brand,
+      model: (product as any).model || '',
       productBrand: product.productBrand,
       categories: product.categories,
       years: product.years,
@@ -108,7 +116,10 @@ export const useProducts = () => {
     setFormError(null);
     setFormData({
       name: '',
+      brandId: '',
+      modelId: '',
       brand: '',
+      model: '',
       productBrand: '',
       categories: '',
       years: '',
@@ -125,15 +136,69 @@ export const useProducts = () => {
     e.preventDefault();
     setFormLoading(true);
     setFormError(null);
+    setFieldErrors({});
+
+    // Frontend Validation
+    const requiredFields = {
+      name: 'Nombre',
+      brandId: 'Marca del vehículo',
+      modelId: 'Modelo del vehículo',
+      productBrand: 'Marca del producto',
+      categories: 'Categorías',
+      years: 'Años',
+      price: 'Precio',
+      amount: 'Cantidad',
+      partNumber: 'Número de parte'
+    };
+
+    const newFieldErrors: Record<string, string> = {};
+
+    Object.entries(requiredFields).forEach(([key, label]) => {
+      const value = formData[key as keyof typeof formData];
+      let isEmpty = false;
+      if (typeof value === 'string') isEmpty = !value.trim();
+      else if (typeof value === 'number') isEmpty = value === undefined || value === null;
+      else isEmpty = !value;
+
+      if (isEmpty) {
+        newFieldErrors[key] = `El campo ${label.toLowerCase()} es requerido`;
+      }
+    });
+
+    if (Number(formData.price) <= 0 && !newFieldErrors.price) {
+      newFieldErrors.price = 'El precio debe ser mayor que cero';
+    }
+
+    if (Number(formData.amount) <= 0 && !newFieldErrors.amount) {
+      newFieldErrors.amount = 'La cantidad debe ser mayor que cero';
+    }
+
+    if (Object.keys(newFieldErrors).length > 0) {
+      setFieldErrors(newFieldErrors);
+      setFormError('Por favor, corrige los errores en el formulario');
+      setFormLoading(false);
+      return;
+    }
 
     try {
+      // Preparar datos para el envío (convertir IDs a números)
+      const dataToSubmit = {
+        ...formData,
+        brandId: formData.brandId ? parseInt(formData.brandId) : null,
+        modelId: formData.modelId ? parseInt(formData.modelId) : null,
+        price: Number(formData.price),
+        amount: Number(formData.amount),
+        discount: Number(formData.discount) || 0,
+      };
+
       if (editingProduct) {
         // Update existing product
-        await updateProduct(editingProduct.id, formData);
+        await updateProduct(editingProduct.id, dataToSubmit as any);
       } else {
         // Create new product
-        await createProduct(formData);
+        await createProduct(dataToSubmit as any);
       }
+      await getProducts(); // Refrescar la lista después de crear/actualizar
       handleCloseForm();
     } catch (err) {
       setFormError(editingProduct ? 'Error al actualizar el producto' : 'Error al crear el producto');
@@ -142,7 +207,7 @@ export const useProducts = () => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
 
@@ -177,6 +242,8 @@ export const useProducts = () => {
     handleCloseForm,
     handleSubmit,
     handleInputChange,
-    setShowForm: setShowForm,
+    setShowForm,
+    setFormData,
+    fieldErrors,
   };
 };

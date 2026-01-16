@@ -28,6 +28,9 @@ const createProduct = asyncHandler(async (req, res) => {
   const {
     name,
     brand,
+    model,
+    brandId,
+    modelId,
     productBrand,
     categories,
     years,
@@ -40,10 +43,10 @@ const createProduct = asyncHandler(async (req, res) => {
   } = req.body;
 
   // Validation
-  if (!name || !brand || !productBrand || !categories || !years || !price || !partNumber) {
+  if (!name || !brand || !model || !brandId || !modelId || !productBrand || !categories || !years || !price || !partNumber) {
     return responser.error({
       res,
-      message: 'Required fields: name, brand, productBrand, categories, years, price, partNumber',
+      message: 'Required fields: name, brand, model, brandId, modelId, productBrand, categories, years, price, partNumber',
       status: 400,
     });
   }
@@ -67,6 +70,9 @@ const createProduct = asyncHandler(async (req, res) => {
   const productData = {
     name,
     brand,
+    model,
+    brandId,
+    modelId,
     productBrand,
     categories,
     years,
@@ -88,10 +94,25 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const updateData = req.body;
+  const {
+    name,
+    brand,
+    model,
+    brandId,
+    modelId,
+    productBrand,
+    categories,
+    years,
+    description,
+    discount,
+    amount,
+    price,
+    freeDelivery,
+    partNumber
+  } = req.body;
 
   // Validation for price if provided
-  if (updateData.price !== undefined && updateData.price <= 0) {
+  if (price !== undefined && price <= 0) {
     return responser.error({
       res,
       message: 'Price must be greater than 0',
@@ -99,8 +120,25 @@ const updateProduct = asyncHandler(async (req, res) => {
     });
   }
 
+  const updateData = {
+    name,
+    brand,
+    model,
+    brandId,
+    modelId,
+    productBrand,
+    categories,
+    years,
+    description,
+    discount,
+    amount,
+    price,
+    freeDelivery,
+    partNumber
+  };
+
   // Validation for amount if provided
-  if (updateData.amount !== undefined && updateData.amount < 0) {
+  if (amount !== undefined && amount < 0) {
     return responser.error({
       res,
       message: 'Amount must be a non-negative number',

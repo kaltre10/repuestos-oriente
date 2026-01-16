@@ -3,7 +3,10 @@ import { ProductFormData, ProductStoreState } from '../utils/interfaces';
 
 const initialFormData: ProductFormData = {
   name: '',
+  brandId: '',
+  modelId: '',
   brand: '',
+  model: '',
   productBrand: '',
   categories: '',
   years: '',
@@ -16,22 +19,22 @@ const initialFormData: ProductFormData = {
 };
 
 const useProductStore = createWithEqualityFn<ProductStoreState>((set) => ({
-  products: [],
-  setProducts: (products) => set(()=>({ products })),
-  loading: false,
-  setLoading: (loading) => set(()=>({ loading })),
   error: null,
   editingProduct: null,
   showForm: false,
   formData: { ...initialFormData },
   formLoading: false,
   formError: null,
-  setError: (error) => set(()=>({ error })),
-  setEditingProduct: (editingProduct) => set(()=>({ editingProduct })),
-  setShowForm: (showForm) => set(()=>({ showForm })),
-  setFormData: (formData) => set(()=>({ formData })),
-  setFormLoading: (formLoading) => set(()=>({ formLoading })),
-  setFormError: (formError) => set(()=>({ formError })),
+  fieldErrors: {},
+  products: [],
+  setProducts: (products) => set({ products }),
+  setError: (error) => set(() => ({ error })),
+  setEditingProduct: (editingProduct) => set(() => ({ editingProduct })),
+  setShowForm: (showForm) => set(() => ({ showForm })),
+  setFormData: (formData) => set(() => ({ formData })),
+  setFormLoading: (formLoading) => set(() => ({ formLoading })),
+  setFormError: (formError) => set(() => ({ formError })),
+  setFieldErrors: (fieldErrors) => set(() => ({ fieldErrors })),
 }));
 
 export default useProductStore;

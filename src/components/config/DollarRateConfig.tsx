@@ -1,0 +1,76 @@
+import React from 'react';
+import { FaDollarSign, FaSave } from 'react-icons/fa';
+import { useDollarRate } from '../../hooks/useDollarRate';
+
+const DollarRateConfig = () => {
+  const { 
+    dollarRate, 
+    setDollarRate, 
+    loading: loadingDollar, 
+    error: errorDollar, 
+    saveDollarRate 
+  } = useDollarRate();
+
+  const handleSaveDollar = async () => {
+    const success = await saveDollarRate(dollarRate);
+    if (success) {
+      alert('Tasa del dólar guardada con éxito');
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
+        <h2 className="text-base font-semibold text-gray-700 flex items-center">
+          <FaDollarSign className="mr-2 text-green-600" />
+          Tasa del Dólar
+        </h2>
+      </div>
+      
+      <div className="p-4">
+        <div className="flex flex-col md:flex-row items-end gap-4">
+          <div className="flex-1 w-full">
+            <label htmlFor="dollarRate" className="block text-xs font-medium text-gray-700 mb-1">
+              Precio del Dólar (USD)
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span className="text-gray-500 sm:text-sm">$</span>
+              </div>
+              <input
+                type="number"
+                step="0.01"
+                id="dollarRate"
+                value={dollarRate}
+                onChange={(e) => setDollarRate(e.target.value)}
+                className="block w-full pl-7 pr-12 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
+                placeholder="0.00"
+                disabled={loadingDollar}
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handleSaveDollar}
+            disabled={loadingDollar}
+            className={`whitespace-nowrap flex justify-center items-center py-2 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white h-[38px] ${
+              loadingDollar ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+            } transition-colors duration-200`}
+          >
+            {loadingDollar ? (
+              <span>Guardando...</span>
+            ) : (
+              <>
+                <FaSave className="mr-2" />
+                Guardar Precio
+              </>
+            )}
+          </button>
+        </div>
+        {errorDollar && <p className="mt-2 text-xs text-red-600">{errorDollar}</p>}
+      </div>
+    </div>
+  );
+};
+
+export default DollarRateConfig;
