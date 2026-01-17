@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import models from '../models/index.js';
 const { Sale } = models;
 
@@ -43,6 +44,39 @@ class SaleService {
       return sale;
     } catch (error) {
       throw new Error(`Failed to create sale: ${error.message}`);
+    }
+  }
+
+  async createMultipleSales(salesData) {
+    try {
+      const sales = await Sale.bulkCreate(salesData);
+      return sales;
+    } catch (error) {
+      throw new Error(`Failed to create multiple sales: ${error.message}`);
+    }
+  }
+
+  async getSalesByUserId(userId) {
+    try {
+      const sales = await Sale.findAll({
+        where: {
+          buyerId: userId
+        },
+        order: [['createdAt', 'DESC']],
+        include: [{
+          model: models.Product,
+          as: 'product',
+          attributes: ['id', 'name', 'price', 'partNumber'],
+          include: [{
+            model: models.ProductImage,
+            as: 'images',
+            attributes: ['image']
+          }]
+        }]
+      });
+      return sales;
+    } catch (error) {
+      throw new Error(`Failed to get sales by user ID: ${error.message}`);
     }
   }
 

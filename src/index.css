@@ -1,7 +1,25 @@
 @import "tailwindcss";
 
 :root {
+    --gray: rgb(153,153,153);
+    --red: rgb(206,42,40);
+}
 
+.bg-logo{
+    background-color: var(--red);
+    padding:12px 0px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    margin-bottom: 15px;
+}
+.bg-logo img{
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+}
+
+.bg-red{
+    background-color: var(--red);
 }
 
 .menu-mobile{

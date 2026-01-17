@@ -6,7 +6,7 @@ class BrandService {
   async getAllBrands() {
     try {
       const brands = await Brand.findAll({
-        order: [['createdAt', 'DESC']]
+        order: [['brand', 'ASC']]
       });
       return brands;
     } catch (error) {

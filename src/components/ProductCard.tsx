@@ -54,7 +54,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
           <span className="text-gray-500 text-sm ml-2">{product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'}</span>
         </div>
-        <p className="text-red-500 font-bold text-lg mt-2">${product.price.toFixed(2)}</p>
+        <p className="text-red-500 font-bold text-lg mt-2">${Number(product.price).toFixed(2)}</p>
         <button
           onClick={handleAddToCart}
           disabled={isInCart}

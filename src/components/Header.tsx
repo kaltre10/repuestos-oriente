@@ -6,7 +6,7 @@ import useStore from '../states/global';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { getCartCount, toggleCart } = useStore();
+  const { getCartCount, toggleCart, user } = useStore();
 
   return (
     <header className="bg-gray-200 text-gray-800 top-0 left-0 right-0 z-50 shadow-md">
@@ -46,7 +46,7 @@ const Header = () => {
 
           {/* Icons */}
           <div className="hidden lg:flex items-center space-x-6">
-            <Link to="/auth" className="hover:text-red-500 transition-colors">
+            <Link to={user ? "/clients/purchases" : "/auth"} className="hover:text-red-500 transition-colors">
               <User size={24} />
             </Link>
             <button onClick={toggleCart} className="relative hover:text-red-500 transition-colors">
@@ -104,7 +104,7 @@ const Header = () => {
               <Link to="/ofertas" className="hover:text-red-500 transition-colors">OFERTAS</Link>
             </nav>
             <div className="flex justify-center items-center space-x-8 mt-8">
-              <Link to="/auth" className="hover:text-red-500 transition-colors">
+              <Link to={user ? "/clients/purchases" : "/auth"} className="hover:text-red-500 transition-colors">
                 <User size={24} />
               </Link>
               <button onClick={toggleCart} className="relative hover:text-red-500 transition-colors">

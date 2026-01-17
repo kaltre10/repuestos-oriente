@@ -4,6 +4,7 @@ import Brand from './Brand.js';
 import Category from './Category.js';
 import Model from './Model.js';
 import Product from './Product.js';
+import ProductImage from './ProductImage.js';
 import Config from './Config.js';
 import Sale from './Sale.js';
 
@@ -35,6 +36,7 @@ const models = {
   Category: Category(sequelize),
   Model: Model(sequelize),
   Product: Product(sequelize),
+  ProductImage: ProductImage(sequelize),
   Config: Config(sequelize),
   Sale: Sale(sequelize),
 };
@@ -45,9 +47,29 @@ models.Sale.belongsTo(models.Product, {
   as: 'product'
 });
 
+models.Sale.belongsTo(models.User, {
+  foreignKey: 'buyerId',
+  as: 'buyer'
+});
+
 models.Product.hasMany(models.Sale, {
   foreignKey: 'productId',
   as: 'sales'
+});
+
+models.User.hasMany(models.Sale, {
+  foreignKey: 'buyerId',
+  as: 'purchases'
+});
+
+models.Product.hasMany(models.ProductImage, {
+  foreignKey: 'productId',
+  as: 'images'
+});
+
+models.ProductImage.belongsTo(models.Product, {
+  foreignKey: 'productId',
+  as: 'product'
 });
 
 // Define associations if any

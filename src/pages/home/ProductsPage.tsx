@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { List, Grid2X2, Grid3X3, Star, Plus, Minus } from 'lucide-react';
-import { products } from '../../data/products';
+import { List, Grid2X2, Grid3X3, Star, Plus, Minus, Loader2 } from 'lucide-react';
+import { useProducts } from '../../hooks/useProducts';
+import { imagesUrl } from '../../utils/utils';
 import ProductCard from '../../components/ProductCard';
 import ProductFilters from '../../components/ProductFilters';
-import Header from '../../components/Header';
 import CartModal from '../../components/CartModal';
-import Footer from '../../components/Footer';
 import useStore from '../../states/global';
 
 const ProductsPage = () => {
     const navigate = useNavigate();
+    const { products, loading, getProducts } = useProducts();
     const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
     const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
 
@@ -37,66 +37,52 @@ const ProductsPage = () => {
     const [filtersExpanded, setFiltersExpanded] = useState(false);
 
     const filteredProducts = useMemo(() => {
-        let filtered = [...products];
+        let filtered = products.map((p: any) => ({
+            ...p,
+            rating: p.rating || 5, // Default rating if not in DB
+            reviews: p.reviews || 0, // Default reviews if not in DB
+            image: p.images && p.images.length > 0 
+                ? `${imagesUrl}${p.images[0].image}` 
+                : '/placeholder-product.png', // Default image if none
+            category: p.categories // Map categories from DB to category for UI
+        }));
 
         // Apply filters
         if (selectedYear) {
-            // For demo purposes, we'll filter by year if it matches the product category or name
-            // In a real app, products would have a year field
             filtered = filtered.filter(product =>
-                product.category.includes(selectedYear) || product.name.includes(selectedYear)
+                product.years.includes(selectedYear) || product.name.includes(selectedYear)
             );
         }
 
         if (selectedBrand) {
-            filtered = filtered.filter(product => product.category === selectedBrand);
+            filtered = filtered.filter(product => product.brand === selectedBrand);
         }
 
         if (selectedCategory) {
-            // Map category names to product tags or categories
-            const categoryMapping: { [key: string]: string[] } = {
-                'Motor': ['Pistones', 'Anillos', 'Cigüeñal', 'Bielas'],
-                'Transmisión y Embrague': ['Caja de cambios', 'Embrague'],
-                'Suspensión y Dirección': ['Amortiguadores', 'Resortes'],
-                'Frenos': ['Pastillas', 'Discos', 'Tambores'],
-                'Sistema Eléctrico y Electrónico': ['Alternador', 'Batería', 'Motor de arranque'],
-                'Sistema de Combustible': ['Bomba de gasolina', 'Inyectores', 'Filtros de combustible'],
-                'Refrigeración y Calefacción': ['Radiador', 'Termostato', 'Bomba de agua'],
-                'Escape': ['Múltiple de escape', 'Catalizador'],
-                'Filtros': ['Filtro de aceite', 'Filtro de aire', 'Filtro de combustible'],
-                'Carrocería y Accesorios Externos': ['Puertas', 'Capó', 'Parachoques', 'Faros'],
-                'Interior y Confort': ['Asientos', 'Tablero', 'Aire acondicionado'],
-                'Neumáticos y Ruedas': ['Llantas', 'Neumáticos', 'Rines'],
-                'Lubricantes y Líquidos': ['Aceite de motor', 'Líquido de frenos']
-            };
-
-            const matchingTags = categoryMapping[selectedCategory] || [];
-            filtered = filtered.filter(product =>
-                matchingTags.some(tag => product.tag?.includes(tag) || product.name.includes(tag))
-            );
+            filtered = filtered.filter(product => product.categories.includes(selectedCategory));
         }
 
         if (selectedSubcategory) {
             filtered = filtered.filter(product =>
-                product.tag?.includes(selectedSubcategory) || product.name.includes(selectedSubcategory)
+                product.name.toLowerCase().includes(selectedSubcategory.toLowerCase())
             );
         }
 
         // Apply sorting
         switch (sortBy) {
             case 'popular':
-                filtered = [...filtered].sort((a, b) => b.rating - a.rating);
+                filtered = [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0));
                 break;
             case 'price-low':
-                filtered = [...filtered].sort((a, b) => a.price - b.price);
+                filtered = [...filtered].sort((a, b) => Number(a.price) - Number(b.price));
                 break;
             case 'price-high':
-                filtered = [...filtered].sort((a, b) => b.price - a.price);
+                filtered = [...filtered].sort((a, b) => Number(b.price) - Number(a.price));
                 break;
         }
 
         return filtered;
-    }, [sortBy, selectedYear, selectedBrand, selectedCategory, selectedSubcategory]);
+    }, [products, sortBy, selectedYear, selectedBrand, selectedCategory, selectedSubcategory]);
 
     const clearFilters = () => {
         setSelectedYear('');
@@ -141,7 +127,7 @@ const ProductsPage = () => {
                 </div>
 
                 {/* Price in top-right corner */}
-                <p className="absolute top-6 right-6 text-red-500 font-bold text-xl">${product.price.toFixed(2)}</p>
+                <p className="absolute top-6 right-6 text-red-500 font-bold text-xl">${Number(product.price).toFixed(2)}</p>
 
                 {/* Add to cart button in bottom-right corner */}
                 <button
@@ -170,6 +156,15 @@ const ProductsPage = () => {
                 return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
         }
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+                <Loader2 className="w-12 h-12 text-red-600 animate-spin mb-4" />
+                <p className="text-gray-600 font-medium">Cargando productos...</p>
+            </div>
+        );
+    }
 
     return (
         <>

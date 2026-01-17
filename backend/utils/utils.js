@@ -1,4 +1,5 @@
 import { connectDB, sequelize } from '../models/index.js';
+import { seedBrands } from './seedBrands.js';
 
 
 export const corsOptions = {
@@ -11,6 +12,9 @@ export const startServer = async (app) => {
         await connectDB();
 
         await sequelize.sync();
+
+        // Seed brands after sync
+        await seedBrands();
 
         const PORT = process.env.PORT || 3001;
         

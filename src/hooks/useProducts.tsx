@@ -24,11 +24,18 @@ export const useProducts = () => {
   } = useProductStore();
 
 
+  useEffect(() => {
+    getProducts();
+  }, []);
+
   const getProducts = async () => {
     try {
       setLoading(true)
       const response = await request.get(`${apiUrl}/products`)
-      const fetchedProducts = response.data.body.products
+      const fetchedProducts = response.data.body.products.map((p: any) => ({
+        ...p,
+        price: Number(p.price)
+      }))
       setProducts(fetchedProducts)
       console.log("obteniendo productos: ,", fetchedProducts)
 
@@ -194,14 +201,15 @@ export const useProducts = () => {
       if (editingProduct) {
         // Update existing product
         await updateProduct(editingProduct.id, dataToSubmit as any);
+        return editingProduct.id;
       } else {
         // Create new product
-        await createProduct(dataToSubmit as any);
+        const product = await createProduct(dataToSubmit as any);
+        return product.id;
       }
-      await getProducts(); // Refrescar la lista después de crear/actualizar
-      handleCloseForm();
     } catch (err) {
       setFormError(editingProduct ? 'Error al actualizar el producto' : 'Error al crear el producto');
+      throw err;
     } finally {
       setFormLoading(false);
     }
@@ -235,6 +243,7 @@ export const useProducts = () => {
     formError: formError,
 
     // Actions
+    getProducts,
     updateProduct,
     deleteProduct,
     handleDelete,

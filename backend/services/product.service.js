@@ -6,7 +6,12 @@ class ProductService {
   async getAllProducts() {
     try {
       const products = await Product.findAll({
-        order: [['createdAt', 'DESC']]
+        order: [['createdAt', 'DESC']],
+        include: [{
+          model: models.ProductImage,
+          as: 'images',
+          attributes: ['image']
+        }]
       });
       return products;
     } catch (error) {

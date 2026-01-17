@@ -1,31 +1,53 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, ArrowLeft, ShoppingCart, Heart, Share2 } from 'lucide-react';
-import { products } from '../../data/products';
-import Header from '../../components/Header';
+import { Star, ArrowLeft, ShoppingCart, Heart, Share2, Loader2 } from 'lucide-react';
+import { useProducts } from '../../hooks/useProducts';
+import { imagesUrl } from '../../utils/utils';
 import CartModal from '../../components/CartModal';
-import Footer from '../../components/Footer';
 import useStore from '../../states/global';
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart, cart } = useStore();
+  const { products, loading } = useProducts();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
-  const product = products.find(p => p.id === parseInt(id || '0'));
+  const productFromDB = products.find(p => p.id === parseInt(id || '0'));
+
+  const product = productFromDB ? {
+    ...productFromDB,
+    rating: (productFromDB as any).rating || 5,
+    reviews: (productFromDB as any).reviews || 0,
+    image: (productFromDB as any).images && (productFromDB as any).images.length > 0
+      ? `${imagesUrl}${(productFromDB as any).images[0].image}`
+      : '/placeholder-product.png',
+    images: (productFromDB as any).images && (productFromDB as any).images.length > 0
+      ? (productFromDB as any).images.map((img: any) => `${imagesUrl}${img.image}`)
+      : ['/placeholder-product.png'],
+    category: (productFromDB as any).categories
+  } : null;
 
   useEffect(() => {
-    if (!product) {
+    if (!loading && !product && products.length > 0) {
       navigate('/productos');
     }
-  }, [product, navigate]);
+  }, [product, loading, products, navigate]);
 
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+        <Loader2 className="w-12 h-12 text-red-600 animate-spin mb-4" />
+        <p className="text-gray-600 font-medium">Cargando detalles del producto...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return null;
@@ -33,20 +55,14 @@ const ProductDetailPage = () => {
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
-      addToCart(product);
+      addToCart(product as any);
     }
   };
 
   const isInCart = cart.some(item => item.id === product.id);
   const cartItemCount = cart.filter(item => item.id === product.id).length;
 
-  // Mock additional images for the product
-  const productImages = [
-    product.image,
-    'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1032&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=1007&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?q=80&w=1007&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-  ];
+  const productImages = product.images;
 
   return (
     <>
@@ -76,15 +92,14 @@ const ProductDetailPage = () => {
 
               {/* Thumbnail Images */}
               <div className="flex gap-2 overflow-x-auto">
-                {productImages.map((image, index) => (
+                {productImages.map((image: any, index: any) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                      selectedImage === index
-                        ? 'border-red-500'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${selectedImage === index
+                      ? 'border-red-500'
+                      : 'border-gray-200 hover:border-gray-300'
+                      }`}
                   >
                     <img
                       src={image}
@@ -99,7 +114,6 @@ const ProductDetailPage = () => {
             {/* Product Information */}
             <div className="space-y-6">
               <div>
-                <p className="text-sm text-gray-500 mb-2">{product.category}</p>
                 <h1 className="text-3xl font-bold text-gray-800 mb-4">{product.name}</h1>
 
                 {/* Rating */}
@@ -114,19 +128,19 @@ const ProductDetailPage = () => {
 
                 {/* Price */}
                 <div className="text-4xl font-bold text-red-500 mb-6">
-                  ${product.price.toFixed(2)}
+                  ${Number(product.price).toFixed(2)}
                 </div>
               </div>
 
               {/* Description */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Descripción</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Producto de alta calidad {product.category.toLowerCase()} para {product.name.toLowerCase()}.
-                  Fabricado con materiales premium que garantizan durabilidad y rendimiento excepcional.
-                  Compatible con una amplia gama de vehículos y cuenta con garantía del fabricante.
-                </p>
-              </div>
+              {product?.description &&
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Descripción</h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {product.description}
+                  </p>
+                </div>
+              }
 
               {/* Specifications */}
               <div>
@@ -134,11 +148,11 @@ const ProductDetailPage = () => {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="font-medium text-gray-700">Categoría:</span>
-                    <p className="text-gray-600">{product.category}</p>
+                    <p className="text-gray-600">{product.category || 'N/A'}</p>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Marca:</span>
-                    <p className="text-gray-600">{product.category.split(' ')[0]}</p>
+                    <p className="text-gray-600">{product.brand || 'N/A'}</p>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Calificación:</span>
@@ -173,11 +187,10 @@ const ProductDetailPage = () => {
                   <button
                     onClick={handleAddToCart}
                     disabled={isInCart && cartItemCount >= 10}
-                    className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg transition-colors ${
-                      isInCart && cartItemCount >= 10
-                        ? 'bg-gray-400 cursor-not-allowed text-white'
-                        : 'bg-red-500 hover:bg-red-600 text-white'
-                    }`}
+                    className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg transition-colors ${isInCart && cartItemCount >= 10
+                      ? 'bg-gray-400 cursor-not-allowed text-white'
+                      : 'bg-red-500 hover:bg-red-600 text-white'
+                      }`}
                   >
                     <ShoppingCart size={20} />
                     {isInCart ? `Agregado (${cartItemCount})` : 'Agregar al carrito'}
@@ -216,26 +229,36 @@ const ProductDetailPage = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-8">Productos relacionados</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {products
-                .filter(p => p.category === product.category && p.id !== product.id)
+                .filter(p => p.categories === productFromDB?.categories && p.id !== product.id)
                 .slice(0, 4)
-                .map(relatedProduct => (
-                  <div
-                    key={relatedProduct.id}
-                    onClick={() => navigate(`/producto/${relatedProduct.id}`)}
-                    className="bg-white rounded-lg overflow-hidden shadow-md cursor-pointer hover:shadow-lg transition-shadow"
-                  >
-                    <img
-                      src={relatedProduct.image}
-                      alt={relatedProduct.name}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="p-4">
-                      <p className="text-sm text-gray-500 mb-1">{relatedProduct.category}</p>
-                      <h3 className="font-semibold text-gray-800 mb-2 truncate">{relatedProduct.name}</h3>
-                      <p className="text-red-500 font-bold">${relatedProduct.price.toFixed(2)}</p>
+                .map(relatedProductRaw => {
+                  const relatedProduct = {
+                    ...relatedProductRaw,
+                    image: (relatedProductRaw as any).images && (relatedProductRaw as any).images.length > 0
+                      ? `${imagesUrl}${(relatedProductRaw as any).images[0].image}`
+                      : '/placeholder-product.png',
+                    category: (relatedProductRaw as any).categories
+                  };
+
+                  return (
+                    <div
+                      key={relatedProduct.id}
+                      onClick={() => navigate(`/producto/${relatedProduct.id}`)}
+                      className="bg-white rounded-lg overflow-hidden shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+                    >
+                      <img
+                        src={relatedProduct.image}
+                        alt={relatedProduct.name}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="p-4">
+                        <p className="text-sm text-gray-500 mb-1">{relatedProduct.category}</p>
+                        <h3 className="font-semibold text-gray-800 mb-2 truncate">{relatedProduct.name}</h3>
+                        <p className="text-red-500 font-bold">${Number(relatedProduct.price).toFixed(2)}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
             </div>
           </div>
         </div>

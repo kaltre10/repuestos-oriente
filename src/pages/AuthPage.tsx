@@ -1,248 +1,250 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import useStore from '../states/global';
-import request from '../utils/request';
-import { apiUrl } from '../utils/utils';
+import { Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
+import useAuth from '../hooks/useAuth';
+import logo from '../../public/logo.png'
 
 const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    name: '',
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [rememberCredentials, setRememberCredentials] = useState(false);
-  const navigate = useNavigate();
-  const { setUser } = useStore();
 
-  const handleRemember = (state: boolean) => {
-    setRememberCredentials(state)
-    if (state) {
-      localStorage.setItem('savedEmail', formData.email)
-      localStorage.setItem('savedPassword', formData.password)
-    } else {
-      localStorage.removeItem('savedEmail')
-      localStorage.removeItem('savedPassword')
-    }
-    localStorage.setItem('remember', String(state))
+  const { isLogin, handleSubmit, handleInputChange,
+    formData, showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword,
+    rememberCredentials, handleRemember, loading, error, setIsLogin,
+    isForgotPassword, setIsForgotPassword, handleForgotPassword, successMessage } = useAuth()
+
+  if (isForgotPassword) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="mt-1 sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="bg-white shadow sm:rounded-lg pb-4">
+            <div className="bg-logo">
+              <img src={logo} alt="Logo" />
+            </div>
+            <div className='px-8 py-2'>
+              <div className="mb-5 text-center text-1xl font-extrabold text-gray-900">
+                Recuperar Contraseña
+              </div>
+              <p className="text-sm text-gray-600 mb-6 text-center">
+                Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
+              </p>
+              
+              <form className="space-y-5" onSubmit={handleForgotPassword}>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Correo electrónico
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
+                      placeholder="tu@email.com"
+                    />
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="text-red-600 text-sm text-center bg-red-100 p-2 rounded-md">
+                    {error}
+                  </div>
+                )}
+
+                {successMessage && (
+                  <div className="text-green-600 text-sm text-center bg-green-100 p-2 rounded-md">
+                    {successMessage}
+                  </div>
+                )}
+
+                <div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="cursor-pointer group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                  >
+                    {loading ? 'Enviando...' : 'Enviar enlace de recuperación'}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={() => setIsForgotPassword(false)}
+                className="cursor-pointer text-sm text-red-600 hover:text-red-500"
+              >
+                Volver al inicio de sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
-
-  useEffect(() => {
-
-    const remember = localStorage.getItem('remember') || 'false';
-    const r = remember === 'true' ? true : false
-
-    if (r) {
-      const savedEmail = localStorage.getItem('savedEmail');
-      const savedPassword = localStorage.getItem('savedPassword');
-      if (savedEmail) setFormData(prev => ({ ...prev, email: savedEmail }));
-      if (savedPassword) setFormData(prev => ({ ...prev, password: savedPassword }));
-    }
-    setRememberCredentials(r)
-  }, []);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.name === 'email' && rememberCredentials) {
-      localStorage.setItem('savedEmail', e.target.value)
-    } else if (e.target.name === 'password' && rememberCredentials) {
-      localStorage.setItem('savedPassword', e.target.value)
-    }
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    // Save credentials to localStorage if remember is checked
-    if (rememberCredentials) {
-      localStorage.setItem('savedEmail', formData.email);
-      localStorage.setItem('savedPassword', formData.password);
-    } else {
-      localStorage.removeItem('savedEmail');
-      localStorage.removeItem('savedPassword');
-    }
-
-    try {
-      const endpoint = isLogin ? '/auth/login' : '/auth/register';
-      const response = await request.post(`${apiUrl}${endpoint}`, formData);
-
-      const data = await response.data;
-
-      if (!response) {
-        throw new Error(data.message || 'Authentication failed');
-      }
-
-      // Store user data and token
-      localStorage.setItem('token', data.token);
-      setUser(data.user);
-      navigate('/clients');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleAuth = async () => {
-    setLoading(true);
-    setError('');
-
-    try {
-      if (!window.google) {
-        setLoading(false);
-        setError('Google Sign-In not loaded');
-        return;
-      }
-
-      window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        // 1. Confirmamos el uso de FedCM explícitamente
-        use_fedcm_for_prompt: true,
-        callback: async (response) => {
-          try {
-            if (response.error) throw new Error('Google authentication failed');
-
-            const res = await request.post(`${apiUrl}/auth/google`,
-              JSON.stringify({ token: response.credential }),
-            );
-
-            const data = await res.data;
-
-            if (!res) {
-              throw new Error(data.message || 'Authentication failed');
-            }
-
-            localStorage.setItem('token', data.token);
-            setUser(data.user);
-            navigate('/clients');
-          } catch (err) {
-            setError(err instanceof Error ? err.message : 'Authentication failed');
-          } finally {
-            setLoading(false);
-          }
-        },
-      });
-
-      // 2. Google recomienda no depender demasiado de los callbacks de notificación 
-      // en FedCM, pero puedes mantenerlo así para el loading:
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          setLoading(false);
-        }
-      });
-
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Google authentication failed');
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
-        </h2>
-      </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {!isLogin && (
+
+      <div className="mt-1 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white shadow sm:rounded-lg pb-4">
+          <div className="bg-logo">
+            <img src={logo} alt="Logo" />
+          </div>
+          <div className='px-8 py-2'>
+            <div className="mb-5 text-center text-1xl font-extrabold text-gray-900">
+              {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
+            </div>
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              {!isLogin && (
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                    Nombre completo
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="name"
+                      name="name"
+                      type="text"
+                      required={!isLogin}
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
+                      placeholder="Tu nombre completo"
+                    />
+                  </div>
+                </div>
+              )}
+
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Nombre completo
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Correo electrónico
                 </label>
                 <div className="mt-1">
                   <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    required={!isLogin}
-                    value={formData.name}
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={formData.email}
                     onChange={handleInputChange}
                     className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
-                    placeholder="Tu nombre completo"
+                    placeholder="tu@email.com"
                   />
                 </div>
               </div>
-            )}
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Correo electrónico
-              </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
-                  placeholder="tu@email.com"
-                />
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Contraseña
+                </label>
+                <div className="mt-1 relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete={isLogin ? "current-password" : "new-password"}
+                    required
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm pr-10"
+                    placeholder="Tu contraseña"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Contraseña
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
-                  placeholder="Tu contraseña"
-                />
+              {!isLogin && (
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                    Confirmar Contraseña
+                  </label>
+                  <div className="mt-1 relative">
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      required={!isLogin}
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm pr-10"
+                      placeholder="Confirma tu contraseña"
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="remember-credentials"
+                    name="remember-credentials"
+                    type="checkbox"
+                    checked={rememberCredentials}
+                    onChange={(e) => handleRemember(e.target.checked)}
+                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="remember-credentials" className="ml-2 block text-sm text-gray-900">
+                    Recordar
+                  </label>
+                </div>
+
+                {isLogin && (
+                  <div className="text-sm">
+                    <button
+                      type="button"
+                      onClick={() => setIsForgotPassword(true)}
+                      className="font-medium text-red-600 hover:text-red-500 cursor-pointer"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
 
-            <div className="flex items-center">
-              <input
-                id="remember-credentials"
-                name="remember-credentials"
-                type="checkbox"
-                checked={rememberCredentials}
-                onChange={(e) => handleRemember(e.target.checked)}
-                className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-credentials" className="ml-2 block text-sm text-gray-900">
-                Recordar credenciales
-              </label>
-            </div>
+              {error && (
+                <div className="text-red-600 text-sm text-center bg-red-100 p-2 rounded-md">
+                  {error}
+                </div>
+              )}
 
-            {error && (
-              <div className="text-red-600 text-sm text-center">
-                {error}
+              <div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="cursor-pointer group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                >
+                  {loading ? 'Cargando...' : (isLogin ? 'Iniciar Sesión' : 'Crear Cuenta')}
+                </button>
               </div>
-            )}
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="cursor-pointer group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
-              >
-                {loading ? 'Cargando...' : (isLogin ? 'Iniciar Sesión' : 'Crear Cuenta')}
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
 
           {/*  <div className="mt-6">
             <div className="relative">

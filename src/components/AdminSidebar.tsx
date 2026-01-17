@@ -1,10 +1,18 @@
-import { Link, useLocation } from 'react-router-dom';
-import { FaUsers, FaBox, FaChartLine, FaCog, FaDollarSign } from 'react-icons/fa';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FaUsers, FaBox, FaChartLine, FaCog, FaDollarSign, FaSignOutAlt } from 'react-icons/fa';
 import { useDollarRate } from '../hooks/useDollarRate';
+import useStore from '../states/global';
 
 const AdminSidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { dollarRate } = useDollarRate();
+  const { logout } = useStore();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/auth');
+  };
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -64,6 +72,14 @@ const AdminSidebar = () => {
           <FaCog className="mr-3" />
           Configuraciones
         </Link>
+
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center px-6 py-3 mt-4 text-red-400 hover:bg-gray-900 hover:text-red-300 transition-colors cursor-pointer"
+        >
+          <FaSignOutAlt className="mr-3" />
+          Cerrar Sesión
+        </button>
       </nav>
     </div>
   );

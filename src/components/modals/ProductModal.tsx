@@ -1,11 +1,15 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useProducts } from '../../hooks/useProducts';
 import { useBrands } from '../../hooks/useBrands';
 import { useModels } from '../../hooks/useModels';
 import { useCategories } from '../../hooks/useCategories';
+import { useImageUpload } from '../../hooks/useImageUpload';
+import ImageUploadSection from '../ImageUploadSection';
 
 const ProductModal = () => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<{ id: number; image: string }[]>([]);
 
   const {
     showForm,
@@ -18,7 +22,10 @@ const ProductModal = () => {
     handleInputChange,
     setFormData,
     fieldErrors,
+    getProducts, // Assuming it's exported or we can call it after submit
   } = useProducts();
+
+  const { uploadImages, fetchProductImages, deleteImage } = useImageUpload();
 
   const { brands } = useBrands();
   const { models } = useModels();
@@ -36,6 +43,18 @@ const ProductModal = () => {
 
   // Filter models based on selected brand
   const filteredModels = models.filter(m => m.brandId === parseInt(formData.brandId));
+
+  // Load existing images when editing
+  useEffect(() => {
+    if (editingProduct && showForm) {
+      fetchProductImages(editingProduct.id).then(imgs => {
+        setExistingImages(imgs);
+      });
+    } else {
+      setExistingImages([]);
+      setSelectedFiles([]);
+    }
+  }, [editingProduct, showForm, fetchProductImages]);
 
   // Scroll to top when form error occurs
   useEffect(() => {
@@ -87,6 +106,33 @@ const ProductModal = () => {
     });
   };
 
+  const handleImagesSubmit = async (productId: number) => {
+    if (selectedFiles.length > 0) {
+      await uploadImages(productId, selectedFiles);
+    }
+  };
+
+  const handleDeleteExistingImage = async (imageId: number) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
+      await deleteImage(imageId);
+      setExistingImages(existingImages.filter(img => img.id !== imageId));
+    }
+  };
+
+  const onFormSubmit = async (e: React.FormEvent) => {
+     e.preventDefault();
+     try {
+       const productId = await handleSubmit(e);
+       if (productId) {
+         await handleImagesSubmit(productId);
+         await getProducts();
+         handleCloseForm();
+       }
+     } catch (error) {
+       console.error("Error submitting product and images:", error);
+     }
+   };
+
   if (!showForm) return null;
 
   return (
@@ -105,7 +151,7 @@ const ProductModal = () => {
           {editingProduct ? 'Editar Producto' : 'Nuevo Producto'}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        <form onSubmit={onFormSubmit} className="space-y-4" noValidate>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Nombre *
@@ -373,6 +419,12 @@ const ProductModal = () => {
               placeholder="Ingresa la descripción del producto"
             />
           </div>
+
+          <ImageUploadSection 
+            onImagesChange={setSelectedFiles}
+            existingImages={existingImages}
+            onDeleteExisting={handleDeleteExistingImage}
+          />
 
           <div className="flex justify-end gap-2 pt-4">
             <button

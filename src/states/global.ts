@@ -19,8 +19,23 @@ interface User {
   id: number;
   email: string;
   name: string;
+  phone?: string;
+  address?: string;
   profilePicture?: string;
 }
+
+const getInitialUser = (): User | null => {
+  const savedUser = localStorage.getItem('user');
+  if (savedUser) {
+    try {
+      return JSON.parse(savedUser);
+    } catch (error) {
+      console.error('Error parsing user from localStorage', error);
+      return null;
+    }
+  }
+  return null;
+};
 
 interface StoreState {
   cart: CartItem[];
@@ -33,6 +48,7 @@ interface StoreState {
   toggleCart: () => void;
   getCartTotal: () => number;
   getCartCount: () => number;
+  clearCart: () => void;
   setUser: (user: User | null) => void;
   logout: () => void;
 }
@@ -40,7 +56,7 @@ interface StoreState {
 const useStore = create<StoreState>((set, get) => ({
   cart: [],
   isCartOpen: false,
-  user: null,
+  user: getInitialUser(),
   addToCart: (product) => set((state) => {
     const existingItem = state.cart.find(item => item.id === product.id);
     if (existingItem) {
@@ -83,9 +99,11 @@ const useStore = create<StoreState>((set, get) => ({
     const { cart } = get();
     return cart.reduce((count, item) => count + item.quantity, 0);
   },
+  clearCart: () => set({ cart: [] }),
   setUser: (user) => set({ user }),
   logout: () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     set({ user: null });
   },
 }))

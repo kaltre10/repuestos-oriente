@@ -1,5 +1,12 @@
 import userService from '../services/user.service.js';
 import responser from './responser.js';
+import { z } from 'zod';
+
+const emailSchema = z.string().email();
+const resetPasswordSchema = z.object({
+  token: z.string(),
+  newPassword: z.string().min(6)
+});
 
 // Async handler wrapper
 const asyncHandler = (fn) => (req, res, next) => {
@@ -29,6 +36,8 @@ const googleAuth = asyncHandler(async (req, res) => {
         id: user.id,
         email: user.email,
         name: user.name,
+        phone: user.phone,
+        address: user.address,
         profilePicture: user.profilePicture,
       },
       token: jwtToken,
@@ -123,6 +132,27 @@ const updateUser = asyncHandler(async (req, res) => {
   });
 });
 
+// Change password
+const changePassword = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword || !newPassword) {
+    return responser.error({
+      res,
+      message: 'Ambas contraseñas son requeridas',
+      status: 400,
+    });
+  }
+
+  const result = await userService.changePassword(id, { oldPassword, newPassword });
+
+  responser.success({
+    res,
+    message: result.message,
+  });
+});
+
 // Delete user
 const deleteUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -142,12 +172,13 @@ const login = asyncHandler(async (req, res) => {
   if (!email || !password) {
     return responser.error({
       res,
-      message: 'Email and password are required',
+      message: 'Email y contraseña son requeridos',
       status: 400,
     });
   }
 
   const user = await userService.login(email, password);
+
   const token = userService.generateToken(user);
 
   responser.success({
@@ -158,6 +189,8 @@ const login = asyncHandler(async (req, res) => {
         id: user.id,
         email: user.email,
         name: user.name,
+        phone: user.phone,
+        address: user.address,
         profilePicture: user.profilePicture,
       },
       token,
@@ -190,10 +223,54 @@ const register = asyncHandler(async (req, res) => {
         id: user.id,
         email: user.email,
         name: user.name,
+        phone: user.phone,
+        address: user.address,
         profilePicture: user.profilePicture,
       },
       token,
     },
+  });
+});
+
+// Forgot password
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const validation = emailSchema.safeParse(email);
+  if (!validation.success) {
+    return responser.error({
+      res,
+      message: 'Email inválido',
+      status: 400,
+    });
+  }
+
+  const result = await userService.forgotPassword(email);
+
+  responser.success({
+    res,
+    message: result.message,
+  });
+});
+
+// Reset password
+const resetPassword = asyncHandler(async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  const validation = resetPasswordSchema.safeParse({ token, newPassword });
+  if (!validation.success) {
+    return responser.error({
+      res,
+      message: 'Datos inválidos. La contraseña debe tener al menos 6 caracteres.',
+      status: 400,
+    });
+  }
+
+  const result = await userService.resetPassword(token, newPassword);
+
+  responser.success({
+    res,
+    message: result.message,
   });
 });
 
@@ -203,7 +280,10 @@ export {
   register,
   getUser,
   updateUser,
+  changePassword,
   deleteUser,
   getUsers,
-  createUser
+  createUser,
+  forgotPassword,
+  resetPassword
 };

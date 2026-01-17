@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { List, Grid2X2, Grid3X3, Star } from 'lucide-react';
-import { products } from '../data/products';
+import { List, Grid2X2, Grid3X3, Star, Loader2 } from 'lucide-react';
+import { useProducts } from '../hooks/useProducts';
+import { imagesUrl } from '../utils/utils';
 import ProductCard from './ProductCard';
 import useStore from '../states/global';
 
 const BestSellers = () => {
   const navigate = useNavigate();
+  const { products, loading } = useProducts();
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
   const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
 
@@ -26,23 +28,31 @@ const BestSellers = () => {
   };
 
   const filteredProducts = useMemo(() => {
-    let filtered = [...products];
+    let filtered = products.map((p: any) => ({
+      ...p,
+      rating: p.rating || 5,
+      reviews: p.reviews || 0,
+      image: p.images && p.images.length > 0 
+        ? `${imagesUrl}${p.images[0].image}` 
+        : '/placeholder-product.png',
+      category: p.categories
+    }));
 
     // Apply sorting
     switch (sortBy) {
       case 'popular':
-        filtered = [...filtered].sort((a, b) => b.rating - a.rating);
+        filtered = [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
       case 'price-low':
-        filtered = [...filtered].sort((a, b) => a.price - b.price);
+        filtered = [...filtered].sort((a, b) => Number(a.price) - Number(b.price));
         break;
       case 'price-high':
-        filtered = [...filtered].sort((a, b) => b.price - a.price);
+        filtered = [...filtered].sort((a, b) => Number(b.price) - Number(a.price));
         break;
     }
 
     return filtered;
-  }, [sortBy]);
+  }, [products, sortBy]);
 
   const getGridClasses = () => {
     switch (gridLayout) {
@@ -92,7 +102,7 @@ const BestSellers = () => {
         </div>
 
         {/* Price in top-right corner */}
-        <p className="absolute top-6 right-6 text-red-500 font-bold text-xl">${product.price.toFixed(2)}</p>
+        <p className="absolute top-6 right-6 text-red-500 font-bold text-xl">${Number(product.price).toFixed(2)}</p>
 
         {/* Add to cart button in bottom-right corner */}
         <button
@@ -108,6 +118,15 @@ const BestSellers = () => {
       </div>
     </div>
   );
+
+  if (loading) {
+    return (
+      <div className="py-12 flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 text-red-600 animate-spin mb-2" />
+        <p className="text-gray-500">Cargando productos destacados...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-100 py-16 mt-4">

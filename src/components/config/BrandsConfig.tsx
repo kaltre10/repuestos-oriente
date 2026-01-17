@@ -55,9 +55,9 @@ const BrandsConfig = () => {
       </div>
 
       <div className="p-4">
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="">
           {/* Formulario a la izquierda */}
-          <div className="lg:w-1/3">
+          <div className="mb-6">
             <form onSubmit={handleAddBrand}>
               <label htmlFor="newBrand" className="block text-xs font-medium text-gray-700 mb-1">
                 Agregar Nueva Marca
@@ -87,15 +87,15 @@ const BrandsConfig = () => {
           </div>
 
           {/* Lista a la derecha */}
-          <div className="lg:w-2/3">
+          <div className="">
             <h3 className="text-xs font-medium text-gray-700 mb-2">Marcas Registradas</h3>
-            <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-md">
+            <div className="max-h-70 overflow-y-auto border border-gray-200 rounded-md">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
                 {brands.length === 0 && !loadingBrands ? (
                   <p className="p-4 text-center text-gray-500 text-xs italic col-span-full">No hay marcas.</p>
                 ) : (
                   brands.map((brand) => (
-                    <div key={brand.id} className="flex items-center justify-between p-2 hover:bg-gray-50 border-b border-gray-100">
+                    <div key={brand.id} className="flex bg-gray-300 items-center justify-between p-2 hover:bg-gray-50 border-b border-gray-100">
                       {editingBrandId === brand.id ? (
                         <div className="flex-1 flex gap-1 items-center">
                           <input

@@ -4,6 +4,7 @@ import productRoutes from './product.routes.js';
 import brandRoutes from './brand.routes.js';
 import categoryRoutes from './category.routes.js';
 import modelRoutes from './model.routes.js';
+import imageRoutes from './image.routes.js';
 import saleRoutes from './sale.routes.js';
 import configRoutes from './config.routes.js';
 
@@ -18,6 +19,7 @@ router.use(apiVersion, productRoutes);
 router.use(apiVersion, brandRoutes);
 router.use(apiVersion, categoryRoutes);
 router.use(apiVersion, modelRoutes);
+router.use(apiVersion, imageRoutes);
 router.use(apiVersion, saleRoutes);
 router.use(apiVersion, configRoutes);
 

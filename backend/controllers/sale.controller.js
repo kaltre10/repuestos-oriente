@@ -24,11 +24,27 @@ const getSale = asyncHandler(async (req, res) => {
   });
 });
 
+const getSalesByUserId = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  if (!userId) {
+    return responser.error({
+      res,
+      message: 'User ID is required',
+      status: 400,
+    });
+  }
+  const sales = await saleService.getSalesByUserId(userId);
+  responser.success({
+    res,
+    body: { sales },
+  });
+});
+
 const createSale = asyncHandler(async (req, res) => {
   const {
     quantity,
     status,
-    buyer,
+    buyerId,
     paymentMethod,
     saleDate,
     productId,
@@ -36,10 +52,10 @@ const createSale = asyncHandler(async (req, res) => {
   } = req.body;
 
   // Validation
-  if (!quantity || !buyer || !paymentMethod || !productId) {
+  if (!quantity || !buyerId || !paymentMethod || !productId) {
     return responser.error({
       res,
-      message: 'Required fields: quantity, buyer, paymentMethod, productId',
+      message: 'Required fields: quantity, buyerId, paymentMethod, productId',
       status: 400,
     });
   }
@@ -85,7 +101,7 @@ const createSale = asyncHandler(async (req, res) => {
     dailyRate,
     quantity,
     status: status || 'pending',
-    buyer,
+    buyerId,
     paymentMethod,
     saleDate: saleDate || new Date(),
     productId,
@@ -138,10 +154,58 @@ const deleteSale = asyncHandler(async (req, res) => {
   });
 });
 
+const createCheckout = asyncHandler(async (req, res) => {
+  const {
+    items, // Array of { productId, quantity }
+    buyerId,
+    paymentMethod
+  } = req.body;
+
+  if (!items || !Array.isArray(items) || items.length === 0 || !buyerId || !paymentMethod) {
+    return responser.error({
+      res,
+      message: 'Required fields: items (array), buyerId, paymentMethod',
+      status: 400,
+    });
+  }
+
+  // Get the current daily rate from config
+  let dailyRate;
+  try {
+    const configs = await configService.getAllConfigs();
+    if (configs.length === 0) {
+      dailyRate = 1; // Default or handle error
+    } else {
+      dailyRate = configs[0].dolarRate;
+    }
+  } catch (error) {
+    dailyRate = 1;
+  }
+
+  const salesData = items.map(item => ({
+    dailyRate,
+    quantity: item.quantity,
+    status: 'pending', 
+    buyerId,
+    paymentMethod,
+    productId: item.productId,
+    saleDate: new Date()
+  }));
+
+  const newSales = await saleService.createMultipleSales(salesData);
+  responser.success({
+    res,
+    message: 'Checkout successful',
+    body: { sales: newSales },
+  });
+});
+
 export {
   getSales,
   getSale,
+  getSalesByUserId,
   createSale,
   updateSale,
-  deleteSale
+  deleteSale,
+  createCheckout
 };

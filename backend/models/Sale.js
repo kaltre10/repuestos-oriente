@@ -20,8 +20,8 @@ export default (sequelize) => {
       allowNull: false,
       defaultValue: 'pending',
     },
-    buyer: {
-      type: DataTypes.STRING,
+    buyerId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     paymentMethod: {

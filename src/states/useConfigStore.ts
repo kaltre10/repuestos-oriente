@@ -107,7 +107,9 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
       const formattedName = formatName(brandName);
       const response = await request.post(`${apiUrl}/brands`, { brand: formattedName });
       const newBrand = response.data.body.brand;
-      set((state) => ({ brands: [...state.brands, newBrand] }));
+      set((state) => ({ 
+        brands: [...state.brands, newBrand].sort((a, b) => a.brand.localeCompare(b.brand)) 
+      }));
       return true;
     } catch (err: any) {
       console.error('Error adding brand:', err);
@@ -126,7 +128,9 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
       const updatedBrand = response.data.body.brand;
       
       set((state) => {
-        const newBrands = state.brands.map(b => b.id === id ? updatedBrand : b);
+        const newBrands = state.brands
+          .map(b => b.id === id ? updatedBrand : b)
+          .sort((a, b) => a.brand.localeCompare(b.brand));
         const newModels = state.models.map(m => {
           if (m.brandId === id) {
             return {

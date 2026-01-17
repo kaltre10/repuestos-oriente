@@ -16,6 +16,9 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static images
+app.use('/images', express.static('images'));
+
 app.get('/', (_, res) => {
   responser.success({ res, message: 'API is working' });
 });
