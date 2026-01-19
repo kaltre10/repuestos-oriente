@@ -15,6 +15,8 @@ interface Sale {
   saleDate: string;
   productId: number;
   rating: number | null;
+  referenceNumber: string | null;
+  receiptImage: string | null;
   createdAt: string;
   product: {
     id: number;
@@ -182,6 +184,16 @@ const Purchases = () => {
                     <div className="flex items-center text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg">
                       <Clock className="w-4 h-4 mr-2 text-red-500" />
                       <span className="font-semibold">{new Date(purchase.saleDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    {purchase.referenceNumber && (
+                      <div className="flex items-center text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg">
+                        <span className="text-red-500 font-bold mr-2">REF:</span>
+                        <span className="font-semibold">{purchase.referenceNumber}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg">
+                      <span className="text-red-500 font-bold mr-2">METODO:</span>
+                      <span className="font-semibold">{purchase.paymentMethod}</span>
                     </div>
                   </div>
 

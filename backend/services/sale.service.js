@@ -8,11 +8,23 @@ class SaleService {
     try {
       const sales = await Sale.findAll({
         order: [['createdAt', 'DESC']],
-        include: [{
-          model: models.Product,
-          as: 'product',
-          attributes: ['id', 'name', 'price', 'partNumber']
-        }]
+        include: [
+          {
+            model: models.Product,
+            as: 'product',
+            attributes: ['id', 'name', 'price', 'partNumber'],
+            include: [{
+              model: models.ProductImage,
+              as: 'images',
+              attributes: ['image']
+            }]
+          },
+          {
+            model: models.User,
+            as: 'buyer',
+            attributes: ['id', 'name', 'email']
+          }
+        ]
       });
       return sales;
     } catch (error) {

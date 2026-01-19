@@ -7,6 +7,7 @@ import modelRoutes from './model.routes.js';
 import imageRoutes from './image.routes.js';
 import saleRoutes from './sale.routes.js';
 import configRoutes from './config.routes.js';
+import questionRoutes from './question.routes.js';
 
 const router = express.Router();
 
@@ -22,5 +23,6 @@ router.use(apiVersion, modelRoutes);
 router.use(apiVersion, imageRoutes);
 router.use(apiVersion, saleRoutes);
 router.use(apiVersion, configRoutes);
+router.use(`${apiVersion}/questions`, questionRoutes);
 
 export default router;

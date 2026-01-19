@@ -28,6 +28,14 @@ export default (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    referenceNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    receiptImage: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     saleDate: {
       type: DataTypes.DATE,
       allowNull: false,

@@ -7,6 +7,7 @@ import Product from './Product.js';
 import ProductImage from './ProductImage.js';
 import Config from './Config.js';
 import Sale from './Sale.js';
+import Question from './Question.js';
 
 import 'dotenv/config';
 
@@ -39,6 +40,7 @@ const models = {
   ProductImage: ProductImage(sequelize),
   Config: Config(sequelize),
   Sale: Sale(sequelize),
+  Question: Question(sequelize),
 };
 
 // Define associations
@@ -70,6 +72,27 @@ models.Product.hasMany(models.ProductImage, {
 models.ProductImage.belongsTo(models.Product, {
   foreignKey: 'productId',
   as: 'product'
+});
+
+// Question associations
+models.Question.belongsTo(models.User, {
+  foreignKey: 'clientId',
+  as: 'client'
+});
+
+models.Question.belongsTo(models.Product, {
+  foreignKey: 'productId',
+  as: 'product'
+});
+
+models.Product.hasMany(models.Question, {
+  foreignKey: 'productId',
+  as: 'questions'
+});
+
+models.User.hasMany(models.Question, {
+  foreignKey: 'clientId',
+  as: 'questions'
 });
 
 // Define associations if any

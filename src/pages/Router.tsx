@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom"
 import HomePage from "./home/HomePage"
 import CheckoutPage from "./home/CheckoutPage"
+import PaymentPage from "./home/PaymentPage"
 import ProductsPage from "./home/ProductsPage"
 import OffersPage from "./home/OffersPage"
 import ProductDetailPage from "./home/ProductDetailPage"
@@ -20,7 +21,8 @@ import Users from "./admin/Users"
 import Sales from "./admin/Sales"
 import Products from "./admin/Products"
 import Configurations from "./admin/Configurations"
-
+import ClientQuestions from "./admin/ClientQuestions"
+import Test from './test'
 const Router = () => {
     return (
         <Routes>
@@ -30,6 +32,7 @@ const Router = () => {
                 <Route path="/producto/:id" element={<ProductDetailPage />} />
                 <Route path="/ofertas" element={<OffersPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/payment" element={<PaymentPage />} />
             </Route>
 
             <Route element={<ClientLayout />}>
@@ -46,9 +49,10 @@ const Router = () => {
                 <Route path="/admin/users" element={<Users />} />
                 <Route path="/admin/products" element={<Products />} />
                 <Route path="/admin/sales" element={<Sales />} />
+                <Route path="/admin/client-questions" element={<ClientQuestions />} />
                 <Route path="/admin/configurations" element={<Configurations />} />
             </Route>
-
+            <Route path='/test' element={<Test />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         </Routes>

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User as UserIcon, Mail, Phone, ShoppingBag, CheckCircle, AlertCircle, X } from 'lucide-react';
-import axios from 'axios';
 import useStore from '../../states/global';
 import { apiUrl } from '../../utils/utils';
+import request from '../../utils/request';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -33,38 +33,7 @@ const CheckoutPage = () => {
       alert('Por favor complete todos los campos de información del cliente');
       return;
     }
-    setIsModalOpen(true);
-  };
-
-  const confirmPurchase = async () => {
-    if (!user) return;
-    setIsProcessing(true);
-    try {
-      const checkoutData = {
-        items: cart.map(item => ({
-          productId: item.id,
-          quantity: item.quantity
-        })),
-        buyerId: user.id,
-        paymentMethod: 'Pago Móvil' // Por ahora fijo ya que es el único mostrado
-      };
-
-      const response = await axios.post(`${apiUrl}/checkout`, checkoutData);
-
-      if (response.data.success) {
-        clearCart();
-        alert('¡Compra realizada con éxito! Su pedido está siendo procesado.');
-        navigate('/');
-      } else {
-        alert('Hubo un error al procesar su compra: ' + response.data.message);
-      }
-    } catch (error: any) {
-      console.error('Error during checkout:', error);
-      alert('Error de conexión al procesar la compra');
-    } finally {
-      setIsProcessing(false);
-      setIsModalOpen(false);
-    }
+    navigate('/payment', { state: { accountData } });
   };
 
   if (cart.length === 0) {
@@ -233,57 +202,13 @@ const CheckoutPage = () => {
                 onClick={handleSubmit}
                 className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-lg hover:shadow-red-200 mt-8 flex items-center justify-center space-x-2 group"
               >
-                <span>Completar Pedido</span>
+                <span>Proceder al pago</span>
                 <CheckCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </button>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Confirmation Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-8 text-center">
-              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <AlertCircle className="w-10 h-10 text-red-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">¿Confirmar compra?</h3>
-              <p className="text-gray-500 mb-8">
-                Estás a punto de realizar un pedido por un total de <span className="font-bold text-red-600">${getCartTotal().toFixed(2)}</span>. ¿Deseas continuar?
-              </p>
-              
-              <div className="flex flex-col space-y-3">
-                <button
-                  onClick={confirmPurchase}
-                  disabled={isProcessing}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                >
-                  {isProcessing ? (
-                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    'Sí, realizar pedido'
-                  )}
-                </button>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  disabled={isProcessing}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-4 rounded-2xl transition-all"
-                >
-                  No, revisar de nuevo
-                </button>
-              </div>
-            </div>
-            <button 
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-6 right-6 text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-      )}
     </>
   );
 };

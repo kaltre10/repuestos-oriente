@@ -155,11 +155,27 @@ const deleteSale = asyncHandler(async (req, res) => {
 });
 
 const createCheckout = asyncHandler(async (req, res) => {
-  const {
+  let {
     items, // Array of { productId, quantity }
     buyerId,
-    paymentMethod
+    paymentMethod,
+    referenceNumber
   } = req.body;
+
+  // If items is sent as a string (common with FormData), parse it
+  if (typeof items === 'string') {
+    try {
+      items = JSON.parse(items);
+    } catch (error) {
+      return responser.error({
+        res,
+        message: 'Invalid items format. Must be a JSON array.',
+        status: 400,
+      });
+    }
+  }
+
+  const receiptImage = req.file ? `/images/products/${req.file.filename}` : null;
 
   if (!items || !Array.isArray(items) || items.length === 0 || !buyerId || !paymentMethod) {
     return responser.error({
@@ -188,6 +204,8 @@ const createCheckout = asyncHandler(async (req, res) => {
     status: 'pending', 
     buyerId,
     paymentMethod,
+    referenceNumber,
+    receiptImage,
     productId: item.productId,
     saleDate: new Date()
   }));

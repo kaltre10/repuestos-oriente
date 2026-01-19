@@ -17,8 +17,8 @@ const ClientSidebar = () => {
   };
 
   const menuItems = [
-    { path: '/clients/profile', icon: <FaUser className="mr-3" />, label: 'Perfil' },
     { path: '/clients/purchases', icon: <FaShoppingBag className="mr-3" />, label: 'Compras' },
+    { path: '/clients/profile', icon: <FaUser className="mr-3" />, label: 'Perfil' },
     { path: '/clients/payments', icon: <FaCreditCard className="mr-3" />, label: 'Métodos de Pago' },
     { path: '/clients/questions', icon: <FaQuestionCircle className="mr-3" />, label: 'Preguntas' },
     { path: '/clients/contact', icon: <FaEnvelope className="mr-3" />, label: 'Contacto' },

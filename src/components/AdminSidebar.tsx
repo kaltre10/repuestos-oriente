@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaUsers, FaBox, FaChartLine, FaCog, FaDollarSign, FaSignOutAlt } from 'react-icons/fa';
+import { FaUsers, FaBox, FaChartLine, FaCog, FaDollarSign, FaSignOutAlt, FaQuestionCircle } from 'react-icons/fa';
 import { useDollarRate } from '../hooks/useDollarRate';
 import useStore from '../states/global';
 
@@ -13,6 +13,14 @@ const AdminSidebar = () => {
     logout();
     navigate('/auth');
   };
+
+  const routes = [
+    { path: '/admin/users', icon: <FaUsers />, label: 'Usuarios' },
+    { path: '/admin/products', icon: <FaBox />, label: 'Productos' },
+    { path: '/admin/sales', icon: <FaChartLine />, label: 'Ventas' },
+    { path: '/admin/client-questions', icon: <FaQuestionCircle />, label: 'Preguntas' },
+    { path: '/admin/configurations', icon: <FaCog />, label: 'Configuraciones' },
+  ];
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -28,50 +36,19 @@ const AdminSidebar = () => {
         </div>
       </div>
       <nav className="mt-6">
-        <Link
-          to="/admin/users"
-          className={`flex items-center px-6 py-3 ${
-            isActive('/admin/users') || isActive('/admin')
+        {routes.map((i) => {
+          return <Link
+            to={i.path}
+            className={`flex items-center px-6 py-3 ${isActive(i.path) || isActive('/admin')
               ? 'bg-gray-900 text-white border-r-4 border-blue-500'
               : 'text-gray-300 hover:bg-gray-900 hover:text-gray-100'
-          }`}
-        >
-          <FaUsers className="mr-3" />
-          Usuarios
-        </Link>
-        <Link
-          to="/admin/products"
-          className={`flex items-center px-6 py-3 ${
-            isActive('/admin/products')
-              ? 'bg-gray-900 text-white border-r-4 border-blue-500'
-              : 'text-gray-300 hover:bg-gray-900 hover:text-gray-100'
-          }`}
-        >
-          <FaBox className="mr-3" />
-          Productos
-        </Link>
-        <Link
-          to="/admin/sales"
-          className={`flex items-center px-6 py-3 ${
-            isActive('/admin/sales')
-              ? 'bg-gray-900 text-white border-r-4 border-blue-500'
-              : 'text-gray-300 hover:bg-gray-900 hover:text-gray-100'
-          }`}
-        >
-          <FaChartLine className="mr-3" />
-          Ventas
-        </Link>
-        <Link
-          to="/admin/configurations"
-          className={`flex items-center px-6 py-3 ${
-            isActive('/admin/configurations')
-              ? 'bg-gray-900 text-white border-r-4 border-blue-500'
-              : 'text-gray-300 hover:bg-gray-900 hover:text-gray-100'
-          }`}
-        >
-          <FaCog className="mr-3" />
-          Configuraciones
-        </Link>
+              }`}
+          >
+            <div className='flex items-center gap-3'>
+              {i.icon} {i.label}
+            </div>
+          </Link>
+        })}
 
         <button
           onClick={handleLogout}

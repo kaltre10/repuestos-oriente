@@ -1,4 +1,12 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "flowbite/src/themes/default";
+
+@layer base {
+  button, a {
+    cursor: pointer;
+  }
+}
 
 :root {
     --gray: rgb(153,153,153);

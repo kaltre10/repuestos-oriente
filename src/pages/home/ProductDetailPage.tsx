@@ -1,18 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, ArrowLeft, ShoppingCart, Heart, Share2, Loader2 } from 'lucide-react';
+import { Star, ArrowLeft, ShoppingCart, Heart, Share2, Loader2, MessageSquare, Send } from 'lucide-react';
 import { useProducts } from '../../hooks/useProducts';
-import { imagesUrl } from '../../utils/utils';
+import { imagesUrl, apiUrl } from '../../utils/utils';
+import request from '../../utils/request';
 import CartModal from '../../components/CartModal';
 import useStore from '../../states/global';
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addToCart, cart } = useStore();
+  const { addToCart, cart, user } = useStore();
   const { products, loading } = useProducts();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  
+  // Question states
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [newQuestion, setNewQuestion] = useState('');
+  const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
 
   const productFromDB = products.find(p => p.id === parseInt(id || '0'));
 
@@ -28,6 +35,49 @@ const ProductDetailPage = () => {
       : ['/placeholder-product.png'],
     category: (productFromDB as any).categories
   } : null;
+
+  useEffect(() => {
+    if (id) {
+      fetchQuestions();
+    }
+  }, [id]);
+
+  const fetchQuestions = async () => {
+    try {
+      setLoadingQuestions(true);
+      const response = await request.get(`${apiUrl}/questions/product/${id}`);
+      setQuestions(response.data.body.questions);
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+    } finally {
+      setLoadingQuestions(false);
+    }
+  };
+
+  const handleQuestionSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      alert('Debes iniciar sesión para realizar una pregunta');
+      return;
+    }
+    if (!newQuestion.trim()) return;
+
+    try {
+      setIsSubmittingQuestion(true);
+      await request.post(`${apiUrl}/questions`, {
+        productId: id,
+        clientId: user.id,
+        questionText: newQuestion
+      });
+      setNewQuestion('');
+      fetchQuestions();
+    } catch (error) {
+      console.error('Error submitting question:', error);
+      alert('Error al enviar la pregunta');
+    } finally {
+      setIsSubmittingQuestion(false);
+    }
+  };
 
   useEffect(() => {
     if (!loading && !product && products.length > 0) {
@@ -221,6 +271,97 @@ const ProductDetailPage = () => {
                   Garantía de 1 año
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Questions and Answers Section */}
+          <div className="mt-16 bg-white rounded-xl shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-8 flex items-center gap-3">
+              <MessageSquare className="text-red-500" />
+              Preguntas y Respuestas
+            </h2>
+
+            {/* Question Input */}
+            <form onSubmit={handleQuestionSubmit} className="mb-10">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={newQuestion}
+                    onChange={(e) => setNewQuestion(e.target.value)}
+                    placeholder="Escribe tu pregunta aquí..."
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+                    disabled={isSubmittingQuestion}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmittingQuestion || !newQuestion.trim()}
+                  className="px-8 py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-red-200"
+                >
+                  {isSubmittingQuestion ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <span>Preguntar</span>
+                      <Send size={18} />
+                    </>
+                  )}
+                </button>
+              </div>
+              {!user && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Debes <span className="text-red-600 font-medium cursor-pointer" onClick={() => navigate('/auth')}>iniciar sesión</span> para preguntar.
+                </p>
+              )}
+            </form>
+
+            {/* Questions List */}
+            <div className="space-y-8">
+              {loadingQuestions ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="w-8 h-8 text-red-600 animate-spin" />
+                </div>
+              ) : questions.length > 0 ? (
+                questions.map((q) => (
+                  <div key={q.id} className="border-b border-gray-100 pb-8 last:border-0">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="bg-gray-100 p-2 rounded-lg">
+                        <MessageSquare size={20} className="text-gray-600" />
+                      </div>
+                      <div>
+                        <p className="text-gray-800 font-medium mb-1">{q.questionText}</p>
+                        <div className="flex items-center gap-2 text-xs text-gray-400">
+                          <span>{q.client?.name || 'Cliente'}</span>
+                          <span>•</span>
+                          <span>{new Date(q.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {q.status === 1 ? (
+                      <div className="ml-12 bg-gray-50 p-4 rounded-xl border-l-4 border-red-500">
+                        <div className="flex items-start gap-3">
+                          <div className="text-red-600 mt-1">
+                            <Send size={16} className="rotate-180" />
+                          </div>
+                          <div>
+                            <p className="text-gray-700 text-sm leading-relaxed">{q.answerText}</p>
+                            <p className="text-xs text-gray-400 mt-2 font-medium">Respuesta del vendedor</p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="ml-12 text-sm text-gray-400 italic">Pendiente de respuesta...</p>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                  <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 font-medium">Aún no hay preguntas. ¡Sé el primero en preguntar!</p>
+                </div>
+              )}
             </div>
           </div>
 
