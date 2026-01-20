@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User as UserIcon, Mail, Phone, ShoppingBag, CheckCircle, AlertCircle, X } from 'lucide-react';
 import useStore from '../../states/global';
-import { apiUrl } from '../../utils/utils';
-import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
+import useNotify from '../../hooks/useNotify';
 
 const CheckoutPage = () => {
+  const { notify } = useNotify()
   const navigate = useNavigate();
   const { cart, getCartTotal, clearCart, user } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,11 +27,11 @@ const CheckoutPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      alert('Debes iniciar sesión para realizar una compra');
+      notify.info('Debes iniciar sesión para realizar una compra');
       return;
     }
     if (!accountData.name || !accountData.email || !accountData.phone) {
-      alert('Por favor complete todos los campos de información del cliente');
+      notify.error('Por favor complete todos los campos de información del cliente');
       return;
     }
     navigate('/payment', { state: { accountData } });
@@ -74,7 +74,7 @@ const CheckoutPage = () => {
                   </div>
                   <h2 className="text-xl font-bold text-gray-800">Información del Cliente</h2>
                 </div>
-                
+
                 <form className="space-y-5">
                   <div className="relative">
                     <label className="block text-sm font-semibold text-gray-700 mb-2">

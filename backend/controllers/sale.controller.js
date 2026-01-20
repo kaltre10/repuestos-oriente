@@ -175,7 +175,7 @@ const createCheckout = asyncHandler(async (req, res) => {
     }
   }
 
-  const receiptImage = req.file ? `/images/products/${req.file.filename}` : null;
+  const receiptImage = req.file ? `${req.file.filename}` : null;
 
   if (!items || !Array.isArray(items) || items.length === 0 || !buyerId || !paymentMethod) {
     return responser.error({
@@ -218,6 +218,53 @@ const createCheckout = asyncHandler(async (req, res) => {
   });
 });
 
+const uploadReceipt = asyncHandler(async (req, res) => {
+  let { saleIds } = req.body;
+
+  if (typeof saleIds === 'string') {
+    try {
+      saleIds = JSON.parse(saleIds);
+    } catch (error) {
+      return responser.error({
+        res,
+        message: 'Invalid saleIds format. Must be a JSON array.',
+        status: 400,
+      });
+    }
+  }
+
+  if (!saleIds || !Array.isArray(saleIds) || saleIds.length === 0) {
+    return responser.error({
+      res,
+      message: 'Required field: saleIds (array)',
+      status: 400,
+    });
+  }
+
+  if (!req.file) {
+    return responser.error({
+      res,
+      message: 'No receipt image uploaded',
+      status: 400,
+    });
+  }
+
+  const receiptImage = `${req.file.filename}`;
+
+  // Update all sales in the list
+  const updatePromises = saleIds.map(id => 
+    saleService.updateSale(id, { receiptImage })
+  );
+
+  await Promise.all(updatePromises);
+
+  responser.success({
+    res,
+    message: 'Receipt uploaded successfully',
+    body: { receiptImage },
+  });
+});
+
 export {
   getSales,
   getSale,
@@ -225,5 +272,6 @@ export {
   createSale,
   updateSale,
   deleteSale,
-  createCheckout
+  createCheckout,
+  uploadReceipt
 };

@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { FaLayerGroup, FaPlus, FaCheck, FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
 import { useSubCategories } from '../../hooks/useSubCategories';
 import { useCategories } from '../../hooks/useCategories';
-
+import { useConfirm } from '../../hooks/useConfirm';
 const SubCategoriesConfig = () => {
-  const { 
-    categories, 
-    loading: loadingCategories 
+  const confirm = useConfirm()
+  const {
+    categories,
+    loading: loadingCategories
   } = useCategories();
 
   const {
@@ -44,7 +45,8 @@ const SubCategoriesConfig = () => {
   };
 
   const handleDeleteSubCategory = async (id: number) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar esta subcategoría?')) {
+    const respuesta = await confirm('¿Estás seguro de que deseas eliminar esta subcategoría?');
+    if (respuesta) {
       await deleteSubCategory(id);
     }
   };
@@ -104,9 +106,8 @@ const SubCategoriesConfig = () => {
                   <button
                     type="submit"
                     disabled={loadingSubCategories || !newSubCategoryName.trim() || !selectedCategoryId}
-                    className={`flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white h-[38px] ${
-                      loadingSubCategories || !newSubCategoryName.trim() || !selectedCategoryId ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-                    } transition-colors duration-200`}
+                    className={`flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white h-[38px] ${loadingSubCategories || !newSubCategoryName.trim() || !selectedCategoryId ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
+                      } transition-colors duration-200`}
                   >
                     <FaPlus />
                   </button>

@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { FaLayerGroup, FaPlus, FaCheck, FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
 import { useModels } from '../../hooks/useModels';
 import { useBrands } from '../../hooks/useBrands';
-
+import { useConfirm } from '../../hooks/useConfirm';
 const ModelsConfig = () => {
+  const confirm = useConfirm();
   const { 
     brands, 
     loading: loadingBrands 
@@ -44,7 +45,8 @@ const ModelsConfig = () => {
   };
 
   const handleDeleteModel = async (id: number) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este modelo?')) {
+    const respuesta = await confirm('¿Estás seguro de que deseas eliminar este modelo?');
+    if (respuesta) {
       await deleteModel(id);
     }
   };

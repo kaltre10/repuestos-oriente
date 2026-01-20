@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { FaCar, FaPlus, FaCheck, FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
 import { useBrands } from '../../hooks/useBrands';
+import { useConfirm } from '../../hooks/useConfirm';
 
 const BrandsConfig = () => {
-  const { 
-    brands, 
-    loading: loadingBrands, 
-    error: errorBrands, 
-    addBrand, 
-    updateBrand, 
-    deleteBrand 
+  const {
+    brands,
+    loading: loadingBrands,
+    error: errorBrands,
+    addBrand,
+    updateBrand,
+    deleteBrand
   } = useBrands();
+
+  const confirm = useConfirm()
 
   const [newBrandName, setNewBrandName] = useState('');
   const [editingBrandId, setEditingBrandId] = useState<number | null>(null);
@@ -35,7 +38,8 @@ const BrandsConfig = () => {
   };
 
   const handleDeleteBrand = async (id: number) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar esta marca?')) {
+    const respuesta = await confirm('¿Estás seguro de que deseas eliminar esta marca?');
+    if (respuesta) {
       await deleteBrand(id);
     }
   };
@@ -75,9 +79,8 @@ const BrandsConfig = () => {
                 <button
                   type="submit"
                   disabled={loadingBrands || !newBrandName.trim()}
-                  className={`flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white h-[38px] ${
-                    loadingBrands || !newBrandName.trim() ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-                  } transition-colors duration-200`}
+                  className={`flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white h-[38px] ${loadingBrands || !newBrandName.trim() ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
+                    } transition-colors duration-200`}
                 >
                   <FaPlus />
                 </button>

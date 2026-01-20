@@ -3,9 +3,9 @@ import request from '../utils/request';
 import { Product } from '../utils/interfaces';
 import { apiUrl } from '../utils/utils';
 import useProductStore from '../states/useProductStore';
-
+import { useConfirm } from './useConfirm';
 export const useProducts = () => {
-
+  const confirm = useConfirm();
   const [loading, setLoading] = useState(false)
 
   const {
@@ -87,7 +87,8 @@ export const useProducts = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+    const respuesta = await confirm('¿Estás seguro de que quieres eliminar este producto?');
+    if (respuesta) {
       try {
         await deleteProduct(id);
       } catch (err) {

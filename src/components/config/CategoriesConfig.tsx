@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { FaTags, FaPlus, FaCheck, FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
 import { useCategories } from '../../hooks/useCategories';
-
+import { useConfirm } from '../../hooks/useConfirm';
 const CategoriesConfig = () => {
+  const confirm = useConfirm();
   const {
     categories,
     loading: loadingCategories,
@@ -35,7 +36,8 @@ const CategoriesConfig = () => {
   };
 
   const handleDeleteCategory = async (id: number) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
+    const respuesta = await confirm('¿Estás seguro de que deseas eliminar esta categoría?');
+    if (respuesta) {
       await deleteCategory(id);
     }
   };

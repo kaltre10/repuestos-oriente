@@ -12,6 +12,7 @@
     --red: rgb(206,42,40);
 }
 
+
 .bg-logo{
     background-color: var(--red);
     padding:12px 0px;
@@ -46,7 +47,17 @@
     margin-right: 8px;
     vertical-align: middle;
 }
-
+.modal-backdrop{
+    background-color:red;
+    width:100vw;
+    height:100vh;
+    z-index:999;
+    position:absolute;
+    position:fixed;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
 .bg-modal {
     background-color: rgba(0, 0, 0, 0.5);
 }

@@ -7,15 +7,16 @@ import request from '../../utils/request';
 import CartModal from '../../components/CartModal';
 import useStore from '../../states/global';
 import FormattedPrice from '../../components/FormattedPrice';
-
+import useNotify from '../../hooks/useNotify';
 const ProductDetailPage = () => {
+  const { notify } = useNotify()
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart, cart, user, incrementQuantity, decrementQuantity, removeFromCart } = useStore();
   const { products, loading } = useProducts();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  
+
   // Question states
   const [questions, setQuestions] = useState<any[]>([]);
   const [newQuestion, setNewQuestion] = useState('');
@@ -58,7 +59,7 @@ const ProductDetailPage = () => {
   const handleQuestionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      alert('Debes iniciar sesión para realizar una pregunta');
+      notify.info('Debes iniciar sesión para realizar una pregunta');
       return;
     }
     if (!newQuestion.trim()) return;
@@ -74,7 +75,7 @@ const ProductDetailPage = () => {
       fetchQuestions();
     } catch (error) {
       console.error('Error submitting question:', error);
-      alert('Error al enviar la pregunta');
+      notify.error('Error al enviar la pregunta');
     } finally {
       setIsSubmittingQuestion(false);
     }

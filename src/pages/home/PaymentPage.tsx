@@ -5,8 +5,9 @@ import useStore from '../../states/global';
 import { apiUrl } from '../../utils/utils';
 import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
-
+import useNotify from '../../hooks/useNotify';
 const PaymentPage = () => {
+  const { notify } = useNotify()
   const location = useLocation();
   const navigate = useNavigate();
   const { cart, clearCart, user, getCartTotal } = useStore();
@@ -48,7 +49,7 @@ const PaymentPage = () => {
 
   const handleConfirmPurchase = async () => {
     if (!referenceNumber) {
-      alert('Por favor ingrese el número de referencia');
+      notify.error('Por favor ingrese el número de referencia');
       return;
     }
 
@@ -61,7 +62,7 @@ const PaymentPage = () => {
       if (receiptImage) {
         formData.append('receiptImage', receiptImage);
       }
-      
+
       const items = cart.map(item => ({
         productId: item.id,
         quantity: item.quantity
@@ -72,15 +73,15 @@ const PaymentPage = () => {
 
       if (response.data.success) {
         clearCart();
-        alert('¡Compra realizada con éxito! Su pedido está siendo procesado.');
+        notify.success('¡Compra realizada con éxito! Su pedido está siendo procesado.');
         navigate('/clients/purchases');
       } else {
-        alert('Hubo un error al procesar su compra: ' + (response.data.message || 'Error desconocido'));
+        notify.error('Hubo un error al procesar su compra: ' + (response.data.message || 'Error desconocido'));
       }
     } catch (error: any) {
       console.error('Error during checkout:', error);
       const errorMessage = error.response?.data?.message || 'Error de conexión al procesar la compra';
-      alert('Hubo un error al procesar su compra: ' + errorMessage);
+      notify.error('Hubo un error al procesar su compra: ' + errorMessage);
     } finally {
       setIsProcessing(false);
     }
@@ -89,7 +90,7 @@ const PaymentPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex items-center text-gray-600 hover:text-red-600 mb-8 transition-colors"
         >
@@ -110,22 +111,20 @@ const PaymentPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => setPaymentMethod('pago_movil')}
-                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-2 ${
-                    paymentMethod === 'pago_movil' 
-                    ? 'border-red-600 bg-red-50 text-red-600' 
-                    : 'border-gray-100 hover:border-gray-200 text-gray-500'
-                  }`}
+                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-2 ${paymentMethod === 'pago_movil'
+                      ? 'border-red-600 bg-red-50 text-red-600'
+                      : 'border-gray-100 hover:border-gray-200 text-gray-500'
+                    }`}
                 >
                   <Smartphone className="w-6 h-6" />
                   <span className="font-semibold text-sm">Pago Móvil</span>
                 </button>
                 <button
                   onClick={() => setPaymentMethod('transferencia')}
-                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-2 ${
-                    paymentMethod === 'transferencia' 
-                    ? 'border-red-600 bg-red-50 text-red-600' 
-                    : 'border-gray-100 hover:border-gray-200 text-gray-500'
-                  }`}
+                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-2 ${paymentMethod === 'transferencia'
+                      ? 'border-red-600 bg-red-50 text-red-600'
+                      : 'border-gray-100 hover:border-gray-200 text-gray-500'
+                    }`}
                 >
                   <CreditCard className="w-6 h-6" />
                   <span className="font-semibold text-sm">Transferencia</span>
@@ -139,7 +138,7 @@ const PaymentPage = () => {
                 {paymentMethod === 'pago_movil' ? <Smartphone className="mr-2" /> : <CreditCard className="mr-2" />}
                 Datos para el pago
               </h2>
-              
+
               <div className="space-y-4 relative z-10">
                 {paymentMethod === 'pago_movil' ? (
                   <>
@@ -233,7 +232,7 @@ const PaymentPage = () => {
                 <span className="text-gray-600 font-medium">Total a pagar:</span>
                 <FormattedPrice price={getCartTotal()} className="text-2xl font-bold text-red-600" />
               </div>
-              
+
               <button
                 onClick={handleConfirmPurchase}
                 disabled={isProcessing}
@@ -248,7 +247,7 @@ const PaymentPage = () => {
                   </>
                 )}
               </button>
-              
+
               <p className="text-center text-xs text-gray-500 mt-4 flex items-center justify-center">
                 <AlertCircle className="w-3 h-3 mr-1" />
                 Su pedido será validado por nuestro equipo una vez verificado el pago.

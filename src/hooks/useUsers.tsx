@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import request from '../utils/request';
 import { User } from '../utils/interfaces';
 import { apiUrl } from '../utils/utils';
+import { useConfirm } from './useConfirm';
 
 export const useUsers = () => {
+  const confirm = useConfirm();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +74,8 @@ export const useUsers = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
+    const respuesta = await confirm('¿Estás seguro de que quieres eliminar este usuario?');
+    if (respuesta) {
       try {
         await deleteUser(id);
       } catch (err) {

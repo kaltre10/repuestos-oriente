@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { MessageSquare, Send, Clock, CheckCircle, Search, Loader2 } from 'lucide-react';
 import { apiUrl, imagesUrl } from '../../utils/utils';
 import request from '../../utils/request';
-
+import useNotify from '../../hooks/useNotify';
 const ClientQuestions = () => {
+
+  const { notify } = useNotify()
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,7 +37,7 @@ const ClientQuestions = () => {
       await request.put(`${apiUrl}/questions/${questionId}/answer`, {
         answerText: answerText.trim()
       });
-      
+
       // Clear answer for this question
       setAnswers(prev => {
         const newAnswers = { ...prev };
@@ -47,13 +49,13 @@ const ClientQuestions = () => {
       fetchQuestions();
     } catch (error) {
       console.error('Error answering question:', error);
-      alert('Error al enviar la respuesta');
+      notify.error('Error al enviar la respuesta');
     } finally {
       setSubmittingIds(prev => ({ ...prev, [questionId]: false }));
     }
   };
 
-  const filteredQuestions = questions.filter(q => 
+  const filteredQuestions = questions.filter(q =>
     q.questionText.toLowerCase().includes(searchTerm.toLowerCase()) ||
     q.product?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     q.client?.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -66,7 +68,7 @@ const ClientQuestions = () => {
           <h1 className="text-3xl font-bold text-gray-800">Preguntas de Clientes</h1>
           <p className="text-gray-500 mt-1">Gestiona y responde las dudas de tus compradores</p>
         </div>
-        
+
         <div className="relative w-full md:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
@@ -94,8 +96,8 @@ const ClientQuestions = () => {
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                       {q.product?.images?.[0] ? (
-                        <img 
-                          src={`${imagesUrl}${q.product.images[0].image}`} 
+                        <img
+                          src={`${imagesUrl}${q.product.images[0].image}`}
                           alt={q.product.name}
                           className="w-full h-full object-cover"
                         />
@@ -110,13 +112,12 @@ const ClientQuestions = () => {
                       <p className="text-sm text-gray-500">Cliente: <span className="font-medium text-gray-700">{q.client?.name || 'Anónimo'}</span></p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-3">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${
-                      q.status === 1 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-amber-100 text-amber-700'
-                    }`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${q.status === 1
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-amber-100 text-amber-700'
+                      }`}>
                       {q.status === 1 ? (
                         <>
                           <CheckCircle size={14} />
@@ -202,7 +203,7 @@ const ClientQuestions = () => {
             {searchTerm ? 'No hay resultados para tu búsqueda actual.' : 'Aún no hay preguntas de clientes para gestionar.'}
           </p>
           {searchTerm && (
-            <button 
+            <button
               onClick={() => setSearchTerm('')}
               className="mt-6 text-red-600 font-semibold hover:underline"
             >

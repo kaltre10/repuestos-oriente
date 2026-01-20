@@ -3,12 +3,12 @@ import { Search, Loader2, ShoppingBag, User, Calendar, ExternalLink, CheckCircle
 import { apiUrl, imagesUrl } from '../../utils/utils';
 import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
-
+import useNotify from '../../hooks/useNotify';
 const Sales = () => {
   const [sales, setSales] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-
+  const { notify } = useNotify()
   useEffect(() => {
     fetchSales();
   }, []);
@@ -31,11 +31,11 @@ const Sales = () => {
       fetchSales(); // Refresh list
     } catch (error) {
       console.error('Error updating sale status:', error);
-      alert('Error al actualizar el estado de la venta');
+      notify.error('Error al actualizar el estado de la venta');
     }
   };
 
-  const filteredSales = sales.filter(sale => 
+  const filteredSales = sales.filter(sale =>
     sale.product?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     sale.buyer?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     sale.referenceNumber?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -61,7 +61,7 @@ const Sales = () => {
           <h1 className="text-3xl font-bold text-gray-800">Registro de Ventas</h1>
           <p className="text-gray-500 mt-1">Monitorea y gestiona las transacciones de la plataforma</p>
         </div>
-        
+
         <div className="relative w-full md:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
@@ -100,8 +100,8 @@ const Sales = () => {
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                           {sale.product?.images?.[0] ? (
-                            <img 
-                              src={`${imagesUrl}${sale.product.images[0].image}`} 
+                            <img
+                              src={`${imagesUrl}${sale.product.images[0].image}`}
                               alt={sale.product.name}
                               className="w-full h-full object-cover"
                             />
@@ -132,9 +132,9 @@ const Sales = () => {
                           <span className="text-xs text-gray-400 font-mono">Ref: {sale.referenceNumber}</span>
                         )}
                         {sale.receiptImage && (
-                          <a 
-                            href={`${apiUrl}${sale.receiptImage}`} 
-                            target="_blank" 
+                          <a
+                            href={`${apiUrl}${sale.receiptImage}`}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="text-xs text-blue-600 hover:underline flex items-center gap-1"
                           >
@@ -145,8 +145,8 @@ const Sales = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <FormattedPrice 
-                          price={sale.quantity * sale.product?.price} 
+                        <FormattedPrice
+                          price={sale.quantity * sale.product?.price}
                           className="text-sm font-bold text-red-600"
                         />
                         <span className="text-[10px] text-gray-400 flex items-center gap-1">
@@ -158,7 +158,7 @@ const Sales = () => {
                       {getStatusBadge(sale.status)}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <select 
+                      <select
                         className="text-xs border border-gray-200 rounded px-2 py-1 bg-white focus:ring-2 focus:ring-red-500 outline-none"
                         value={sale.status}
                         onChange={(e) => handleUpdateStatus(sale.id, e.target.value)}
@@ -184,7 +184,7 @@ const Sales = () => {
             {searchTerm ? 'No hay resultados para tu búsqueda actual.' : 'Aún no se han realizado ventas en la plataforma.'}
           </p>
           {searchTerm && (
-            <button 
+            <button
               onClick={() => setSearchTerm('')}
               className="mt-6 text-red-600 font-semibold hover:underline"
             >

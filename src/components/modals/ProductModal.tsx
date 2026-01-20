@@ -6,8 +6,9 @@ import { useCategories } from '../../hooks/useCategories';
 import { useSubCategories } from '../../hooks/useSubCategories';
 import { useImageUpload } from '../../hooks/useImageUpload';
 import ImageUploadSection from '../ImageUploadSection';
-
+import { useConfirm } from '../../hooks/useConfirm';
 const ProductModal = () => {
+  const confirm = useConfirm();
   const modalRef = useRef<HTMLDivElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<{ id: number; image: string }[]>([]);
@@ -174,7 +175,8 @@ const ProductModal = () => {
   };
 
   const handleDeleteExistingImage = async (imageId: number) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
+    const respuesta = await confirm('¿Estás seguro de que quieres eliminar esta imagen?');
+    if (respuesta) {
       await deleteImage(imageId);
       setExistingImages(existingImages.filter(img => img.id !== imageId));
     }
