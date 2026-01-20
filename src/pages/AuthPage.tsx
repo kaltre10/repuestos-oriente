@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
-import logo from '../../public/logo.png'
+import logo from '../assets/logo.png'
 
 const AuthPage = () => {
 

@@ -9,6 +9,7 @@ const initialFormData: ProductFormData = {
   model: '',
   productBrand: '',
   categories: '',
+  subcategories: '',
   years: '',
   description: '',
   discount: 0,
@@ -16,6 +17,7 @@ const initialFormData: ProductFormData = {
   price: 0,
   freeDelivery: false,
   partNumber: '',
+  noBrand: false,
 };
 
 const useProductStore = createWithEqualityFn<ProductStoreState>((set) => ({

@@ -106,6 +106,7 @@ export const useProducts = () => {
       model: (product as any).model || '',
       productBrand: product.productBrand,
       categories: product.categories,
+      subcategories: (product as any).subcategories || '',
       years: product.years,
       description: product.description || '',
       discount: product.discount,
@@ -113,6 +114,7 @@ export const useProducts = () => {
       price: product.price,
       freeDelivery: product.freeDelivery,
       partNumber: product.partNumber,
+      noBrand: !(product as any).brandId && !(product as any).modelId,
     });
     setShowForm(true);
   };
@@ -129,6 +131,7 @@ export const useProducts = () => {
       model: '',
       productBrand: '',
       categories: '',
+      subcategories: '',
       years: '',
       description: '',
       discount: 0,
@@ -136,6 +139,7 @@ export const useProducts = () => {
       price: 0,
       freeDelivery: false,
       partNumber: '',
+      noBrand: false,
     });
   };
 
@@ -146,17 +150,21 @@ export const useProducts = () => {
     setFieldErrors({});
 
     // Frontend Validation
-    const requiredFields = {
+    const requiredFields: Record<string, string> = {
       name: 'Nombre',
-      brandId: 'Marca del vehículo',
-      modelId: 'Modelo del vehículo',
       productBrand: 'Marca del producto',
       categories: 'Categorías',
+      subcategories: 'Subcategorías',
       years: 'Años',
       price: 'Precio',
       amount: 'Cantidad',
       partNumber: 'Número de parte'
     };
+
+    if (!formData.noBrand) {
+      requiredFields.brandId = 'Marca del vehículo';
+      requiredFields.modelId = 'Modelo del vehículo';
+    }
 
     const newFieldErrors: Record<string, string> = {};
 

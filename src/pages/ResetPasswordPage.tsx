@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { Eye, EyeOff, CheckCircle } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
-import logo from '../../public/logo.png';
+import logo from '../assets/logo.png';
 
 const ResetPasswordPage = () => {
   const { token } = useParams<{ token: string }>();

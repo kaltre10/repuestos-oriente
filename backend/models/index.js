@@ -2,6 +2,7 @@ import { Sequelize } from 'sequelize';
 import User from './User.js';
 import Brand from './Brand.js';
 import Category from './Category.js';
+import SubCategory from './SubCategory.js';
 import Model from './Model.js';
 import Product from './Product.js';
 import ProductImage from './ProductImage.js';
@@ -35,6 +36,7 @@ const models = {
   User: User(sequelize),
   Brand: Brand(sequelize),
   Category: Category(sequelize),
+  SubCategory: SubCategory(sequelize),
   Model: Model(sequelize),
   Product: Product(sequelize),
   ProductImage: ProductImage(sequelize),
@@ -93,6 +95,17 @@ models.Product.hasMany(models.Question, {
 models.User.hasMany(models.Question, {
   foreignKey: 'clientId',
   as: 'questions'
+});
+
+// Category - SubCategory associations
+models.Category.hasMany(models.SubCategory, {
+  foreignKey: 'categoryId',
+  as: 'subCategories'
+});
+
+models.SubCategory.belongsTo(models.Category, {
+  foreignKey: 'categoryId',
+  as: 'category'
 });
 
 // Define associations if any

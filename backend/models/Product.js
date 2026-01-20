@@ -13,19 +13,19 @@ export default (sequelize) => {
     },
     brand: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     model: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     brandId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     modelId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     productBrand: {
       type: DataTypes.STRING,
@@ -35,9 +35,14 @@ export default (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    subcategories: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: '',
+    },
     years: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     description: {
       type: DataTypes.TEXT,
@@ -59,12 +64,12 @@ export default (sequelize) => {
     },
     freeDelivery: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
+      allowNull: true,
       defaultValue: false,
     },
     partNumber: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     createdAt: {
       type: DataTypes.DATE,

@@ -33,6 +33,7 @@ const createProduct = asyncHandler(async (req, res) => {
     modelId,
     productBrand,
     categories,
+    subcategories,
     years,
     description,
     discount,
@@ -43,10 +44,10 @@ const createProduct = asyncHandler(async (req, res) => {
   } = req.body;
 
   // Validation
-  if (!name || !brand || !model || !brandId || !modelId || !productBrand || !categories || !years || !price || !partNumber) {
+  if (!name || !productBrand || !categories || !years || !price || !partNumber) {
     return responser.error({
       res,
-      message: 'Required fields: name, brand, model, brandId, modelId, productBrand, categories, years, price, partNumber',
+      message: 'Required fields: name, productBrand, categories, years, price, partNumber',
       status: 400,
     });
   }
@@ -69,12 +70,13 @@ const createProduct = asyncHandler(async (req, res) => {
 
   const productData = {
     name,
-    brand,
-    model,
-    brandId,
-    modelId,
+    brand: brand || null,
+    model: model || null,
+    brandId: brandId || null,
+    modelId: modelId || null,
     productBrand,
     categories,
+    subcategories: subcategories || '',
     years,
     description,
     discount: discount || 0,
@@ -102,6 +104,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     modelId,
     productBrand,
     categories,
+    subcategories,
     years,
     description,
     discount,
@@ -122,12 +125,13 @@ const updateProduct = asyncHandler(async (req, res) => {
 
   const updateData = {
     name,
-    brand,
-    model,
-    brandId,
-    modelId,
+    brand: brand !== undefined ? (brand || null) : undefined,
+    model: model !== undefined ? (model || null) : undefined,
+    brandId: brandId !== undefined ? (brandId || null) : undefined,
+    modelId: modelId !== undefined ? (modelId || null) : undefined,
     productBrand,
     categories,
+    subcategories: subcategories !== undefined ? (subcategories || '') : undefined,
     years,
     description,
     discount,

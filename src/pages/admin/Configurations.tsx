@@ -2,6 +2,7 @@ import DollarRateConfig from '../../components/config/DollarRateConfig';
 import BrandsConfig from '../../components/config/BrandsConfig';
 import ModelsConfig from '../../components/config/ModelsConfig';
 import CategoriesConfig from '../../components/config/CategoriesConfig';
+import SubCategoriesConfig from '../../components/config/SubCategoriesConfig';
 
 const Configurations = () => {
   return (
@@ -13,6 +14,7 @@ const Configurations = () => {
         <BrandsConfig />
         <ModelsConfig />
         <CategoriesConfig />
+        <SubCategoriesConfig />
       </div>
     </div>
   );

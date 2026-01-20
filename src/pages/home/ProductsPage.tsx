@@ -8,6 +8,7 @@ import ProductCard from '../../components/ProductCard';
 import ProductFilters from '../../components/ProductFilters';
 import CartModal from '../../components/CartModal';
 import useStore from '../../states/global';
+import { Dropdown, DropdownItem } from 'flowbite-react';
 
 const ProductsPage = () => {
     const navigate = useNavigate();
@@ -41,8 +42,8 @@ const ProductsPage = () => {
             ...p,
             rating: p.rating || 5, // Default rating if not in DB
             reviews: p.reviews || 0, // Default reviews if not in DB
-            image: p.images && p.images.length > 0 
-                ? `${imagesUrl}${p.images[0].image}` 
+            image: p.images && p.images.length > 0
+                ? `${imagesUrl}${p.images[0].image}`
                 : '/placeholder-product.png', // Default image if none
             category: p.categories // Map categories from DB to category for UI
         }));
@@ -189,7 +190,7 @@ const ProductsPage = () => {
 
                     {/* Main content */}
                     <div className="grid grid-cols-12 gap-4">
-                        
+
                         <div className={'block md:hidden'}>
                             <div className={`${filtersExpanded ? 'block' : 'hidden'} lg:block w-full mb-8`}>
                                 <ProductFilters
@@ -223,22 +224,32 @@ const ProductsPage = () => {
 
                             </div>
                         </div>
-                        
+
                         {/* Sorting and Grid Controls */}
                         <div className="col-span-12 md:col-span-8">
                             <div className='flex items-center justify-between mb-6 p-4'>
 
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm font-medium text-gray-700">Ordenar por:</span>
-                                    <select
-                                        value={sortBy}
-                                        onChange={(e) => setSortBy(e.target.value as 'popular' | 'price-low' | 'price-high')}
-                                        className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                                    <Dropdown className='px-4 py-1 border border-gray-300 rounded-md text-sm focus:outline-none'
+                                        label={
+                                            sortBy === 'popular' ? 'Más popular' :
+                                                sortBy === 'price-low' ? 'Precio menor' : 'Precio mayor'
+                                        }
+                                        size="sm"
+                                        color="light" // Esto imita el borde gris de tu original
+                                        dismissOnClick={true}
                                     >
-                                        <option value="popular">Más popular</option>
-                                        <option value="price-low">Precio menor</option>
-                                        <option value="price-high">Precio mayor</option>
-                                    </select>
+                                        <DropdownItem onClick={() => setSortBy('popular')}>
+                                            Más popular
+                                        </DropdownItem>
+                                        <DropdownItem onClick={() => setSortBy('price-low')}>
+                                            Precio menor
+                                        </DropdownItem>
+                                        <DropdownItem onClick={() => setSortBy('price-high')}>
+                                            Precio mayor
+                                        </DropdownItem>
+                                    </Dropdown>
                                 </div>
 
                                 <div className="flex items-center gap-2">

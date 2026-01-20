@@ -3,8 +3,8 @@ import models from '../models/index.js';
 const brandsToSeed = [
   'JAC', 'Toyota', 'Changan', 'Chevrolet', 'Ford', 'Hyundai', 'Kia', 'Fiat', 
   'Foton', 'Jeep', 'Chery', 'Mitsubishi', 'RAM', 'Renault', 'Suzuki', 'Subaru', 
-  'Chrysler', 'Tesla', 'Donfeng', 'Mini', 'Audi', 'Peugeot', 'Lexus', 'Mazda', 
-  'Land Rober', 'Mercedes Benz', 'Dodge', 'Nissan', 'Volswagen', 'Honda', 'Bmw'
+  'Chrysler', 'Tesla', 'Dongfeng', 'Mini', 'Audi', 'Peugeot', 'Lexus', 'Mazda', 
+  'Land Rover', 'Mercedes Benz', 'Dodge', 'Nissan', 'Volkswagen', 'Honda', 'BMW'
 ];
 
 export const seedBrands = async () => {

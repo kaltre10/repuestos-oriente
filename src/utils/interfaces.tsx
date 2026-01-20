@@ -26,6 +26,7 @@ export interface Product {
   modelId?: number;
   productBrand: string;
   categories: string;
+  subcategories?: string;
   years: string;
   description?: string;
   discount: number;
@@ -45,6 +46,7 @@ export interface ProductFormData {
   model: string;
   productBrand: string;
   categories: string;
+  subcategories: string;
   years: string;
   description: string;
   discount: number;
@@ -52,6 +54,7 @@ export interface ProductFormData {
   price: number;
   freeDelivery: boolean;
   partNumber: string;
+  noBrand: boolean;
 }
 
 export interface ProductStoreState {

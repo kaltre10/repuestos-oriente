@@ -24,19 +24,31 @@ interface Category {
   category: string;
 }
 
+interface SubCategory {
+  id: number;
+  subCategory: string;
+  categoryId: number;
+  category?: {
+    category: string;
+  };
+}
+
 interface ConfigState {
   brands: Brand[];
   models: Model[];
   categories: Category[];
+  subCategories: SubCategory[];
   dollarRate: string;
   configId: number | null;
   loadingBrands: boolean;
   loadingModels: boolean;
   loadingCategories: boolean;
+  loadingSubCategories: boolean;
   loadingDollar: boolean;
   errorBrands: string | null;
   errorModels: string | null;
   errorCategories: string | null;
+  errorSubCategories: string | null;
   errorDollar: string | null;
 
   // Brands Actions
@@ -57,6 +69,12 @@ interface ConfigState {
   updateCategory: (id: number, categoryName: string) => Promise<boolean>;
   deleteCategory: (id: number) => Promise<boolean>;
 
+  // SubCategories Actions
+  fetchSubCategories: () => Promise<void>;
+  addSubCategory: (subCategoryName: string, categoryId: number) => Promise<boolean>;
+  updateSubCategory: (id: number, subCategoryName: string, categoryId: number) => Promise<boolean>;
+  deleteSubCategory: (id: number) => Promise<boolean>;
+
   // Dollar Actions
   fetchDollarRate: () => Promise<void>;
   saveDollarRate: (newRate: string) => Promise<boolean>;
@@ -73,15 +91,18 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
   brands: [],
   models: [],
   categories: [],
+  subCategories: [],
   dollarRate: '0',
   configId: null,
   loadingBrands: false,
   loadingModels: false,
   loadingCategories: false,
+  loadingSubCategories: false,
   loadingDollar: false,
   errorBrands: null,
   errorModels: null,
   errorCategories: null,
+  errorSubCategories: null,
   errorDollar: null,
 
   // Brands Actions
@@ -312,6 +333,79 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
       return false;
     } finally {
       set({ loadingCategories: false });
+    }
+  },
+
+  // SubCategories Actions
+  fetchSubCategories: async () => {
+    set({ loadingSubCategories: true, errorSubCategories: null });
+    try {
+      const response = await request.get(`${apiUrl}/subcategories`);
+      set({ subCategories: response.data.body.subCategories });
+    } catch (err) {
+      console.error('Error fetching subcategories:', err);
+      set({ errorSubCategories: 'Error al obtener las subcategorías' });
+    } finally {
+      set({ loadingSubCategories: false });
+    }
+  },
+
+  addSubCategory: async (subCategoryName, categoryId) => {
+    set({ loadingSubCategories: true, errorSubCategories: null });
+    try {
+      const formattedName = formatName(subCategoryName);
+      const response = await request.post(`${apiUrl}/subcategories`, { 
+        subCategory: formattedName,
+        categoryId 
+      });
+      const newSubCategory = response.data.body.subCategory;
+      set((state) => ({ subCategories: [newSubCategory, ...state.subCategories] }));
+      return true;
+    } catch (err: any) {
+      console.error('Error adding subcategory:', err);
+      set({ errorSubCategories: err.response?.data?.message || 'Error al agregar la subcategoría' });
+      return false;
+    } finally {
+      set({ loadingSubCategories: false });
+    }
+  },
+
+  updateSubCategory: async (id, subCategoryName, categoryId) => {
+    set({ loadingSubCategories: true, errorSubCategories: null });
+    try {
+      const formattedName = formatName(subCategoryName);
+      const response = await request.put(`${apiUrl}/subcategories/${id}`, { 
+        subCategory: formattedName,
+        categoryId 
+      });
+      const updatedSubCategory = response.data.body.subCategory;
+      set((state) => ({
+        subCategories: state.subCategories.map(s => s.id === id ? updatedSubCategory : s)
+      }));
+      return true;
+    } catch (err: any) {
+      console.error('Error updating subcategory:', err);
+      set({ errorSubCategories: err.response?.data?.message || 'Error al actualizar la subcategoría' });
+      return false;
+    } finally {
+      set({ loadingSubCategories: false });
+    }
+  },
+
+  deleteSubCategory: async (id) => {
+    set({ loadingSubCategories: true, errorSubCategories: null });
+    try {
+      await request.delete(`${apiUrl}/subcategories/${id}`);
+      set((state) => ({
+        subCategories: state.subCategories.filter(s => s.id !== id)
+      }));
+      return true;
+    } catch (err: any) {
+      console.error('Error deleting subcategory:', err);
+      set({ errorSubCategories: err.response?.data?.message || 'Error al eliminar la subcategoría' });
+      return false;
+    } finally {
+      set({ loadingSubCategories: false });
     }
   },
 

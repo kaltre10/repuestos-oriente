@@ -3,6 +3,7 @@ import { useProducts } from '../../hooks/useProducts';
 import { useBrands } from '../../hooks/useBrands';
 import { useModels } from '../../hooks/useModels';
 import { useCategories } from '../../hooks/useCategories';
+import { useSubCategories } from '../../hooks/useSubCategories';
 import { useImageUpload } from '../../hooks/useImageUpload';
 import ImageUploadSection from '../ImageUploadSection';
 
@@ -30,15 +31,33 @@ const ProductModal = () => {
   const { brands } = useBrands();
   const { models } = useModels();
   const { categories } = useCategories();
+  const { subCategories } = useSubCategories();
 
   // Parse categories string to array
   const selectedCategories = formData.categories
     ? formData.categories.split(',').map(c => c.trim()).filter(Boolean)
     : [];
 
+  // Parse subcategories string to array
+  const selectedSubCategories = formData.subcategories
+    ? formData.subcategories.split(',').map(c => c.trim()).filter(Boolean)
+    : [];
+
   // Filter available categories (those not already selected)
   const availableCategories = categories.filter(
     cat => !selectedCategories.includes(cat.category)
+  );
+
+  // Get selected category objects to filter subcategories
+  const selectedCategoryObjects = categories.filter(cat => 
+    selectedCategories.includes(cat.category)
+  );
+  
+  const selectedCategoryIds = selectedCategoryObjects.map(cat => cat.id);
+
+  // Filter available subcategories based on selected categories
+  const availableSubCategories = subCategories.filter(
+    sub => selectedCategoryIds.includes(sub.categoryId) && !selectedSubCategories.includes(sub.subCategory)
   );
 
   // Filter models based on selected brand
@@ -74,10 +93,40 @@ const ProductModal = () => {
 
   // Handle category removal
   const removeCategory = (categoryName: string) => {
-    const newSelected = selectedCategories.filter(c => c !== categoryName);
+    const category = categories.find(c => c.category === categoryName);
+    const newSelectedCategories = selectedCategories.filter(c => c !== categoryName);
+    
+    // Also remove subcategories that belong to this category
+    const subCatsToRemove = subCategories
+      .filter(sc => sc.categoryId === category?.id)
+      .map(sc => sc.subCategory);
+      
+    const newSelectedSubCategories = selectedSubCategories.filter(
+      sc => !subCatsToRemove.includes(sc)
+    );
+
     setFormData({
       ...formData,
-      categories: newSelected.join(',')
+      categories: newSelectedCategories.join(','),
+      subcategories: newSelectedSubCategories.join(',')
+    });
+  };
+
+  // Handle subcategory addition
+  const addSubCategory = (subCategoryName: string) => {
+    const newSelected = [...selectedSubCategories, subCategoryName];
+    setFormData({
+      ...formData,
+      subcategories: newSelected.join(',')
+    });
+  };
+
+  // Handle subcategory removal
+  const removeSubCategory = (subCategoryName: string) => {
+    const newSelected = selectedSubCategories.filter(sc => sc !== subCategoryName);
+    setFormData({
+      ...formData,
+      subcategories: newSelected.join(',')
     });
   };
 
@@ -103,6 +152,18 @@ const ProductModal = () => {
       ...formData,
       modelId,
       model: selectedModel ? selectedModel.model : ''
+    });
+  };
+
+  const handleNoBrandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = e.target.checked;
+    setFormData({
+      ...formData,
+      noBrand: isChecked,
+      brandId: isChecked ? '' : formData.brandId,
+      brand: isChecked ? '' : formData.brand,
+      modelId: isChecked ? '' : formData.modelId,
+      model: isChecked ? '' : formData.model,
     });
   };
 
@@ -239,17 +300,89 @@ const ProductModal = () => {
               <p className="mt-1 text-xs text-red-500">{fieldErrors.categories}</p>
             )}
           </div>
+
+          {/* Subcategorías */}
+          {selectedCategories.length > 0 && (
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Subcategorías *
+              </label>
+              
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="w-full md:w-1/2">
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        addSubCategory(e.target.value);
+                        e.target.value = ''; // Reset selection
+                      }
+                    }}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Selecciona una subcategoría</option>
+                    {availableSubCategories.length > 0 ? (
+                      availableSubCategories.map(sub => (
+                        <option key={sub.id} value={sub.subCategory}>
+                          {sub.subCategory} ({sub.category?.category || 'N/A'})
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>No hay más subcategorías disponibles</option>
+                    )}
+                  </select>
+                </div>
+
+                <div className="flex flex-wrap gap-2 flex-1 p-2 border border-dashed border-gray-300 rounded-md bg-gray-50 min-h-[42px] items-center">
+                  {selectedSubCategories.length > 0 ? (
+                    selectedSubCategories.map(subName => (
+                      <button
+                        key={subName}
+                        type="button"
+                        onClick={() => removeSubCategory(subName)}
+                        className="px-3 py-1 text-xs bg-indigo-500 text-white rounded-full hover:bg-red-500 transition-colors flex items-center gap-1"
+                      >
+                        {subName}
+                        <span className="font-bold">×</span>
+                      </button>
+                    ))
+                  ) : (
+                    <span className="text-xs text-gray-400">Selecciona subcategorías a la izquierda...</span>
+                  )}
+                </div>
+              </div>
+              {fieldErrors.subcategories && (
+                <p className="mt-1 text-xs text-red-500">{fieldErrors.subcategories}</p>
+              )}
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 py-2 bg-gray-50 p-3 rounded-md border border-gray-200">
+            <input
+              type="checkbox"
+              id="noBrand"
+              name="noBrand"
+              checked={formData.noBrand}
+              onChange={handleNoBrandChange}
+              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="noBrand" className="text-sm font-medium text-gray-700 cursor-pointer">
+              Sin marca específica
+            </label>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Marca del vehículo *
+                Marca del vehículo {formData.noBrand ? '' : '*'}
               </label>
               <select
                 name="brandId"
                 value={formData.brandId}
                 onChange={handleBrandChange}
-                required
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                required={!formData.noBrand}
+                disabled={formData.noBrand}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
                   fieldErrors.brandId ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
@@ -267,20 +400,20 @@ const ProductModal = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Modelo del vehículo *
+                Modelo del vehículo {formData.noBrand ? '' : '*'}
               </label>
               <select
                 name="modelId"
                 value={formData.modelId}
                 onChange={handleModelChange}
-                required
-                disabled={!formData.brandId}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 ${
+                required={!formData.noBrand}
+                disabled={formData.noBrand || !formData.brandId}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
                   fieldErrors.modelId ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
                 <option value="">
-                  {!formData.brandId ? 'Selecciona primero una marca' : 'Selecciona un modelo'}
+                  {formData.noBrand ? 'N/A' : (!formData.brandId ? 'Selecciona primero una marca' : 'Selecciona un modelo')}
                 </option>
                 {filteredModels.map(model => (
                   <option key={model.id} value={model.id}>
