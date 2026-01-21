@@ -1,0 +1,89 @@
+import methodsService from '../services/methods.service.js';
+import responser from './responser.js';
+
+const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+const getPaymentMethods = asyncHandler(async (req, res) => {
+  const { onlyActive } = req.query;
+  let paymentMethods;
+  
+  if (onlyActive === 'true') {
+    paymentMethods = await methodsService.getActivePaymentMethods();
+  } else {
+    paymentMethods = await methodsService.getAllPaymentMethods();
+  }
+
+  responser.success({
+    res,
+    body: { paymentMethods },
+  });
+});
+
+const getPaymentMethod = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const paymentMethod = await methodsService.getPaymentMethodById(id);
+  responser.success({
+    res,
+    body: { paymentMethod },
+  });
+});
+
+const createPaymentMethod = asyncHandler(async (req, res) => {
+  const { name, type, bank, email, accountNumber, phone, ci_rif, isActive } = req.body;
+
+  if (!type) {
+    return responser.error({
+      res,
+      message: 'type are required',
+      status: 400,
+    });
+  }
+
+  const paymentMethod = await methodsService.createPaymentMethod({
+    name,
+    type,
+    bank,
+    email,
+    accountNumber,
+    phone,
+    ci_rif,
+    isActive,
+  });
+
+  responser.success({
+    res,
+    body: { paymentMethod },
+    status: 201,
+  });
+});
+
+const updatePaymentMethod = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+
+  const paymentMethod = await methodsService.updatePaymentMethod(id, data);
+
+  responser.success({
+    res,
+    body: { paymentMethod },
+  });
+});
+
+const deletePaymentMethod = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const result = await methodsService.deletePaymentMethod(id);
+  responser.success({
+    res,
+    body: result,
+  });
+});
+
+export default {
+  getPaymentMethods,
+  getPaymentMethod,
+  createPaymentMethod,
+  updatePaymentMethod,
+  deletePaymentMethod,
+};

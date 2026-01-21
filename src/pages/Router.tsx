@@ -1,5 +1,8 @@
 import { Routes, Route } from "react-router-dom"
 import HomePage from "./home/HomePage"
+import HelpSupport from "./home/HelpSupport"
+import CompanyInfo from "./home/CompanyInfo"
+import CustomerService from "./home/CustomerService"
 import CheckoutPage from "./home/CheckoutPage"
 import PaymentPage from "./home/PaymentPage"
 import ProductsPage from "./home/ProductsPage"
@@ -16,13 +19,17 @@ import Purchases from "./clients/Purchases"
 import Payments from "./clients/Payments"
 import Questions from "./clients/Questions"
 import Contact from "./clients/Contact"
+import Dashboard from "./admin/Dashboard"
 
 import Users from "./admin/Users"
 import Sales from "./admin/Sales"
 import Products from "./admin/Products"
 import Configurations from "./admin/Configurations"
 import ClientQuestions from "./admin/ClientQuestions"
+import PaymentMethods from "./admin/PaymentMethods"
+import Sliders from "./admin/Sliders"
 import Test from './test'
+
 const Router = () => {
     return (
         <Routes>
@@ -33,6 +40,9 @@ const Router = () => {
                 <Route path="/ofertas" element={<OffersPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/payment" element={<PaymentPage />} />
+                <Route path="/ayuda-soporte" element={<HelpSupport />} />
+                <Route path="/informacion-empresa" element={<CompanyInfo />} />
+                <Route path="/atencion-cliente" element={<CustomerService />} />
             </Route>
 
             <Route element={<ClientLayout />}>
@@ -45,11 +55,14 @@ const Router = () => {
             </Route>
 
             <Route element={<AdminLayout />}>
-                <Route path="/admin" element={<Users />} />
+                <Route path="/admin" element={<Dashboard />} />
+                <Route path="/admin/sliders" element={<Sliders />} />
+                <Route path="/admin/dashboard" element={<Dashboard />} />
                 <Route path="/admin/users" element={<Users />} />
                 <Route path="/admin/products" element={<Products />} />
                 <Route path="/admin/sales" element={<Sales />} />
                 <Route path="/admin/client-questions" element={<ClientQuestions />} />
+                <Route path="/admin/payment-methods" element={<PaymentMethods />} />
                 <Route path="/admin/configurations" element={<Configurations />} />
             </Route>
             <Route path='/test' element={<Test />} />

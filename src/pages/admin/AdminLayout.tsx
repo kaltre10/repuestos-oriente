@@ -5,8 +5,6 @@ const AdminLayout = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       <AdminSidebar />
-
-      {/* Main content */}
       <div className="flex-1 p-8 overflow-y-auto">
         <Outlet />
       </div>

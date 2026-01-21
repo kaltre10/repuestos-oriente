@@ -1,0 +1,27 @@
+-> ajustar el footer con los links reales, crear paginas de esos link por ejemplo:
+ como ordenar? , 
+informacion de envio y trakin, 
+devoluciones, 
+sobre nosotros,
+ ubicacion de tiendas (mapa con lla ubicacion de las tiendas), 
+preguntas frecuentes, 
+contactanos. 
+terminos de servicio
+(se puede crear un modulo en el administrador para llenar la infomacion que quieren que salga)
+
+-> mejorar el responsive con los botones abaj cuando sea telefono (debe ser como una app de telefono)
+
+-> los links de las redes sociales que se muestran en la pagina (los iconos) deben ser gestionados desde el administrador
+
+-> modulo de contactos o soporte en el administrador
+
+-> modulo para gestionar publicidad/modales de ofertas en la pagina de inicio en el administrador
+
+-> modulo de gestion de slider de la pagina de inicio en el administrador
+
+-> modulo dashboard en el administrador con estadsticas y graficas de ventas utiles
+
+-> ajustar el modulo de configuracion del adminsitrador apegado al documento de requerimientos (pdf con la descripcion de la aplicacion)
+
+los sliders se editan
+si hay un producto vinculado no se puede eliminar

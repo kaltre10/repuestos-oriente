@@ -1,14 +1,17 @@
 import { Sequelize } from 'sequelize';
-import User from './User.js';
-import Brand from './Brand.js';
-import Category from './Category.js';
-import SubCategory from './SubCategory.js';
-import Model from './Model.js';
-import Product from './Product.js';
-import ProductImage from './ProductImage.js';
-import Config from './Config.js';
-import Sale from './Sale.js';
-import Question from './Question.js';
+import defineUser from './User.js';
+import defineBrand from './Brand.js';
+import defineCategory from './Category.js';
+import defineSubCategory from './SubCategory.js';
+import defineModel from './Model.js';
+import defineProduct from './Product.js';
+import defineProductImage from './ProductImage.js';
+import defineConfig from './Config.js';
+import defineSale from './Sale.js';
+import defineQuestion from './Question.js';
+import defineVisit from './Visit.js';
+import definePaymentMethod from './paymentmethod.js';
+import defineSlider from './Slider.js';
 
 import 'dotenv/config';
 
@@ -33,17 +36,20 @@ const sequelize = new Sequelize(
 
 // Initialize models
 const models = {
-  User: User(sequelize),
-  Brand: Brand(sequelize),
-  Category: Category(sequelize),
-  SubCategory: SubCategory(sequelize),
-  Model: Model(sequelize),
-  Product: Product(sequelize),
-  ProductImage: ProductImage(sequelize),
-  Config: Config(sequelize),
-  Sale: Sale(sequelize),
-  Question: Question(sequelize),
-};
+  User: defineUser(sequelize),
+  Brand: defineBrand(sequelize),
+  Category: defineCategory(sequelize),
+  SubCategory: defineSubCategory(sequelize),
+  Model: defineModel(sequelize),
+  Product: defineProduct(sequelize),
+  ProductImage: defineProductImage(sequelize),
+  Config: defineConfig(sequelize),
+  Sale: defineSale(sequelize),
+  Question: defineQuestion(sequelize),
+    Visit: defineVisit(sequelize),
+    PaymentMethod: definePaymentMethod(sequelize),
+    Slider: defineSlider(sequelize),
+  };
 
 // Define associations
 models.Sale.belongsTo(models.Product, {
@@ -125,7 +131,28 @@ const connectDB = async () => {
   }
 };
 
-export { sequelize, connectDB };
+export {
+  sequelize,
+  connectDB,
+};
+
+// Export individual models from the models object
+export const {
+  User,
+  Brand,
+  Category,
+  SubCategory,
+  Model,
+  Product,
+  ProductImage,
+  Config,
+  Sale,
+  Question,
+  Visit,
+  PaymentMethod,
+  Slider,
+} = models;
+
 export default {
   sequelize,
   connectDB,

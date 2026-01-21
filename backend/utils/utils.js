@@ -2,6 +2,7 @@ import { connectDB, sequelize } from '../models/index.js';
 import { seedBrands } from './seedBrands.js';
 import { seedCategories } from './seedCategories.js';
 import { seedModels } from './seedModels.js';
+import { seedSliders } from './seedSliders.js';
 
 
 export const corsOptions = {
@@ -19,6 +20,7 @@ export const startServer = async (app) => {
         await seedBrands();
         await seedCategories();
         await seedModels();
+        await seedSliders();
 
         const PORT = process.env.PORT || 3001;
         
@@ -31,3 +33,4 @@ export const startServer = async (app) => {
         process.exit(1);
     }
 };
+

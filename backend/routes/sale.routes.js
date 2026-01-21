@@ -1,9 +1,10 @@
 import express from 'express';
-import { uploadReceipt, getSales, getSale, getSalesByUserId, createSale, updateSale, deleteSale, createCheckout } from '../controllers/sale.controller.js';
+import { uploadReceipt, getSales, getSale, getSalesByUserId, createSale, updateSale, deleteSale, createCheckout, getStats } from '../controllers/sale.controller.js';
 import { uploadMidelware } from '../midelwares/uploadMidelware.js';
 const router = express.Router();
 
 router.get('/', getSales);
+router.get('/stats', getStats);
 router.get('/user/:userId', getSalesByUserId);
 router.get('/:id', getSale);
 router.post('/', createSale);

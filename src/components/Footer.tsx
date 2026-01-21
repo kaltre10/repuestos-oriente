@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import {
   SiInstagram,
   SiFacebook,
@@ -5,11 +6,32 @@ import {
   SiWhatsapp
 } from "react-icons/si";
 
+const socials = [
+  {
+    icon: SiInstagram,
+    link: "https://www.instagram.com/repuestosoriente/"
+  },
+  {
+    icon: SiFacebook,
+    link: "https://www.facebook.com/repuestosoriente/"
+  },
+  {
+    icon: SiYoutube,
+    link: "https://www.youtube.com/channel/UCi431n3h3h3h3h3h3h3h3"
+  },
+  {
+    icon: SiWhatsapp,
+    link: "https://api.whatsapp.com/send?phone=584121234567"
+  }
+]
+
+
+
 export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white text-sm pt-10 pb-6 px-4 md:px-20">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
-        
+
         {/* Columna 1 */}
         <div>
           <h3 className="text-red-600 uppercase font-semibold mb-4">REPUESTOS ORIENTE</h3>
@@ -24,10 +46,17 @@ export default function Footer() {
           </ul>
 
           <div className="flex space-x-4 text-gray-400">
-            <SiWhatsapp className="hover:text-white cursor-pointer" size={20} />
-            <SiInstagram className="hover:text-white cursor-pointer" size={20} />
-            <SiFacebook className="hover:text-white cursor-pointer" size={20} />
-            <SiYoutube className="hover:text-white cursor-pointer" size={20} />
+            {socials.map(({ icon: Icon, link }) => (
+              <a
+                key={link}
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white cursor-pointer"
+              >
+                <Icon size={20} />
+              </a>
+            ))}
           </div>
         </div>
 
@@ -35,11 +64,11 @@ export default function Footer() {
         <div>
           <h3 className="text-red-600 uppercase font-semibold mb-4">Ayuda y Soporte</h3>
           <ul className="space-y-2">
-            <li>Información de Envío</li>
-            <li>Devoluciones</li>
-            <li>Cómo Ordenar</li>
-            <li>Cómo Rastrear</li>
-            <li>Guía de Tallas</li>
+            <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Información de Envío</Link></li>
+            <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Devoluciones</Link></li>
+            <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Cómo Ordenar</Link></li>
+            <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Cómo Rastrear</Link></li>
+            <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Garantía de Calidad</Link></li>
           </ul>
         </div>
 
@@ -47,11 +76,11 @@ export default function Footer() {
         <div>
           <h3 className="text-red-600 uppercase font-semibold mb-4">Información de la Empresa</h3>
           <ul className="space-y-2">
-            <li>Sobre Nosotros</li>
-            <li>Nuestro Blog</li>
-            <li>Carreras</li>
-            <li>Ubicaciones de Tiendas</li>
-            <li>Testimonios</li>
+            <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Sobre Nosotros</Link></li>
+            <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Nuestro Blog</Link></li>
+            <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Carreras</Link></li>
+            <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Ubicaciones</Link></li>
+            <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Testimonios</Link></li>
           </ul>
         </div>
 
@@ -59,11 +88,11 @@ export default function Footer() {
         <div>
           <h3 className="text-red-600 uppercase font-semibold mb-4">Atención al Cliente</h3>
           <ul className="space-y-2">
-            <li>Preguntas Frecuentes</li>
-            <li>Términos de Servicio</li>
-            <li>Política de Privacidad</li>
-            <li>Contáctanos</li>
-            <li>Tarjeta de Regalo</li>
+            <li><Link to="/atencion-cliente" className="hover:text-red-500 transition-colors">Preguntas Frecuentes</Link></li>
+            <li><Link to="/atencion-cliente" className="hover:text-red-500 transition-colors">Términos de Servicio</Link></li>
+            <li><Link to="/atencion-cliente" className="hover:text-red-500 transition-colors">Política de Privacidad</Link></li>
+            <li><Link to="/atencion-cliente" className="hover:text-red-500 transition-colors">Contáctanos</Link></li>
+            <li><Link to="/atencion-cliente" className="hover:text-red-500 transition-colors">Tarjeta de Regalo</Link></li>
           </ul>
         </div>
       </div>

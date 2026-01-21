@@ -4,9 +4,27 @@ const { Sale } = models;
 
 class SaleService {
 
-  async getAllSales() {
+  async getAllSales(filters = {}) {
     try {
+      const where = {};
+      const { startDate, endDate, status, paymentMethod } = filters;
+
+      if (startDate && endDate) {
+        where.createdAt = {
+          [Op.between]: [new Date(startDate), new Date(endDate)]
+        };
+      }
+
+      if (status) {
+        where.status = status;
+      }
+
+      if (paymentMethod) {
+        where.paymentMethod = paymentMethod;
+      }
+
       const sales = await Sale.findAll({
+        where,
         order: [['createdAt', 'DESC']],
         include: [
           {
@@ -89,6 +107,31 @@ class SaleService {
       return sales;
     } catch (error) {
       throw new Error(`Failed to get sales by user ID: ${error.message}`);
+    }
+  }
+
+  async getStats(startDate, endDate) {
+    try {
+      const where = {};
+      if (startDate && endDate) {
+        where.createdAt = {
+          [Op.between]: [new Date(startDate), new Date(endDate)]
+        };
+      }
+
+      const sales = await Sale.findAll({
+        where,
+        attributes: ['id', 'quantity', 'dailyRate', 'createdAt'],
+        include: [{
+          model: models.Product,
+          as: 'product',
+          attributes: ['price']
+        }]
+      });
+
+      return sales;
+    } catch (error) {
+      throw new Error(`Failed to get stats: ${error.message}`);
     }
   }
 

@@ -9,6 +9,9 @@ import imageRoutes from './image.routes.js';
 import saleRoutes from './sale.routes.js';
 import configRoutes from './config.routes.js';
 import questionRoutes from './question.routes.js';
+import visitRoutes from './visit.routes.js';
+import paymentMethodRoutes from './paymentmethod.routes.js';
+import sliderRoutes from './slider.routes.js';
 
 const router = express.Router();
 
@@ -26,5 +29,8 @@ router.use(apiVersion, imageRoutes);
 router.use(`${apiVersion}/sales`, saleRoutes);
 router.use(apiVersion, configRoutes);
 router.use(`${apiVersion}/questions`, questionRoutes);
+router.use(`${apiVersion}/visits`, visitRoutes);
+router.use(`${apiVersion}/payment-methods`, paymentMethodRoutes);
+router.use(`${apiVersion}/sliders`, sliderRoutes);
 
 export default router;

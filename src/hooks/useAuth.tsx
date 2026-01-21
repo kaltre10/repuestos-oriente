@@ -79,8 +79,6 @@ const useAuth = () => {
             const response = await request.post(`${apiUrl}${endpoint}`, formData);
             const data = response.data;
 
-            console.log("data: ", data)
-
             if (!data || (data.status !== 200 && data.status !== 201)) {
                 throw new Error(data?.message || 'Login fallido');
             }
@@ -95,8 +93,8 @@ const useAuth = () => {
 
             setUser(userToSave);
             const user = userToSave;
-            if (user.id === 1) {
-                navigate('/admin')
+            if (user.role === 'admin') {
+                navigate('/admin/dashboard')
             } else {
                 navigate('/clients');
             }

@@ -1,53 +1,45 @@
 import { DataTypes } from 'sequelize';
 
 export default (sequelize) => {
-  const User = sequelize.define('User', {
+  const PaymentMethod = sequelize.define('PaymentMethod', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    googleId: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: true,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    phone: {
+    bank:{
       type: DataTypes.STRING,
       allowNull: true,
     },
-    address: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    profilePicture: {
+    email:{
       type: DataTypes.STRING,
       allowNull: true,
     },
-    resetPasswordToken: {
+    accountNumber:{
       type: DataTypes.STRING,
       allowNull: true,
     },
-    resetPasswordExpires: {
-      type: DataTypes.DATE,
+    phone:{
+      type: DataTypes.STRING,
       allowNull: true,
     },
-    role: {
+    ci_rif:{
       type: DataTypes.STRING,
-      defaultValue: 'user',
+      allowNull: true,
+    },
+    type: {
+      type: DataTypes.ENUM('Pago Movil', 'Zelle', 'Transferencia', 'Efectivo'),
+      allowNull: false,
+      defaultValue: 'Pago Movil',
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -58,9 +50,9 @@ export default (sequelize) => {
       defaultValue: DataTypes.NOW,
     },
   }, {
-    tableName: 'users',
+    tableName: 'payment_methods',
     timestamps: true,
   });
 
-  return User;
+  return PaymentMethod;
 };

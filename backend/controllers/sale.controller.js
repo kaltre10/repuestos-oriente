@@ -1,4 +1,6 @@
 import saleService from '../services/sale.service.js';
+import userService from '../services/user.service.js';
+import visitService from '../services/visit.service.js';
 import configService from '../services/config.service.js';
 import responser from './responser.js';
 
@@ -8,7 +10,8 @@ const asyncHandler = (fn) => (req, res, next) => {
 };
 
 const getSales = asyncHandler(async (req, res) => {
-  const sales = await saleService.getAllSales();
+  const { startDate, endDate, status, paymentMethod } = req.query;
+  const sales = await saleService.getAllSales({ startDate, endDate, status, paymentMethod });
   responser.success({
     res,
     body: { sales },
@@ -218,6 +221,34 @@ const createCheckout = asyncHandler(async (req, res) => {
   });
 });
 
+const getStats = asyncHandler(async (req, res) => {
+  const { startDate, endDate } = req.query;
+  const sales = await saleService.getStats(startDate, endDate);
+  const users = await userService.getAllUsers();
+  const visitsCount = await visitService.getVisitsCount(startDate, endDate);
+  
+  // Total sales calculation (price * quantity)
+  const totalSales = sales.reduce((acc, sale) => {
+    const price = sale.product?.price || 0;
+    return acc + (Number(price) * Number(sale.quantity));
+  }, 0);
+
+  responser.success({
+    res,
+    body: {
+      salesCount: sales.length,
+      totalSales: totalSales, // Keep for backward compatibility if needed
+      totalRevenue: totalSales,
+      usersCount: users.length,
+      visitsCount: visitsCount,
+      salesData: sales.map(s => ({
+        date: s.createdAt,
+        amount: Number(s.product?.price || 0) * Number(s.quantity)
+      }))
+    },
+  });
+});
+
 const uploadReceipt = asyncHandler(async (req, res) => {
   let { saleIds } = req.body;
 
@@ -273,5 +304,6 @@ export {
   updateSale,
   deleteSale,
   createCheckout,
-  uploadReceipt
+  uploadReceipt,
+  getStats
 };

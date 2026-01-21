@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaUsers, FaBox, FaChartLine, FaCog, FaDollarSign, FaSignOutAlt, FaQuestionCircle } from 'react-icons/fa';
+import { FaUsers, FaBox, FaChartLine, FaCog, FaDollarSign, FaSignOutAlt, FaQuestionCircle, FaCreditCard, FaSlidersH } from 'react-icons/fa';
 import { useDollarRate } from '../hooks/useDollarRate';
 import useStore from '../states/global';
 
@@ -15,16 +15,20 @@ const AdminSidebar = () => {
   };
 
   const routes = [
+    { path: '/admin/dashboard', icon: <FaChartLine />, label: 'Dashboard' },
     { path: '/admin/users', icon: <FaUsers />, label: 'Usuarios' },
+    { path: '/admin/sliders', icon: <FaSlidersH />, label: 'Sliders' },
     { path: '/admin/products', icon: <FaBox />, label: 'Productos' },
     { path: '/admin/sales', icon: <FaChartLine />, label: 'Ventas' },
     { path: '/admin/client-questions', icon: <FaQuestionCircle />, label: 'Preguntas' },
+    { path: '/admin/payment-methods', icon: <FaCreditCard />, label: 'Métodos de Pago' },
     { path: '/admin/configurations', icon: <FaCog />, label: 'Configuraciones' },
   ];
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
+  
   return (
     <div className="w-64 bg-black shadow-lg h-screen overflow-y-auto">
       <div className="p-6 text-center border-b border-gray-800">
@@ -61,8 +65,9 @@ const AdminSidebar = () => {
         </div>
       </div>
       <nav className="mt-6">
-        {routes.map((i) => {
+        {routes.map((i, index) => {
           return <Link
+          key={index}
             to={i.path}
             className={`flex items-center px-6 py-3 ${isActive(i.path) || isActive('/admin')
               ? 'bg-gray-900 text-white border-r-4 border-blue-500'

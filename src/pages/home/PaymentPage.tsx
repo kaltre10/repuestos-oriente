@@ -1,11 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CreditCard, Smartphone, Hash, Image as ImageIcon, CheckCircle, AlertCircle, ChevronLeft } from 'lucide-react';
 import useStore from '../../states/global';
-import { apiUrl } from '../../utils/utils';
+import { apiUrl, bancos } from '../../utils/utils';
 import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
+
+interface PaymentMethodDB {
+  id: number;
+  name: string;
+  type: 'Pago Movil' | 'Zelle' | 'Transferencia' | 'Efectivo';
+  bank?: string;
+  email?: string;
+  accountNumber?: string;
+  phone?: string;
+  ci_rif?: string;
+  isActive: boolean;
+}
+
 const PaymentPage = () => {
   const { notify } = useNotify()
   const location = useLocation();
@@ -13,25 +26,39 @@ const PaymentPage = () => {
   const { cart, clearCart, user, getCartTotal } = useStore();
   const accountData = location.state?.accountData;
 
-  const [paymentMethod, setPaymentMethod] = useState<'pago_movil' | 'transferencia'>('pago_movil');
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethodDB[]>([]);
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethodDB | null>(null);
+  const [loadingMethods, setLoadingMethods] = useState(true);
   const [referenceNumber, setReferenceNumber] = useState('');
   const [receiptImage, setReceiptImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Datos de pago (ejemplo)
-  const paymentDetails = {
-    pago_movil: {
-      banco: 'Banco de Venezuela',
-      telefono: '0412-1234567',
-      cedula: 'V-12345678',
-    },
-    transferencia: {
-      banco: 'Banco Mercantil',
-      cuenta: '0105-0000-00-0000000000',
-      nombre: 'Repuestos Picha C.A.',
-      rif: 'J-12345678-9',
+  useEffect(() => {
+    fetchPaymentMethods();
+  }, []);
+
+  const fetchPaymentMethods = async () => {
+    try {
+      const response = await request.get(`${apiUrl}/payment-methods?onlyActive=true`);
+      // Acceder a response.data.body.paymentMethods según el formato del responser.js
+      const methods = response.data.body?.paymentMethods || [];
+      setPaymentMethods(methods);
+      if (methods.length > 0) {
+        setSelectedMethod(methods[0]);
+      }
+    } catch (error) {
+      console.error('Error fetching payment methods:', error);
+      notify.error('Error al cargar los métodos de pago');
+    } finally {
+      setLoadingMethods(false);
     }
+  };
+
+  const getBankName = (code?: string) => {
+    if (!code) return '';
+    const banco = bancos.find(b => b.codigo === code);
+    return banco ? banco.nombre : code;
   };
 
   if (!accountData || cart.length === 0) {
@@ -57,7 +84,7 @@ const PaymentPage = () => {
     try {
       const formData = new FormData();
       formData.append('buyerId', user?.id.toString() || '');
-      formData.append('paymentMethod', paymentMethod === 'pago_movil' ? 'Pago Móvil' : 'Transferencia Bancaria');
+      formData.append('paymentMethod', selectedMethod?.name || 'Desconocido');
       formData.append('referenceNumber', referenceNumber);
       if (receiptImage) {
         formData.append('receiptImage', receiptImage);
@@ -86,7 +113,6 @@ const PaymentPage = () => {
       setIsProcessing(false);
     }
   };
-
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4">
@@ -108,72 +134,79 @@ const PaymentPage = () => {
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
               <h2 className="text-lg font-bold text-gray-800 mb-4">Seleccione su método</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  onClick={() => setPaymentMethod('pago_movil')}
-                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-2 ${paymentMethod === 'pago_movil'
-                      ? 'border-red-600 bg-red-50 text-red-600'
-                      : 'border-gray-100 hover:border-gray-200 text-gray-500'
-                    }`}
-                >
-                  <Smartphone className="w-6 h-6" />
-                  <span className="font-semibold text-sm">Pago Móvil</span>
-                </button>
-                <button
-                  onClick={() => setPaymentMethod('transferencia')}
-                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-2 ${paymentMethod === 'transferencia'
-                      ? 'border-red-600 bg-red-50 text-red-600'
-                      : 'border-gray-100 hover:border-gray-200 text-gray-500'
-                    }`}
-                >
-                  <CreditCard className="w-6 h-6" />
-                  <span className="font-semibold text-sm">Transferencia</span>
-                </button>
-              </div>
+              
+              {loadingMethods ? (
+                <div className="flex justify-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+                </div>
+              ) : paymentMethods.length > 0 ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {paymentMethods.map((method) => (
+                    <button
+                      key={method.id}
+                      onClick={() => setSelectedMethod(method)}
+                      className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-2 ${
+                        selectedMethod?.id === method.id
+                          ? 'border-red-600 bg-red-50 text-red-600'
+                          : 'border-gray-100 hover:border-gray-200 text-gray-500'
+                      }`}
+                    >
+                      {method.type === 'Pago Movil' ? (
+                        <Smartphone className="w-5 h-5" />
+                      ) : (
+                        <CreditCard className="w-5 h-5" />
+                      )}
+                      <span className="font-semibold text-xs text-center">{method.name}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm text-center py-4">No hay métodos de pago disponibles</p>
+              )}
             </div>
 
-            <div className="bg-red-600 p-8 rounded-2xl shadow-xl text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-              <h2 className="text-xl font-bold mb-6 flex items-center">
-                {paymentMethod === 'pago_movil' ? <Smartphone className="mr-2" /> : <CreditCard className="mr-2" />}
-                Datos para el pago
-              </h2>
+            {selectedMethod && (
+              <div className="bg-red-600 p-8 rounded-2xl shadow-xl text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                <h2 className="text-xl font-bold mb-6 flex items-center">
+                  {selectedMethod.type === 'Pago Movil' ? <Smartphone className="mr-2" /> : <CreditCard className="mr-2" />}
+                  Datos para el pago
+                </h2>
 
-              <div className="space-y-4 relative z-10">
-                {paymentMethod === 'pago_movil' ? (
-                  <>
+                <div className="space-y-4 relative z-10">
+                  {selectedMethod.bank && (
                     <div>
                       <p className="text-red-100 text-sm">Banco</p>
-                      <p className="font-bold text-lg">{paymentDetails.pago_movil.banco}</p>
+                      <p className="font-bold text-lg">{getBankName(selectedMethod.bank)}</p>
                     </div>
+                  )}
+                  {selectedMethod.phone && (
                     <div>
                       <p className="text-red-100 text-sm">Teléfono</p>
-                      <p className="font-bold text-lg">{paymentDetails.pago_movil.telefono}</p>
+                      <p className="font-bold text-lg">{selectedMethod.phone}</p>
                     </div>
+                  )}
+                  {selectedMethod.ci_rif && (
                     <div>
-                      <p className="text-red-100 text-sm">Cédula</p>
-                      <p className="font-bold text-lg">{paymentDetails.pago_movil.cedula}</p>
+                      <p className="text-red-100 text-sm">Cédula / RIF</p>
+                      <p className="font-bold text-lg">{selectedMethod.ci_rif}</p>
                     </div>
-                  </>
-                ) : (
-                  <>
+                  )}
+                  {selectedMethod.email && (
                     <div>
-                      <p className="text-red-100 text-sm">Banco</p>
-                      <p className="font-bold text-lg">{paymentDetails.transferencia.banco}</p>
+                      <p className="text-red-100 text-sm">Email</p>
+                      <p className="font-bold text-lg">{selectedMethod.email}</p>
                     </div>
+                  )}
+                  {selectedMethod.accountNumber && (
                     <div>
                       <p className="text-red-100 text-sm">Número de Cuenta</p>
-                      <p className="font-bold text-base break-all">{paymentDetails.transferencia.cuenta}</p>
+                      <p className="font-bold text-base break-all">{selectedMethod.accountNumber}</p>
                     </div>
-                    <div>
-                      <p className="text-red-100 text-sm">Nombre / RIF</p>
-                      <p className="font-bold text-lg">{paymentDetails.transferencia.nombre}</p>
-                      <p className="font-bold text-lg">{paymentDetails.transferencia.rif}</p>
-                    </div>
-                  </>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Right Column - Reference & Capture */}
