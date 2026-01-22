@@ -1,7 +1,10 @@
 import express from 'express';
 import { uploadReceipt, getSales, getSale, getSalesByUserId, createSale, updateSale, deleteSale, createCheckout, getStats } from '../controllers/sale.controller.js';
 import { uploadMidelware } from '../midelwares/uploadMidelware.js';
+import validateToken from '../midelwares/validateToken.js';
+
 const router = express.Router();
+router.use(validateToken);
 
 router.get('/', getSales);
 router.get('/stats', getStats);

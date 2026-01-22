@@ -4,7 +4,6 @@ import useNotify from './hooks/useNotify';
 import { GlobalConfirmModal } from './components/modals/GlobalConfirmModal';
 import ScrollToTop from './components/ScrollToTop';
 import AdvertisingModal from './components/AdvertisingModal';
-import MobileBottomNav from './components/MobileBottomNav';
 
 const App: React.FC = () => {
 
@@ -16,7 +15,7 @@ const App: React.FC = () => {
     <GlobalConfirmModal />
     <ToastContainer theme="dark" />
     <Router />
-    <MobileBottomNav />
+    
   </>
 };
 
