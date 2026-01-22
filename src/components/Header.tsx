@@ -6,7 +6,7 @@ import useStore from '../states/global';
 import { useDollarRate } from '../hooks/useDollarRate';
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { getCartCount, toggleCart, user, currency, setCurrency } = useStore();
   const { dollarRate } = useDollarRate();
 
@@ -56,8 +56,10 @@ const Header = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-3">
           <div className="text-3xl font-bold text-gray-800 flex items-center">
-            <img className='logo' src="./logo.png" alt="" />
-            <span className="text-red-500">REPUESTOS</span>PICHA
+            <Link to="/" className="flex items-center">
+              <img className='logo' src="./logo.png" alt="" />
+              <span className="hidden lg:inline"><span className="text-red-500">REPUESTOS</span>PICHA</span>
+            </Link>
           </div>
           <div className="hidden lg:flex flex-1 mx-8 max-w-3xl">
             <div className="relative w-full">
@@ -85,17 +87,32 @@ const Header = () => {
 
           {/* Mobile Header Icons */}
           <div className="lg:hidden flex items-center space-x-4">
+            <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="hover:text-red-500 transition-colors">
+              <Search size={24} />
+            </button>
             <button onClick={toggleCart} className="relative hover:text-red-500 transition-colors">
               <ShoppingCart size={24} />
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                 {getCartCount()}
               </span>
             </button>
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
           </div>
         </div>
+
+        {/* Mobile Search Bar Expandable */}
+        {isSearchOpen && (
+          <div className="lg:hidden pb-4 animate-in slide-in-from-top duration-300">
+            <div className="relative w-full">
+              <input
+                type="text"
+                placeholder="Escribe lo que buscas...."
+                className="w-full bg-white text-black rounded-full py-2.5 pl-5 pr-12 focus:outline-none shadow-sm border border-gray-200"
+                autoFocus
+              />
+              <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            </div>
+          </div>
+        )}
 
         {/* Bottom Bar - Desktop Navigation */}
         <div className="hidden lg:flex items-center justify-center h-12">
@@ -106,43 +123,6 @@ const Header = () => {
           </nav>
         </div>
       </div>
-
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div
-          className={`bg-gray-100 menu-mobile p-5 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`}
-        >
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-            <div className="mt-8 mx-auto max-w-sm">
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  placeholder="Escribe lo que buscas..."
-                  className="w-full bg-white text-black rounded-full py-3 pl-6 pr-12 focus:outline-none"
-                />
-                <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-400" />
-              </div>
-            </div>
-            <nav className="flex flex-col items-center space-y-6 text-lg mt-8">
-              <Link to="/" className="hover:text-red-500 transition-colors">INICIO</Link>
-              <Link to="/productos" className="hover:text-red-500 transition-colors">PRODUCTOS</Link>
-              <Link to="/ofertas" className="hover:text-red-500 transition-colors">OFERTAS</Link>
-            </nav>
-            <div className="flex justify-center items-center space-x-8 mt-8">
-              <Link to={user ? "/clients/purchases" : "/auth"} className="hover:text-red-500 transition-colors">
-                <User size={24} />
-              </Link>
-              <button onClick={toggleCart} className="relative hover:text-red-500 transition-colors">
-                <ShoppingCart size={24} />
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {getCartCount()}
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>)}
-
     </header>
   );
 };

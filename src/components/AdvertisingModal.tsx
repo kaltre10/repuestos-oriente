@@ -66,7 +66,7 @@ const AdvertisingModal = () => {
                 <div className="body-modal" onClick={(e) => e.stopPropagation()}>
                     <img src={getImageUrl(advertising.image)} alt="Publicidad" className="rounded-lg shadow-2xl" />
                     <div className="text-white close-modal-btn">
-                        <button onClick={closeModal} className='z-[110] bg-black/20 hover:bg-black/40 p-1 rounded-full transition-colors'>
+                        <button onClick={closeModal} className='z-[110] p-1 rounded-full btn-close-pub bg-gray-500'>
                             <X size={24} />
                         </button>
                     </div>
