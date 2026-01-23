@@ -50,7 +50,6 @@ const Header = () => {
     </button>
   </div>
 
-
   return (
     <header className="bg-gray-200 text-gray-800 top-0 left-0 right-0 z-50 shadow-md">
       {/* Top Banner */}
