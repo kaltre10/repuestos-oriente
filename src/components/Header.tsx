@@ -10,50 +10,57 @@ const Header = () => {
   const { getCartCount, toggleCart, user, currency, setCurrency } = useStore();
   const { dollarRate } = useDollarRate();
 
+  const Envio = () => <div>
+    <span className="flex items-center gap-2 max-md:hidden">
+      <Truck size={16} />
+      Envío gratis a partir de $20
+    </span>
+  </div>
+
+  const PrecioDolar = () => <span className="flex items-center gap-2">
+    <img
+      src="https://flagcdn.com/w40/ve.png"
+      srcSet="https://flagcdn.com/w80/ve.png 2x"
+      width="25"
+      alt="Venezuela"></img>
+    {/* Texto visible en desktop, oculto en móvil */}
+    <span className="hidden sm:inline">Dólar BCV:</span>
+    {/* El valor siempre visible */}
+    <span className="font-semibold">{Number(dollarRate).toFixed(2)} Bs</span>
+  </span>
+
+  const SwitchButtons = () => <div className="flex bg-white rounded-full p-0.5 shadow-sm border border-gray-200">
+    <button
+      onClick={() => setCurrency('USD')}
+      className={`px-3 py-1 rounded-full transition-all duration-200 ${currency === 'USD'
+        ? 'bg-red-500 text-white shadow-sm'
+        : 'text-gray-500 hover:text-gray-700'
+        }`}
+    >
+      USD
+    </button>
+    <button
+      onClick={() => setCurrency('BS')}
+      className={`px-3 py-1 rounded-full transition-all duration-200 ${currency === 'BS'
+        ? 'bg-red-500 text-white shadow-sm'
+        : 'text-gray-500 hover:text-gray-700'
+        }`}
+    >
+      BS
+    </button>
+  </div>
+
+
   return (
     <header className="bg-gray-200 text-gray-800 top-0 left-0 right-0 z-50 shadow-md">
       {/* Top Banner */}
-      <div className="bg-gray-100 text-gray-800 text-sm py-2">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <span className="flex items-center gap-2">
-            <Truck size={16} />
-            Envío gratis a partir de $20
-          </span>
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-2">
-              <img
-                src="https://flagcdn.com/w40/ve.png"
-                srcSet="https://flagcdn.com/w80/ve.png 2x"
-                width="25"
-                alt="Venezuela"></img>
-                {/* Texto visible en desktop, oculto en móvil */}
-                <span className="hidden sm:inline">Precio del dólar BCV:</span>
-                {/* El valor siempre visible */}
-                <span className="font-semibold">{Number(dollarRate).toFixed(2)} Bs</span>
-            </span>
-            <div className="flex items-center bg-white rounded-full p-0.5 shadow-sm border border-gray-200">
-              <button
-                onClick={() => setCurrency('USD')}
-                className={`px-3 py-1 rounded-full transition-all duration-200 ${
-                  currency === 'USD'
-                    ? 'bg-red-500 text-white shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                USD
-              </button>
-              <button
-                onClick={() => setCurrency('BS')}
-                className={`px-3 py-1 rounded-full transition-all duration-200 ${
-                  currency === 'BS'
-                    ? 'bg-red-500 text-white shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                BS
-              </button>
-            </div>
+      <div className="text-gray-800 text-sm">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center bg-gray-100 py-2">
+          <div className='flex gap-3'>
+            <PrecioDolar />
+            <Envio />
           </div>
+          <SwitchButtons />
         </div>
       </div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
