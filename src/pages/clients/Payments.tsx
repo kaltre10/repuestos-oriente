@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CreditCard, Smartphone, Banknote, Mail, Phone, Hash, ChevronRight, Loader2, Info, Copy, Check } from 'lucide-react';
+import { CreditCard, Smartphone, Banknote, Mail, Phone, Hash, Loader2, Info, Copy, Check } from 'lucide-react';
 import request from '../../utils/request';
 import { apiUrl, bancos } from '../../utils/utils';
 import useNotify from '../../hooks/useNotify';

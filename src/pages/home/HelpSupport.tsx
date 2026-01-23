@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { HelpCircle, Truck, RefreshCcw, ShoppingBag, Search, ShieldCheck } from 'lucide-react';
 
 const HelpSupport = () => {

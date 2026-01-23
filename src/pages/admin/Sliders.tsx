@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Upload, Loader2, Image as ImageIcon, Type, Link as LinkIcon, AlignLeft, Plus, Trash2, X } from 'lucide-react';
+import { Save, Upload, Loader2, Image as ImageIcon, Type, Link as LinkIcon, Plus, Trash2, X } from 'lucide-react';
 import request from '../../utils/request';
 import { apiUrl } from '../../utils/utils';
 import useNotify from '../../hooks/useNotify';

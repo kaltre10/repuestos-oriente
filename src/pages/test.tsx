@@ -1,4 +1,4 @@
-import { Dropdown, DropdownItem } from "flowbite-react";
+import { Dropdown } from "flowbite-react";
 
 const Test = () => {
     return (<>

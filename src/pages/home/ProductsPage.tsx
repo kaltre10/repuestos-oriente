@@ -13,7 +13,7 @@ import { Dropdown, DropdownItem } from 'flowbite-react';
 
 const ProductsPage = () => {
     const navigate = useNavigate();
-    const { products, loading, getProducts } = useProducts();
+    const { products, loading } = useProducts();
     const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
     const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
 

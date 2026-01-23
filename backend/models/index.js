@@ -10,7 +10,7 @@ import defineConfig from './Config.js';
 import defineSale from './Sale.js';
 import defineQuestion from './Question.js';
 import defineVisit from './Visit.js';
-import definePaymentMethod from './paymentmethod.js';
+import definePaymentMethod from './Paymentmethod.js';
 import defineSlider from './Slider.js';
 import defineAdvertising from './Advertising.js';
 
