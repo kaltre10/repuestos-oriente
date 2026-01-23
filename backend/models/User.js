@@ -47,7 +47,7 @@ export default (sequelize) => {
     },
     role: {
       type: DataTypes.STRING,
-      defaultValue: 'user',
+      defaultValue: 'client',
     },
     createdAt: {
       type: DataTypes.DATE,

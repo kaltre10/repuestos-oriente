@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User as UserIcon, Mail, Phone, ShoppingBag, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { User as UserIcon, Mail, Phone, ShoppingBag, CheckCircle, AlertCircle } from 'lucide-react';
 import useStore from '../../states/global';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
@@ -8,9 +8,9 @@ import useNotify from '../../hooks/useNotify';
 const CheckoutPage = () => {
   const { notify } = useNotify()
   const navigate = useNavigate();
-  const { cart, getCartTotal, clearCart, user } = useStore();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const { cart, getCartTotal, user } = useStore();  
+  // const [isModalOpen, setIsModalOpen] = useState(false); 
+  // const [isProcessing, setIsProcessing] = useState(false);  
   const [accountData, setAccountData] = useState({
     name: user?.name || '',
     email: user?.email || '',

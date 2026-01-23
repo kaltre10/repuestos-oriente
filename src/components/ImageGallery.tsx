@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ImageGalleryProps {
   images: string[];

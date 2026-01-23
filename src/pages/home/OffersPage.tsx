@@ -2,9 +2,9 @@ import { useState, useMemo } from 'react';
 import { List, Grid2X2, Grid3X3, Tag } from 'lucide-react';
 import { products } from '../../data/products';
 import ProductCard from '../../components/ProductCard';
-import Header from '../../components/Header';
+// import Header from '../../components/Header';
 import CartModal from '../../components/CartModal';
-import Footer from '../../components/Footer';
+// import Footer from '../../components/Footer';
 
 // Simulated offers data - in a real app this would come from an API
 const offersData = products.slice(0, 8).map(product => ({

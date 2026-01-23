@@ -1,5 +1,5 @@
-import React from 'react';
-import { Headset, MessageCircle, FileText, Lock, Mail, Phone, Clock } from 'lucide-react';
+// import React from 'react';
+import { Headset, MessageCircle, FileText, Lock, Mail, Clock } from 'lucide-react';
 
 const CustomerService = () => {
   return (

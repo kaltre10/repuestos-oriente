@@ -1,4 +1,4 @@
-import { Search, User, ShoppingCart, Menu, X, Truck } from 'lucide-react';
+import { Search, User, ShoppingCart, Truck } from 'lucide-react';
 /* import { Heart} from 'lucide-react'; */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -26,7 +26,10 @@ const Header = () => {
                 srcSet="https://flagcdn.com/w80/ve.png 2x"
                 width="25"
                 alt="Venezuela"></img>
-              Precio del dólar BCV: {Number(dollarRate).toFixed(2)} Bs
+                {/* Texto visible en desktop, oculto en móvil */}
+                <span className="hidden sm:inline">Precio del dólar BCV:</span>
+                {/* El valor siempre visible */}
+                <span className="font-semibold">{Number(dollarRate).toFixed(2)} Bs</span>
             </span>
             <div className="flex items-center bg-white rounded-full p-0.5 shadow-sm border border-gray-200">
               <button

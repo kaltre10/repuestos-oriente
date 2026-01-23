@@ -21,10 +21,10 @@ const ProductDetailPage = () => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   // Question states
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [, setQuestions] = useState<any[]>([]);
   const [newQuestion, setNewQuestion] = useState('');
   const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
-  const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const [, setLoadingQuestions] = useState(true);
 
   const productFromDB = products.find(p => p.id === parseInt(id || '0'));
 
