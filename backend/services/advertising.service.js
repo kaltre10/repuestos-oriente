@@ -11,7 +11,7 @@ class AdvertisingService {
       });
       return advertising;
     } catch (error) {
-      throw new Error(`Failed to get advertising: ${error.message}`);
+      throw new Error(`Error al obtener publicidad: ${error.message}`);
     }
   }
 
@@ -19,11 +19,11 @@ class AdvertisingService {
     try {
       const advertising = await Advertising.findByPk(id);
       if (!advertising) {
-        throw new Error('Advertising not found');
+        throw new Error('Publicidad no encontrada');
       }
       return advertising;
     } catch (error) {
-      throw new Error(`Failed to get advertising: ${error.message}`);
+      throw new Error(`Error al obtener publicidad: ${error.message}`);
     }
   }
 
@@ -34,7 +34,7 @@ class AdvertisingService {
       });
       return advertising;
     } catch (error) {
-      throw new Error(`Failed to get active advertising: ${error.message}`);
+      throw new Error(`Error al obtener publicidad activa: ${error.message}`);
     }
   }
 
@@ -70,7 +70,7 @@ class AdvertisingService {
       });
       return advertising;
     } catch (error) {
-      throw new Error(`Failed to create advertising: ${error.message}`);
+      throw new Error(`Error al crear publicidad: ${error.message}`);
     }
   }
 
@@ -78,7 +78,7 @@ class AdvertisingService {
     try {
       const advertising = await Advertising.findByPk(id);
       if (!advertising) {
-        throw new Error('Advertising not found');
+        throw new Error('Publicidad no encontrada');
       }
 
       let imageData = data.image;
@@ -120,7 +120,7 @@ class AdvertisingService {
       });
       return advertising;
     } catch (error) {
-      throw new Error(`Failed to update advertising: ${error.message}`);
+      throw new Error(`Error al actualizar publicidad: ${error.message}`);
     }
   }
 
@@ -128,7 +128,7 @@ class AdvertisingService {
     try {
       const advertising = await Advertising.findByPk(id);
       if (!advertising) {
-        throw new Error('Advertising not found');
+        throw new Error('Publicidad no encontrada');
       }
 
       // Delete image file
@@ -141,9 +141,9 @@ class AdvertisingService {
       }
 
       await advertising.destroy();
-      return { message: 'Advertising deleted successfully' };
+      return { message: 'Publicidad eliminada con éxito' };
     } catch (error) {
-      throw new Error(`Failed to delete advertising: ${error.message}`);
+      throw new Error(`Error al eliminar publicidad: ${error.message}`);
     }
   }
 }

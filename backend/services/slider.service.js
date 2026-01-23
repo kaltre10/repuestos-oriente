@@ -11,7 +11,7 @@ class SliderService {
       });
       return sliders;
     } catch (error) {
-      throw new Error(`Failed to get sliders: ${error.message}`);
+      throw new Error(`Error al obtener sliders: ${error.message}`);
     }
   }
 
@@ -19,11 +19,11 @@ class SliderService {
     try {
       const slider = await Slider.findByPk(id);
       if (!slider) {
-        throw new Error('Slider not found');
+        throw new Error('Slider no encontrado');
       }
       return slider;
     } catch (error) {
-      throw new Error(`Failed to get slider: ${error.message}`);
+      throw new Error(`Error al obtener slider: ${error.message}`);
     }
   }
 
@@ -53,7 +53,7 @@ class SliderService {
       });
       return slider;
     } catch (error) {
-      throw new Error(`Failed to create slider: ${error.message}`);
+      throw new Error(`Error al crear slider: ${error.message}`);
     }
   }
 
@@ -61,7 +61,7 @@ class SliderService {
     try {
       const slider = await Slider.findByPk(id);
       if (!slider) {
-        throw new Error('Slider not found');
+        throw new Error('Slider no encontrado');
       }
 
       let imageData = data.image;
@@ -97,7 +97,7 @@ class SliderService {
       });
       return slider;
     } catch (error) {
-      throw new Error(`Failed to update slider: ${error.message}`);
+      throw new Error(`Error al actualizar slider: ${error.message}`);
     }
   }
 
@@ -105,12 +105,22 @@ class SliderService {
     try {
       const slider = await Slider.findByPk(id);
       if (!slider) {
-        throw new Error('Slider not found');
+        throw new Error('Slider no encontrado');
       }
+
+      // Delete image if exists
+      if (slider.image && !slider.image.startsWith('http')) {
+        const dir = path.join(process.cwd(), 'images', 'sliders');
+        const filePath = path.join(dir, slider.image);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      }
+
       await slider.destroy();
-      return { message: 'Slider deleted successfully' };
+      return { message: 'Slider eliminado con éxito' };
     } catch (error) {
-      throw new Error(`Failed to delete slider: ${error.message}`);
+      throw new Error(`Error al eliminar slider: ${error.message}`);
     }
   }
 }

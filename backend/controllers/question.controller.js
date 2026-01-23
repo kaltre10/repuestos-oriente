@@ -11,7 +11,7 @@ export const createQuestion = asyncHandler(async (req, res) => {
   if (!productId || !questionText || !clientId) {
     return responser.error({
       res,
-      message: 'Product ID, Question text and Client ID are required',
+      message: 'ID del producto, texto de la pregunta e ID del cliente son requeridos',
       status: 400
     });
   }
@@ -25,7 +25,7 @@ export const createQuestion = asyncHandler(async (req, res) => {
 
   responser.success({
     res,
-    message: 'Question created successfully',
+    message: 'Pregunta creada con éxito',
     body: { question }
   });
 });
@@ -66,7 +66,7 @@ export const answerQuestion = asyncHandler(async (req, res) => {
   if (!answerText) {
     return responser.error({
       res,
-      message: 'Answer text is required',
+      message: 'El texto de la respuesta es requerido',
       status: 400
     });
   }
@@ -75,7 +75,7 @@ export const answerQuestion = asyncHandler(async (req, res) => {
 
   responser.success({
     res,
-    message: 'Question answered successfully',
+    message: 'Pregunta respondida con éxito',
     body: { question }
   });
 });

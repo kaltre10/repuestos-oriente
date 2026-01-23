@@ -20,7 +20,7 @@ const googleAuth = asyncHandler(async (req, res) => {
   if (!token) {
     return responser.error({
       res,
-      message: 'Token is required',
+      message: 'El token es requerido',
       status: 400,
     });
   }
@@ -30,7 +30,7 @@ const googleAuth = asyncHandler(async (req, res) => {
 
   responser.success({
     res,
-    message: 'Authentication successful',
+    message: 'Autenticación exitosa',
     body: {
       user: {
         id: user.id,
@@ -60,7 +60,7 @@ const createUser = asyncHandler(async (req, res) => {
   if (!email || !password || !name) {
     return responser.error({
       res,
-      message: 'Email, password, and name are required',
+      message: 'Email, contraseña y nombre son requeridos',
       status: 400,
     });
   }
@@ -69,7 +69,7 @@ const createUser = asyncHandler(async (req, res) => {
 
   responser.success({
     res,
-    message: 'User created successfully',
+    message: 'Usuario creado con éxito',
     body: {
       user: {
         id: user.id,
@@ -117,7 +117,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
   responser.success({
     res,
-    message: 'User updated successfully',
+    message: 'Usuario actualizado con éxito',
     body: {
       user: {
         id: user.id,
@@ -183,7 +183,7 @@ const login = asyncHandler(async (req, res) => {
 
   responser.success({
     res,
-    message: 'Login successful',
+    message: 'Inicio de sesión exitoso',
     body: {
       user: {
         id: user.id,
@@ -208,7 +208,7 @@ const register = asyncHandler(async (req, res) => {
   if (!email || !password || !name) {
     return responser.error({
       res,
-      message: 'Email, password, and name are required',
+      message: 'Email, contraseña y nombre son requeridos',
       status: 400,
     });
   }
@@ -218,7 +218,7 @@ const register = asyncHandler(async (req, res) => {
 
   responser.success({
     res,
-    message: 'Registration successful',
+    message: 'Registro exitoso',
     body: {
       user: {
         id: user.id,

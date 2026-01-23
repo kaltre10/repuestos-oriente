@@ -17,7 +17,7 @@ class ModelService {
       });
       return allModels;
     } catch (error) {
-      throw new Error(`Failed to get models: ${error.message}`);
+      throw new Error(`Error al obtener modelos: ${error.message}`);
     }
   }
 
@@ -33,11 +33,11 @@ class ModelService {
         }]
       });
       if (!model) {
-        throw new Error('Model not found');
+        throw new Error('Modelo no encontrado');
       }
       return model;
     } catch (error) {
-      throw new Error(`Failed to get model: ${error.message}`);
+      throw new Error(`Error al obtener modelo: ${error.message}`);
     }
   }
 
@@ -55,7 +55,7 @@ class ModelService {
       });
       return createdModel;
     } catch (error) {
-      throw new Error(`Failed to create model: ${error.message}`);
+      throw new Error(`Error al crear modelo: ${error.message}`);
     }
   }
 
@@ -63,7 +63,7 @@ class ModelService {
     try {
       const model = await Model.findByPk(id);
       if (!model) {
-        throw new Error('Model not found');
+        throw new Error('Modelo no encontrado');
       }
 
       await model.update(updateData);
@@ -79,7 +79,7 @@ class ModelService {
       });
       return updatedModel;
     } catch (error) {
-      throw new Error(`Failed to update model: ${error.message}`);
+      throw new Error(`Error al actualizar modelo: ${error.message}`);
     }
   }
 
@@ -87,13 +87,13 @@ class ModelService {
     try {
       const model = await Model.findByPk(id);
       if (!model) {
-        throw new Error('Model not found');
+        throw new Error('Modelo no encontrado');
       }
 
       await model.destroy();
-      return { message: 'Model deleted successfully' };
+      return { message: 'Modelo eliminado con éxito' };
     } catch (error) {
-      throw new Error(`Failed to delete model: ${error.message}`);
+      throw new Error(`Error al eliminar modelo: ${error.message}`);
     }
   }
 }

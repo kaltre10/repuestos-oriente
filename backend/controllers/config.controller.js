@@ -29,7 +29,7 @@ const createConfig = asyncHandler(async (req, res) => {
   if (!dolarRate || dolarRate <= 0) {
     return responser.error({
       res,
-      message: 'Dolar rate is required and must be greater than 0',
+      message: 'La tasa del dólar es requerida y debe ser mayor a 0',
       status: 400,
     });
   }
@@ -37,7 +37,7 @@ const createConfig = asyncHandler(async (req, res) => {
   const newConfig = await configService.createConfig({ dolarRate });
   responser.success({
     res,
-    message: 'Config created successfully',
+    message: 'Configuración creada con éxito',
     body: { config: newConfig },
   });
 });
@@ -49,7 +49,7 @@ const updateConfig = asyncHandler(async (req, res) => {
   if (dolarRate !== undefined && dolarRate <= 0) {
     return responser.error({
       res,
-      message: 'Dolar rate must be greater than 0',
+      message: 'La tasa del dólar debe ser mayor a 0',
       status: 400,
     });
   }
@@ -57,7 +57,7 @@ const updateConfig = asyncHandler(async (req, res) => {
   const updatedConfig = await configService.updateConfig(id, { dolarRate });
   responser.success({
     res,
-    message: 'Config updated successfully',
+    message: 'Configuración actualizada con éxito',
     body: { config: updatedConfig },
   });
 });

@@ -21,14 +21,14 @@ class ImageService {
 
       return await Promise.all(imagePromises);
     } catch (error) {
-      throw new Error(`Error uploading images: ${error.message}`);
+      throw new Error(`Error al subir imágenes: ${error.message}`);
     }
   }
 
   async deleteImage(imageId) {
     try {
       const image = await ProductImage.findByPk(imageId);
-      if (!image) throw new Error('Image not found');
+      if (!image) throw new Error('Imagen no encontrada');
 
       // Delete physical file
       const filePath = path.join(process.cwd(), 'images/products', path.basename(image.image));
@@ -37,9 +37,9 @@ class ImageService {
       }
 
       await image.destroy();
-      return { message: 'Image deleted successfully' };
+      return { message: 'Imagen eliminada con éxito' };
     } catch (error) {
-      throw new Error(`Error deleting image: ${error.message}`);
+      throw new Error(`Error al eliminar imagen: ${error.message}`);
     }
   }
 
@@ -49,7 +49,7 @@ class ImageService {
         where: { productId }
       });
     } catch (error) {
-      throw new Error(`Error fetching images: ${error.message}`);
+      throw new Error(`Error al obtener imágenes: ${error.message}`);
     }
   }
 }

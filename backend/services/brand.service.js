@@ -11,7 +11,7 @@ class BrandService {
       });
       return brands;
     } catch (error) {
-      throw new Error(`Failed to get brands: ${error.message}`);
+      throw new Error(`Error al obtener marcas: ${error.message}`);
     }
   }
 
@@ -21,11 +21,11 @@ class BrandService {
         where: { id, softDelete: 0 }
       });
       if (!brand) {
-        throw new Error('Brand not found');
+        throw new Error('Marca no encontrada');
       }
       return brand;
     } catch (error) {
-      throw new Error(`Failed to get brand: ${error.message}`);
+      throw new Error(`Error al obtener marca: ${error.message}`);
     }
   }
 
@@ -34,7 +34,7 @@ class BrandService {
       const brand = await Brand.create(brandData);
       return brand;
     } catch (error) {
-      throw new Error(`Failed to create brand: ${error.message}`);
+      throw new Error(`Error al crear marca: ${error.message}`);
     }
   }
 
@@ -44,13 +44,13 @@ class BrandService {
         where: { id, softDelete: 0 }
       });
       if (!brand) {
-        throw new Error('Brand not found');
+        throw new Error('Marca no encontrada');
       }
 
       await brand.update(updateData);
       return brand;
     } catch (error) {
-      throw new Error(`Failed to update brand: ${error.message}`);
+      throw new Error(`Error al actualizar marca: ${error.message}`);
     }
   }
 
@@ -58,13 +58,13 @@ class BrandService {
     try {
       const brand = await Brand.findByPk(id);
       if (!brand) {
-        throw new Error('Brand not found');
+        throw new Error('Marca no encontrada');
       }
 
       await brand.update({ softDelete: 1 });
-      return { message: 'Brand deleted successfully' };
+      return { message: 'Marca eliminada con éxito' };
     } catch (error) {
-      throw new Error(`Failed to delete brand: ${error.message}`);
+      throw new Error(`Error al eliminar marca: ${error.message}`);
     }
   }
 }

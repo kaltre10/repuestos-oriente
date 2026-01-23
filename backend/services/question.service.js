@@ -6,7 +6,7 @@ class QuestionService {
     try {
       return await Question.create(data);
     } catch (error) {
-      throw new Error(`Failed to create question: ${error.message}`);
+      throw new Error(`Error al crear la pregunta: ${error.message}`);
     }
   }
 
@@ -24,7 +24,7 @@ class QuestionService {
         order: [['createdAt', 'DESC']]
       });
     } catch (error) {
-      throw new Error(`Failed to get questions by product: ${error.message}`);
+      throw new Error(`Error al obtener preguntas por producto: ${error.message}`);
     }
   }
 
@@ -50,7 +50,7 @@ class QuestionService {
         order: [['createdAt', 'DESC']]
       });
     } catch (error) {
-      throw new Error(`Failed to get questions by client: ${error.message}`);
+      throw new Error(`Error al obtener preguntas por cliente: ${error.message}`);
     }
   }
 
@@ -80,7 +80,7 @@ class QuestionService {
         order: [['createdAt', 'DESC']]
       });
     } catch (error) {
-      throw new Error(`Failed to get all questions: ${error.message}`);
+      throw new Error(`Error al obtener todas las preguntas: ${error.message}`);
     }
   }
 
@@ -88,14 +88,14 @@ class QuestionService {
     try {
       const question = await Question.findByPk(id);
       if (!question) {
-        throw new Error('Question not found');
+        throw new Error('Pregunta no encontrada');
       }
       return await question.update({
         answerText,
         status: 1
       });
     } catch (error) {
-      throw new Error(`Failed to answer question: ${error.message}`);
+      throw new Error(`Error al responder la pregunta: ${error.message}`);
     }
   }
 }

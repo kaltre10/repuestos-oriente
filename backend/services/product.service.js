@@ -15,7 +15,7 @@ class ProductService {
       });
       return products;
     } catch (error) {
-      throw new Error(`Failed to get products: ${error.message}`);
+      throw new Error(`Error al obtener productos: ${error.message}`);
     }
   }
 
@@ -23,11 +23,11 @@ class ProductService {
     try {
       const product = await Product.findByPk(id);
       if (!product) {
-        throw new Error('Product not found');
+        throw new Error('Producto no encontrado');
       }
       return product;
     } catch (error) {
-      throw new Error(`Failed to get product: ${error.message}`);
+      throw new Error(`Error al obtener producto: ${error.message}`);
     }
   }
 
@@ -36,7 +36,7 @@ class ProductService {
       const product = await Product.create(productData);
       return product;
     } catch (error) {
-      throw new Error(`Failed to create product: ${error.message}`);
+      throw new Error(`Error al crear producto: ${error.message}`);
     }
   }
 
@@ -44,13 +44,13 @@ class ProductService {
     try {
       const product = await Product.findByPk(id);
       if (!product) {
-        throw new Error('Product not found');
+        throw new Error('Producto no encontrado');
       }
 
       await product.update(updateData);
       return product;
     } catch (error) {
-      throw new Error(`Failed to update product: ${error.message}`);
+      throw new Error(`Error al actualizar producto: ${error.message}`);
     }
   }
 
@@ -58,13 +58,13 @@ class ProductService {
     try {
       const product = await Product.findByPk(id);
       if (!product) {
-        throw new Error('Product not found');
+        throw new Error('Producto no encontrado');
       }
 
       await product.destroy();
-      return { message: 'Product deleted successfully' };
+      return { message: 'Producto eliminado con éxito' };
     } catch (error) {
-      throw new Error(`Failed to delete product: ${error.message}`);
+      throw new Error(`Error al eliminar producto: ${error.message}`);
     }
   }
 }

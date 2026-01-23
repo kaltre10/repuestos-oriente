@@ -114,17 +114,17 @@ const Profile = () => {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="bg-red-600 px-8 py-4">
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
+    <div className="p-6">
+      <div className="pb-8">
+        <div className="border-b border-gray-300 pb-3 mb-3">
+          <h2 className="text-xl font-bold text-gray-600 flex items-center gap-2">
             <FaUser /> Mi Perfil
-          </h1>
+          </h2>
         </div>
         
-        <div className="p-8">
+        <div className="">
           {message.text && (
-            <div className={`mb-6 p-4 rounded-lg text-sm ${
+            <div className={`mb-6 p-4 rounded-md text-sm ${
               message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
             }`}>
               {message.text}
@@ -143,7 +143,7 @@ const Profile = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
                 />
               </div>
 
@@ -157,7 +157,7 @@ const Profile = () => {
                   value={formData.phone}
                   onChange={handleInputChange}
                   placeholder="Ej: +58 412 1234567"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
                 />
               </div>
             </div>
@@ -172,7 +172,7 @@ const Profile = () => {
                 onChange={handleInputChange}
                 rows={3}
                 placeholder="Ingresa tu dirección completa"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all resize-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all resize-none"
               />
             </div>
 
@@ -180,7 +180,7 @@ const Profile = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="bg-red-600 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 {loading ? 'Guardando...' : <><FaSave /> Guardar Cambios</>}
               </button>
@@ -189,14 +189,14 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="bg-gray-800 px-8 py-4">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+      <div className="">
+        <div className="py-4 border-b border-gray-300 pb-3 mb-3">
+          <h2 className="text-xl font-bold text-gray-600 flex items-center gap-2">
             <FaLock /> Cambiar Contraseña
           </h2>
         </div>
 
-        <div className="p-8">
+        <div className="">
           <form onSubmit={handleUpdatePassword} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
@@ -210,7 +210,7 @@ const Profile = () => {
                     value={passwordData.oldPassword}
                     onChange={handlePasswordChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all pr-10"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all pr-10"
                   />
                   <button
                     type="button"
@@ -237,7 +237,7 @@ const Profile = () => {
                     value={passwordData.newPassword}
                     onChange={handlePasswordChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all pr-10"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all pr-10"
                   />
                   <button
                     type="button"
@@ -264,7 +264,7 @@ const Profile = () => {
                     value={passwordData.confirmPassword}
                     onChange={handlePasswordChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all pr-10"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all pr-10"
                   />
                   <button
                     type="button"
@@ -285,7 +285,7 @@ const Profile = () => {
               <button
                 type="submit"
                 disabled={passwordLoading}
-                className="bg-gray-800 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-900 transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="bg-red-600 text-white px-6 py-2 rounded-md font-semibold hover:bg-gray-900 transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 {passwordLoading ? 'Actualizando...' : <><FaLock /> Actualizar Contraseña</>}
               </button>

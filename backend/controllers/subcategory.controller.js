@@ -38,7 +38,7 @@ const createSubCategory = asyncHandler(async (req, res) => {
   if (!subCategory || !categoryId) {
     return responser.error({
       res,
-      message: 'Subcategory name and category ID are required',
+      message: 'El nombre de la subcategoría y el ID de la categoría son requeridos',
       status: 400,
     });
   }
@@ -46,7 +46,7 @@ const createSubCategory = asyncHandler(async (req, res) => {
   const newSubCategory = await subCategoryService.createSubCategory({ subCategory, categoryId });
   responser.success({
     res,
-    message: 'Subcategory created successfully',
+    message: 'Subcategoría creada con éxito',
     body: { subCategory: newSubCategory },
   });
 });
@@ -58,7 +58,7 @@ const updateSubCategory = asyncHandler(async (req, res) => {
   if (!subCategory && !categoryId) {
     return responser.error({
       res,
-      message: 'At least one field (subCategory or categoryId) is required for update',
+      message: 'Se requiere al menos un campo (subCategoría o ID de categoría) para actualizar',
       status: 400,
     });
   }
@@ -66,7 +66,7 @@ const updateSubCategory = asyncHandler(async (req, res) => {
   const updatedSubCategory = await subCategoryService.updateSubCategory(id, { subCategory, categoryId });
   responser.success({
     res,
-    message: 'Subcategory updated successfully',
+    message: 'Subcategoría actualizada con éxito',
     body: { subCategory: updatedSubCategory },
   });
 });

@@ -29,7 +29,7 @@ const createBrand = asyncHandler(async (req, res) => {
   if (!brand) {
     return responser.error({
       res,
-      message: 'Brand name is required',
+      message: 'La marca es requerida',
       status: 400,
     });
   }
@@ -37,7 +37,7 @@ const createBrand = asyncHandler(async (req, res) => {
   const newBrand = await brandService.createBrand({ brand });
   responser.success({
     res,
-    message: 'Brand created successfully',
+    message: 'Marca creada con exito',
     body: { brand: newBrand },
   });
 });
@@ -49,7 +49,7 @@ const updateBrand = asyncHandler(async (req, res) => {
   if (!brand) {
     return responser.error({
       res,
-      message: 'Brand name is required',
+      message: 'La marca es requerida',
       status: 400,
     });
   }
@@ -57,7 +57,7 @@ const updateBrand = asyncHandler(async (req, res) => {
   const updatedBrand = await brandService.updateBrand(id, { brand });
   responser.success({
     res,
-    message: 'Brand updated successfully',
+    message: 'Marca editada con exito',
     body: { brand: updatedBrand },
   });
 });

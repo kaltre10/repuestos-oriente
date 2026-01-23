@@ -24,47 +24,48 @@ const getSliderById = asyncHandler(async (req, res) => {
 });
 
 const createSlider = asyncHandler(async (req, res) => {
-  const { title, description1, description2, buttonText, buttonLink, image, status } = req.body;
-  const slider = await sliderService.createSlider({
-    title,
-    description1,
-    description2,
-    buttonText,
-    buttonLink,
-    image,
-    status,
-  });
-  return responser.success({
+  if (!req.file) {
+    return responser.error({
+      res,
+      message: 'No se subió ninguna imagen',
+      status: 400,
+    });
+  }
+
+  const { title, description, link } = req.body;
+  const image = `${req.file.filename}`;
+
+  const newSlider = await sliderService.createSlider({ title, description, image, link });
+  responser.success({
     res,
-    body: { slider },
-    status: 201,
+    message: 'Slider creado con éxito',
+    body: { slider: newSlider },
   });
 });
 
 const updateSlider = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { title, description1, description2, buttonText, buttonLink, image, status } = req.body;
-  const slider = await sliderService.updateSlider(id, {
-    title,
-    description1,
-    description2,
-    buttonText,
-    buttonLink,
-    image,
-    status,
-  });
-  return responser.success({
+  const { title, description, link, status } = req.body;
+  let image;
+
+  if (req.file) {
+    image = `${req.file.filename}`;
+  }
+
+  const updatedSlider = await sliderService.updateSlider(id, { title, description, image, link, status });
+  responser.success({
     res,
-    body: { slider },
+    message: 'Slider actualizado con éxito',
+    body: { slider: updatedSlider },
   });
 });
 
 const deleteSlider = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const result = await sliderService.deleteSlider(id);
-  return responser.success({
+  await sliderService.deleteSlider(id);
+  responser.success({
     res,
-    message: result.message,
+    message: 'Slider eliminado con éxito',
   });
 });
 

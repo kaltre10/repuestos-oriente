@@ -8,7 +8,7 @@ class VisitService {
       const visit = await Visit.create(visitData);
       return visit;
     } catch (error) {
-      throw new Error(`Failed to record visit: ${error.message}`);
+      throw new Error(`Error al registrar la visita: ${error.message}`);
     }
   }
 
@@ -23,7 +23,7 @@ class VisitService {
       const count = await Visit.count({ where });
       return count;
     } catch (error) {
-      throw new Error(`Failed to get visits count: ${error.message}`);
+      throw new Error(`Error al obtener el conteo de visitas: ${error.message}`);
     }
   }
 }

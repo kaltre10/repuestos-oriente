@@ -29,7 +29,7 @@ const createModel = asyncHandler(async (req, res) => {
   if (!model || !brandId) {
     return responser.error({
       res,
-      message: 'Model name and brandId are required',
+      message: 'El nombre del modelo y el ID de la marca son requeridos',
       status: 400,
     });
   }
@@ -37,7 +37,7 @@ const createModel = asyncHandler(async (req, res) => {
   const newModel = await modelService.createModel({ model, brandId });
   responser.success({
     res,
-    message: 'Model created successfully',
+    message: 'Modelo creado con éxito',
     body: { model: newModel },
   });
 });
@@ -49,7 +49,7 @@ const updateModel = asyncHandler(async (req, res) => {
   if (!model || !brandId) {
     return responser.error({
       res,
-      message: 'Model name and brandId are required',
+      message: 'El nombre del modelo y el ID de la marca son requeridos',
       status: 400,
     });
   }
@@ -57,7 +57,7 @@ const updateModel = asyncHandler(async (req, res) => {
   const updatedModel = await modelService.updateModel(id, { model, brandId });
   responser.success({
     res,
-    message: 'Model updated successfully',
+    message: 'Modelo actualizado con éxito',
     body: { model: updatedModel },
   });
 });

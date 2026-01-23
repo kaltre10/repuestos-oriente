@@ -10,7 +10,7 @@ class CategoryService {
       });
       return categories;
     } catch (error) {
-      throw new Error(`Failed to get categories: ${error.message}`);
+      throw new Error(`Error al obtener categorías: ${error.message}`);
     }
   }
 
@@ -18,11 +18,11 @@ class CategoryService {
     try {
       const category = await Category.findByPk(id);
       if (!category) {
-        throw new Error('Category not found');
+        throw new Error('Categoría no encontrada');
       }
       return category;
     } catch (error) {
-      throw new Error(`Failed to get category: ${error.message}`);
+      throw new Error(`Error al obtener categoría: ${error.message}`);
     }
   }
 
@@ -31,7 +31,7 @@ class CategoryService {
       const category = await Category.create(categoryData);
       return category;
     } catch (error) {
-      throw new Error(`Failed to create category: ${error.message}`);
+      throw new Error(`Error al crear categoría: ${error.message}`);
     }
   }
 
@@ -39,13 +39,13 @@ class CategoryService {
     try {
       const category = await Category.findByPk(id);
       if (!category) {
-        throw new Error('Category not found');
+        throw new Error('Categoría no encontrada');
       }
 
       await category.update(updateData);
       return category;
     } catch (error) {
-      throw new Error(`Failed to update category: ${error.message}`);
+      throw new Error(`Error al actualizar categoría: ${error.message}`);
     }
   }
 
@@ -53,13 +53,13 @@ class CategoryService {
     try {
       const category = await Category.findByPk(id);
       if (!category) {
-        throw new Error('Category not found');
+        throw new Error('Categoría no encontrada');
       }
 
       await category.destroy();
-      return { message: 'Category deleted successfully' };
+      return { message: 'Categoría eliminada con éxito' };
     } catch (error) {
-      throw new Error(`Failed to delete category: ${error.message}`);
+      throw new Error(`Error al eliminar categoría: ${error.message}`);
     }
   }
 }

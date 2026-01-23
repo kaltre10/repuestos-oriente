@@ -17,7 +17,7 @@ const recordVisit = asyncHandler(async (req, res) => {
 
   responser.success({
     res,
-    message: 'Visit recorded successfully',
+    message: 'Visita registrada con éxito',
   });
 });
 

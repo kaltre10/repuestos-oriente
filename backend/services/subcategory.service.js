@@ -15,7 +15,7 @@ class SubCategoryService {
       });
       return subCategories;
     } catch (error) {
-      throw new Error(`Failed to get subcategories: ${error.message}`);
+      throw new Error(`Error al obtener subcategorías: ${error.message}`);
     }
   }
 
@@ -27,7 +27,7 @@ class SubCategoryService {
       });
       return subCategories;
     } catch (error) {
-      throw new Error(`Failed to get subcategories by category ID: ${error.message}`);
+      throw new Error(`Error al obtener subcategorías por ID de categoría: ${error.message}`);
     }
   }
 
@@ -41,11 +41,11 @@ class SubCategoryService {
         }]
       });
       if (!subCategory) {
-        throw new Error('SubCategory not found');
+        throw new Error('Subcategoría no encontrada');
       }
       return subCategory;
     } catch (error) {
-      throw new Error(`Failed to get subcategory: ${error.message}`);
+      throw new Error(`Error al obtener subcategoría: ${error.message}`);
     }
   }
 
@@ -54,7 +54,7 @@ class SubCategoryService {
       const subCategory = await SubCategory.create(subCategoryData);
       return subCategory;
     } catch (error) {
-      throw new Error(`Failed to create subcategory: ${error.message}`);
+      throw new Error(`Error al crear subcategoría: ${error.message}`);
     }
   }
 
@@ -62,13 +62,13 @@ class SubCategoryService {
     try {
       const subCategory = await SubCategory.findByPk(id);
       if (!subCategory) {
-        throw new Error('SubCategory not found');
+        throw new Error('Subcategoría no encontrada');
       }
 
       await subCategory.update(updateData);
       return subCategory;
     } catch (error) {
-      throw new Error(`Failed to update subcategory: ${error.message}`);
+      throw new Error(`Error al actualizar subcategoría: ${error.message}`);
     }
   }
 
@@ -76,13 +76,13 @@ class SubCategoryService {
     try {
       const subCategory = await SubCategory.findByPk(id);
       if (!subCategory) {
-        throw new Error('SubCategory not found');
+        throw new Error('Subcategoría no encontrada');
       }
 
       await subCategory.destroy();
-      return { message: 'SubCategory deleted successfully' };
+      return { message: 'Subcategoría eliminada con éxito' };
     } catch (error) {
-      throw new Error(`Failed to delete subcategory: ${error.message}`);
+      throw new Error(`Error al eliminar subcategoría: ${error.message}`);
     }
   }
 }

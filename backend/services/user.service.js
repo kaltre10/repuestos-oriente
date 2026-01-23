@@ -26,7 +26,7 @@ class UserService {
         profilePicture: payload.picture,
       };
     } catch (error) {
-      throw new Error('Invalid Google token');
+      throw new Error('Token de Google inválido');
     }
   }
 
@@ -35,7 +35,7 @@ class UserService {
       const users = await User.findAll();
       return users;
     } catch (error) {
-      throw new Error(`Failed to get users: ${error.message}`);
+      throw new Error(`Error al obtener usuarios: ${error.message}`);
     }
   }
 
@@ -59,7 +59,7 @@ class UserService {
 
       return user;
     } catch (error) {
-      throw new Error(`Authentication failed: ${error.message}`);
+      throw new Error(`Autenticación fallida: ${error.message}`);
     }
   }
 
@@ -68,11 +68,11 @@ class UserService {
     try {
       const user = await User.findByPk(id);
       if (!user) {
-        throw new Error('User not found');
+        throw new Error('Usuario no encontrado');
       }
       return user;
     } catch (error) {
-      throw new Error(`Failed to get user: ${error.message}`);
+      throw new Error(`Error al obtener usuario: ${error.message}`);
     }
   }
 
@@ -81,7 +81,7 @@ class UserService {
     try {
       const user = await User.findByPk(id);
       if (!user) {
-        throw new Error('User not found');
+        throw new Error('Usuario no encontrado');
       }
 
       // Only allow updating specific fields
@@ -97,7 +97,7 @@ class UserService {
       await user.update(filteredData);
       return user;
     } catch (error) {
-      throw new Error(`Failed to update user: ${error.message}`);
+      throw new Error(`Error al actualizar usuario: ${error.message}`);
     }
   }
 
@@ -106,7 +106,7 @@ class UserService {
     try {
       const user = await User.findByPk(id);
       if (!user) {
-        throw new Error('User not found');
+        throw new Error('Usuario no encontrado');
       }
 
       // If user has a password (not a Google-only user)
@@ -133,13 +133,13 @@ class UserService {
     try {
       const user = await User.findByPk(id);
       if (!user) {
-        throw new Error('User not found');
+        throw new Error('Usuario no encontrado');
       }
 
       await user.destroy();
-      return { message: 'User deleted successfully' };
+      return { message: 'Usuario eliminado con éxito' };
     } catch (error) {
-      throw new Error(`Failed to delete user: ${error.message}`);
+      throw new Error(`Error al eliminar usuario: ${error.message}`);
     }
   }
 
@@ -149,7 +149,7 @@ class UserService {
       // Check if user already exists
       const existingUser = await User.findOne({ where: { email } });
       if (existingUser) {
-        throw new Error('User already exists with this email');
+        throw new Error('Ya existe un usuario con este correo electrónico');
       }
 
       // Hash password
@@ -167,7 +167,7 @@ class UserService {
 
       return user;
     } catch (error) {
-      throw new Error(`User creation failed: ${error.message}`);
+      throw new Error(`Error al crear el usuario: ${error.message}`);
     }
   }
 
@@ -177,7 +177,7 @@ class UserService {
       // Check if user already exists
       const existingUser = await User.findOne({ where: { email } });
       if (existingUser) {
-        throw new Error('User already exists with this email');
+        throw new Error('Ya existe un usuario con este correo electrónico');
       }
 
       // Hash password
@@ -193,7 +193,7 @@ class UserService {
 
       return user;
     } catch (error) {
-      throw new Error(`Registration failed: ${error.message}`);
+      throw new Error(`Error en el registro: ${error.message}`);
     }
   }
 
@@ -251,7 +251,7 @@ class UserService {
 
       return { message: 'Si el correo electrónico está registrado, recibirás un enlace para restablecer tu contraseña.' };
     } catch (error) {
-      throw new Error(`Failed to process forgot password: ${error.message}`);
+      throw new Error(`Error al procesar el olvido de contraseña: ${error.message}`);
     }
   }
 

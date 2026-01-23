@@ -174,7 +174,7 @@ const Purchases = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px]">
+      <div className="p-6 flex flex-col items-center justify-center min-h-[400px]">
         <div className="w-12 h-12 border-4 border-red-600/30 border-t-red-600 rounded-full animate-spin mb-4" />
         <p className="text-gray-500 font-medium">Cargando tus compras...</p>
       </div>
@@ -183,7 +183,7 @@ const Purchases = () => {
 
   if (error) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-12 border border-gray-100 text-center">
+      <div className="p-6 bg-white rounded-2xl shadow-sm p-12 border border-gray-100 text-center">
         <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
           <AlertCircle className="w-10 h-10 text-red-600" />
         </div>
@@ -201,7 +201,7 @@ const Purchases = () => {
 
   if (purchases.length === 0) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-12 border border-gray-100 text-center">
+      <div className="bg-white rounded-2xl shadow-sm p-12 border border-gray-100 text-center p-6">
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
           <ShoppingBag className="w-10 h-10 text-gray-300" />
         </div>
@@ -218,7 +218,7 @@ const Purchases = () => {
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="p-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-1">Mis Compras</h1>

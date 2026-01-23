@@ -9,7 +9,7 @@ class PaymentMethodService {
       });
       return paymentMethods;
     } catch (error) {
-      throw new Error(`Failed to get payment methods: ${error.message}`);
+      throw new Error(`Error al obtener métodos de pago: ${error.message}`);
     }
   }
 
@@ -21,7 +21,7 @@ class PaymentMethodService {
       });
       return paymentMethods;
     } catch (error) {
-      throw new Error(`Failed to get active payment methods: ${error.message}`);
+      throw new Error(`Error al obtener métodos de pago activos: ${error.message}`);
     }
   }
 
@@ -29,11 +29,11 @@ class PaymentMethodService {
     try {
       const paymentMethod = await PaymentMethod.findByPk(id);
       if (!paymentMethod) {
-        throw new Error('Payment method not found');
+        throw new Error('Método de pago no encontrado');
       }
       return paymentMethod;
     } catch (error) {
-      throw new Error(`Failed to get payment method: ${error.message}`);
+      throw new Error(`Error al obtener método de pago: ${error.message}`);
     }
   }
 
@@ -42,7 +42,7 @@ class PaymentMethodService {
       const paymentMethod = await PaymentMethod.create(data);
       return paymentMethod;
     } catch (error) {
-      throw new Error(`Failed to create payment method: ${error.message}`);
+      throw new Error(`Error al crear método de pago: ${error.message}`);
     }
   }
 
@@ -50,12 +50,12 @@ class PaymentMethodService {
     try {
       const paymentMethod = await PaymentMethod.findByPk(id);
       if (!paymentMethod) {
-        throw new Error('Payment method not found');
+        throw new Error('Método de pago no encontrado');
       }
       await paymentMethod.update(data);
       return paymentMethod;
     } catch (error) {
-      throw new Error(`Failed to update payment method: ${error.message}`);
+      throw new Error(`Error al actualizar método de pago: ${error.message}`);
     }
   }
 
@@ -63,12 +63,12 @@ class PaymentMethodService {
     try {
       const paymentMethod = await PaymentMethod.findByPk(id);
       if (!paymentMethod) {
-        throw new Error('Payment method not found');
+        throw new Error('Método de pago no encontrado');
       }
       await paymentMethod.destroy();
-      return { message: 'Payment method deleted successfully' };
+      return { message: 'Método de pago eliminado con éxito' };
     } catch (error) {
-      throw new Error(`Failed to delete payment method: ${error.message}`);
+      throw new Error(`Error al eliminar método de pago: ${error.message}`);
     }
   }
 }

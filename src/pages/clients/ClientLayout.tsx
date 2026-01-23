@@ -26,10 +26,8 @@ const ClientLayout = () => {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
-          <div className="max-w-5xl mx-auto pb-20 lg:pb-0">
-            <Outlet />
-          </div>
+        <main className="overflow-y-auto w-full">
+          <Outlet />
         </main>
       </div>
     </div>

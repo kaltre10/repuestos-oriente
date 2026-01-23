@@ -29,7 +29,7 @@ const createCategory = asyncHandler(async (req, res) => {
   if (!category) {
     return responser.error({
       res,
-      message: 'Category name is required',
+      message: 'El nombre de la categoría es requerido',
       status: 400,
     });
   }
@@ -37,7 +37,7 @@ const createCategory = asyncHandler(async (req, res) => {
   const newCategory = await categoryService.createCategory({ category });
   responser.success({
     res,
-    message: 'Category created successfully',
+    message: 'Categoría creada con éxito',
     body: { category: newCategory },
   });
 });
@@ -49,7 +49,7 @@ const updateCategory = asyncHandler(async (req, res) => {
   if (!category) {
     return responser.error({
       res,
-      message: 'Category name is required',
+      message: 'El nombre de la categoría es requerido',
       status: 400,
     });
   }
@@ -57,7 +57,7 @@ const updateCategory = asyncHandler(async (req, res) => {
   const updatedCategory = await categoryService.updateCategory(id, { category });
   responser.success({
     res,
-    message: 'Category updated successfully',
+    message: 'Categoría actualizada con éxito',
     body: { category: updatedCategory },
   });
 });

@@ -10,7 +10,7 @@ class ConfigService {
       });
       return configs;
     } catch (error) {
-      throw new Error(`Failed to get configs: ${error.message}`);
+      throw new Error(`Error al obtener configuraciones: ${error.message}`);
     }
   }
 
@@ -18,11 +18,11 @@ class ConfigService {
     try {
       const config = await Config.findByPk(id);
       if (!config) {
-        throw new Error('Config not found');
+        throw new Error('Configuración no encontrada');
       }
       return config;
     } catch (error) {
-      throw new Error(`Failed to get config: ${error.message}`);
+      throw new Error(`Error al obtener configuración: ${error.message}`);
     }
   }
 
@@ -31,7 +31,7 @@ class ConfigService {
       const config = await Config.create(configData);
       return config;
     } catch (error) {
-      throw new Error(`Failed to create config: ${error.message}`);
+      throw new Error(`Error al crear configuración: ${error.message}`);
     }
   }
 
@@ -39,13 +39,13 @@ class ConfigService {
     try {
       const config = await Config.findByPk(id);
       if (!config) {
-        throw new Error('Config not found');
+        throw new Error('Configuración no encontrada');
       }
 
       await config.update(updateData);
       return config;
     } catch (error) {
-      throw new Error(`Failed to update config: ${error.message}`);
+      throw new Error(`Error al actualizar configuración: ${error.message}`);
     }
   }
 
@@ -53,13 +53,13 @@ class ConfigService {
     try {
       const config = await Config.findByPk(id);
       if (!config) {
-        throw new Error('Config not found');
+        throw new Error('Configuración no encontrada');
       }
 
       await config.destroy();
-      return { message: 'Config deleted successfully' };
+      return { message: 'Configuración eliminada con éxito' };
     } catch (error) {
-      throw new Error(`Failed to delete config: ${error.message}`);
+      throw new Error(`Error al eliminar configuración: ${error.message}`);
     }
   }
 }

@@ -46,7 +46,7 @@ class SaleService {
       });
       return sales;
     } catch (error) {
-      throw new Error(`Failed to get sales: ${error.message}`);
+      throw new Error(`Error al obtener ventas: ${error.message}`);
     }
   }
 
@@ -60,11 +60,11 @@ class SaleService {
         }]
       });
       if (!sale) {
-        throw new Error('Sale not found');
+        throw new Error('Venta no encontrada');
       }
       return sale;
     } catch (error) {
-      throw new Error(`Failed to get sale: ${error.message}`);
+      throw new Error(`Error al obtener venta: ${error.message}`);
     }
   }
 
@@ -73,7 +73,7 @@ class SaleService {
       const sale = await Sale.create(saleData);
       return sale;
     } catch (error) {
-      throw new Error(`Failed to create sale: ${error.message}`);
+      throw new Error(`Error al crear venta: ${error.message}`);
     }
   }
 
@@ -82,7 +82,7 @@ class SaleService {
       const sales = await Sale.bulkCreate(salesData);
       return sales;
     } catch (error) {
-      throw new Error(`Failed to create multiple sales: ${error.message}`);
+      throw new Error(`Error al crear múltiples ventas: ${error.message}`);
     }
   }
 
@@ -106,7 +106,7 @@ class SaleService {
       });
       return sales;
     } catch (error) {
-      throw new Error(`Failed to get sales by user ID: ${error.message}`);
+      throw new Error(`Error al obtener ventas por ID de usuario: ${error.message}`);
     }
   }
 
@@ -131,7 +131,7 @@ class SaleService {
 
       return sales;
     } catch (error) {
-      throw new Error(`Failed to get stats: ${error.message}`);
+      throw new Error(`Error al obtener estadísticas: ${error.message}`);
     }
   }
 
@@ -139,13 +139,13 @@ class SaleService {
     try {
       const sale = await Sale.findByPk(id);
       if (!sale) {
-        throw new Error('Sale not found');
+        throw new Error('Venta no encontrada');
       }
 
       await sale.update(updateData);
       return sale;
     } catch (error) {
-      throw new Error(`Failed to update sale: ${error.message}`);
+      throw new Error(`Error al actualizar venta: ${error.message}`);
     }
   }
 
@@ -153,13 +153,13 @@ class SaleService {
     try {
       const sale = await Sale.findByPk(id);
       if (!sale) {
-        throw new Error('Sale not found');
+        throw new Error('Venta no encontrada');
       }
 
       await sale.destroy();
-      return { message: 'Sale deleted successfully' };
+      return { message: 'Venta eliminada con éxito' };
     } catch (error) {
-      throw new Error(`Failed to delete sale: ${error.message}`);
+      throw new Error(`Error al eliminar venta: ${error.message}`);
     }
   }
 }

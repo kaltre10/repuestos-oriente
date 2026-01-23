@@ -8,11 +8,11 @@ class ImageController {
       const files = req.files;
 
       if (!productId) {
-        return responser.error({ res, message: 'productId is required', status: 400 });
+        return responser.error({ res, message: 'El ID del producto es requerido', status: 400 });
       }
 
       const images = await imageService.uploadImages(productId, files);
-      responser.success({ res, message: 'Images uploaded successfully', body: images });
+      responser.success({ res, message: 'Imágenes subidas con éxito', body: images });
     } catch (error) {
       next(error);
     }

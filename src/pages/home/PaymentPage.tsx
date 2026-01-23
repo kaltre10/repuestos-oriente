@@ -61,11 +61,6 @@ const PaymentPage = () => {
     return banco ? banco.nombre : code;
   };
 
-  if (!accountData || cart.length === 0) {
-    navigate('/checkout');
-    return null;
-  }
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -96,7 +91,7 @@ const PaymentPage = () => {
       }));
       formData.append('items', JSON.stringify(items));
 
-      const response = await request.post(`${apiUrl}/sales/checkout`, formData);
+      const response = await request.postImage(`${apiUrl}/sales/checkout`, formData);
 
       if (response.data.success) {
         clearCart();

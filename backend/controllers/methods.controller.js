@@ -36,7 +36,7 @@ const createPaymentMethod = asyncHandler(async (req, res) => {
   if (!type) {
     return responser.error({
       res,
-      message: 'type are required',
+      message: 'El tipo de método de pago es requerido',
       status: 400,
     });
   }

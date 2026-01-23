@@ -32,7 +32,7 @@ const getSalesByUserId = asyncHandler(async (req, res) => {
   if (!userId) {
     return responser.error({
       res,
-      message: 'User ID is required',
+      message: 'El ID de usuario es requerido',
       status: 400,
     });
   }
@@ -58,7 +58,7 @@ const createSale = asyncHandler(async (req, res) => {
   if (!quantity || !buyerId || !paymentMethod || !productId) {
     return responser.error({
       res,
-      message: 'Required fields: quantity, buyerId, paymentMethod, productId',
+      message: 'Campos requeridos: cantidad, ID del comprador, método de pago, ID del producto',
       status: 400,
     });
   }
@@ -66,7 +66,7 @@ const createSale = asyncHandler(async (req, res) => {
   if (quantity <= 0) {
     return responser.error({
       res,
-      message: 'Quantity must be greater than 0',
+      message: 'La cantidad debe ser mayor a 0',
       status: 400,
     });
   }
@@ -74,7 +74,7 @@ const createSale = asyncHandler(async (req, res) => {
   if (rating !== undefined && (rating < 1 || rating > 5)) {
     return responser.error({
       res,
-      message: 'Rating must be between 1 and 5',
+      message: 'La calificación debe estar entre 1 y 5',
       status: 400,
     });
   }
@@ -86,7 +86,7 @@ const createSale = asyncHandler(async (req, res) => {
     if (configs.length === 0) {
       return responser.error({
         res,
-        message: 'No configuration found. Please set up the daily rate first.',
+        message: 'No se encontró ninguna configuración. Por favor, configure la tasa del dólar primero.',
         status: 400,
       });
     }
@@ -95,7 +95,7 @@ const createSale = asyncHandler(async (req, res) => {
   } catch (error) {
     return responser.error({
       res,
-      message: 'Failed to get daily rate from configuration',
+      message: 'Error al obtener la tasa diaria de la configuración',
       status: 500,
     });
   }
@@ -114,7 +114,7 @@ const createSale = asyncHandler(async (req, res) => {
   const newSale = await saleService.createSale(saleData);
   responser.success({
     res,
-    message: 'Sale created successfully',
+    message: 'Venta creada con éxito',
     body: { sale: newSale },
   });
 });
@@ -127,7 +127,7 @@ const updateSale = asyncHandler(async (req, res) => {
   if (updateData.quantity !== undefined && updateData.quantity <= 0) {
     return responser.error({
       res,
-      message: 'Quantity must be greater than 0',
+      message: 'La cantidad debe ser mayor a 0',
       status: 400,
     });
   }
@@ -135,7 +135,7 @@ const updateSale = asyncHandler(async (req, res) => {
   if (updateData.rating !== undefined && (updateData.rating < 1 || updateData.rating > 5)) {
     return responser.error({
       res,
-      message: 'Rating must be between 1 and 5',
+      message: 'La calificación debe estar entre 1 y 5',
       status: 400,
     });
   }
@@ -143,7 +143,7 @@ const updateSale = asyncHandler(async (req, res) => {
   const updatedSale = await saleService.updateSale(id, updateData);
   responser.success({
     res,
-    message: 'Sale updated successfully',
+    message: 'Venta actualizada con éxito',
     body: { sale: updatedSale },
   });
 });
@@ -172,7 +172,7 @@ const createCheckout = asyncHandler(async (req, res) => {
     } catch (error) {
       return responser.error({
         res,
-        message: 'Invalid items format. Must be a JSON array.',
+        message: 'Formato de items inválido. Debe ser un arreglo JSON.',
         status: 400,
       });
     }
@@ -183,7 +183,7 @@ const createCheckout = asyncHandler(async (req, res) => {
   if (!items || !Array.isArray(items) || items.length === 0 || !buyerId || !paymentMethod) {
     return responser.error({
       res,
-      message: 'Required fields: items (array), buyerId, paymentMethod',
+      message: 'Campos requeridos: items (arreglo), ID del comprador, método de pago',
       status: 400,
     });
   }
@@ -216,7 +216,7 @@ const createCheckout = asyncHandler(async (req, res) => {
   const newSales = await saleService.createMultipleSales(salesData);
   responser.success({
     res,
-    message: 'Checkout successful',
+    message: 'Checkout realizado con éxito',
     body: { sales: newSales },
   });
 });
@@ -258,7 +258,7 @@ const uploadReceipt = asyncHandler(async (req, res) => {
     } catch (error) {
       return responser.error({
         res,
-        message: 'Invalid saleIds format. Must be a JSON array.',
+        message: 'Formato de saleIds inválido. Debe ser un arreglo JSON.',
         status: 400,
       });
     }
@@ -267,7 +267,7 @@ const uploadReceipt = asyncHandler(async (req, res) => {
   if (!saleIds || !Array.isArray(saleIds) || saleIds.length === 0) {
     return responser.error({
       res,
-      message: 'Required field: saleIds (array)',
+      message: 'Campo requerido: saleIds (arreglo)',
       status: 400,
     });
   }
@@ -275,7 +275,7 @@ const uploadReceipt = asyncHandler(async (req, res) => {
   if (!req.file) {
     return responser.error({
       res,
-      message: 'No receipt image uploaded',
+      message: 'No se subió ninguna imagen del comprobante',
       status: 400,
     });
   }
@@ -291,7 +291,7 @@ const uploadReceipt = asyncHandler(async (req, res) => {
 
   responser.success({
     res,
-    message: 'Receipt uploaded successfully',
+    message: 'Comprobante subido con éxito',
     body: { receiptImage },
   });
 });

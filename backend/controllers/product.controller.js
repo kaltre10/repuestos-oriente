@@ -47,7 +47,7 @@ const createProduct = asyncHandler(async (req, res) => {
   if (!name || !productBrand || !categories || !years || !price || !partNumber) {
     return responser.error({
       res,
-      message: 'Required fields: name, productBrand, categories, years, price, partNumber',
+      message: 'Campos requeridos: nombre, marca del producto, categorías, años, precio, número de parte',
       status: 400,
     });
   }
@@ -55,7 +55,7 @@ const createProduct = asyncHandler(async (req, res) => {
   if (amount === undefined || amount < 0) {
     return responser.error({
       res,
-      message: 'Amount must be a non-negative number',
+      message: 'La cantidad debe ser un número no negativo',
       status: 400,
     });
   }
@@ -63,7 +63,7 @@ const createProduct = asyncHandler(async (req, res) => {
   if (price <= 0) {
     return responser.error({
       res,
-      message: 'Price must be greater than 0',
+      message: 'El precio debe ser mayor a 0',
       status: 400,
     });
   }
@@ -89,7 +89,7 @@ const createProduct = asyncHandler(async (req, res) => {
   const newProduct = await productService.createProduct(productData);
   responser.success({
     res,
-    message: 'Product created successfully',
+    message: 'Producto creado con éxito',
     body: { product: newProduct },
   });
 });
@@ -118,7 +118,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   if (price !== undefined && price <= 0) {
     return responser.error({
       res,
-      message: 'Price must be greater than 0',
+      message: 'El precio debe ser mayor a 0',
       status: 400,
     });
   }
@@ -145,7 +145,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   if (amount !== undefined && amount < 0) {
     return responser.error({
       res,
-      message: 'Amount must be a non-negative number',
+      message: 'La cantidad debe ser un número no negativo',
       status: 400,
     });
   }
@@ -153,7 +153,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   const updatedProduct = await productService.updateProduct(id, updateData);
   responser.success({
     res,
-    message: 'Product updated successfully',
+    message: 'Producto actualizado con éxito',
     body: { product: updatedProduct },
   });
 });
