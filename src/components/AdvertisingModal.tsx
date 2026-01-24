@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { X } from 'lucide-react'
 import request from '../utils/request'
 import { apiUrl } from '../utils/utils'
@@ -33,7 +33,7 @@ const AdvertisingModal = () => {
                 }
 
             } catch (error) {
-                console.error('Error fetching active advertising:', error);
+                // console.error('Error fetching active advertising:', error);
             }
         };
 
@@ -84,4 +84,4 @@ const AdvertisingModal = () => {
 
 }
 
-export default AdvertisingModal
+export default memo(AdvertisingModal)

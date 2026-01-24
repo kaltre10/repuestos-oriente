@@ -96,7 +96,7 @@ const useAuth = () => {
             if (user.role === 'admin') {
                 navigate('/admin/dashboard')
             } else {
-                navigate('/clients');
+                navigate('/clients/purchases');
             }
         } catch (err: any) {
             console.log(err)

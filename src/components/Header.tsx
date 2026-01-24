@@ -13,7 +13,7 @@ const Header = () => {
   const Envio = () => <div>
     <span className="flex items-center gap-2 max-md:hidden">
       <Truck size={16} />
-      Envío gratis a partir de $20
+      Envío gratis a partir de $200
     </span>
   </div>
 
@@ -66,7 +66,7 @@ const Header = () => {
         <div className="flex items-center justify-between py-3">
           <div className="text-3xl font-bold text-gray-800 flex items-center">
             <Link to="/" className="flex items-center">
-              <img className='logo' src="./logo.png" alt="" />
+              <img className='logo rounded-full bg-red-500' src="./logo.png" alt="" />
               <span className="hidden lg:inline"><span className="text-red-500">REPUESTOS</span>PICHA</span>
             </Link>
           </div>
