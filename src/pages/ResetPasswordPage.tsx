@@ -35,7 +35,7 @@ const ResetPasswordPage = () => {
 
   if (successMessage) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="mt-1 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white shadow sm:rounded-lg p-8 text-center">
             <div className="flex justify-center mb-4">
