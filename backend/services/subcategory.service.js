@@ -1,9 +1,10 @@
+import { Op } from 'sequelize';
 import models from '../models/index.js';
-const { SubCategory, Category } = models;
+const { SubCategory, Category, Product } = models;
 
 class SubCategoryService {
 
-  async getAllSubCategories() {
+  async getAllSubCategories(onlyActive = false) {
     try {
       const subCategories = await SubCategory.findAll({
         order: [['createdAt', 'DESC']],
@@ -13,6 +14,28 @@ class SubCategoryService {
           attributes: ['id', 'category']
         }]
       });
+
+      if (onlyActive) {
+        // Obtenemos todos los productos con stock
+        const activeProducts = await Product.findAll({
+          where: {
+            amount: { [Op.gt]: 0 }
+          },
+          attributes: ['subcategories']
+        });
+
+        // Extraemos los nombres de subcategorías únicos de los productos activos
+        const activeSubCategoryNames = new Set();
+        activeProducts.forEach(product => {
+          if (product.subcategories) {
+            product.subcategories.split(',').forEach(sub => activeSubCategoryNames.add(sub.trim()));
+          }
+        });
+
+        // Filtramos las subcategorías que tienen al menos un producto activo
+        return subCategories.filter(sub => activeSubCategoryNames.has(sub.subCategory));
+      }
+
       return subCategories;
     } catch (error) {
       throw new Error(`Error al obtener subcategorías: ${error.message}`);

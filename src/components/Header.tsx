@@ -1,67 +1,18 @@
-import { Search, User, ShoppingCart, Truck } from 'lucide-react';
-/* import { Heart} from 'lucide-react'; */
+import { Search, User, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import useStore from '../states/global';
-import { useDollarRate } from '../hooks/useDollarRate';
+
+import TopBanner from './TopBanner';
 
 const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const { getCartCount, toggleCart, user, currency, setCurrency } = useStore();
-  const { dollarRate } = useDollarRate();
-
-  const Envio = () => <div>
-    <span className="flex items-center gap-2 max-md:hidden">
-      <Truck size={16} />
-      Envío gratis a partir de $20
-    </span>
-  </div>
-
-  const PrecioDolar = () => <span className="flex items-center gap-2">
-    <img
-      src="https://flagcdn.com/w40/ve.png"
-      srcSet="https://flagcdn.com/w80/ve.png 2x"
-      width="25"
-      alt="Venezuela"></img>
-    {/* Texto visible en desktop, oculto en móvil */}
-    <span className="hidden sm:inline">Dólar BCV:</span>
-    {/* El valor siempre visible */}
-    <span className="font-semibold">{Number(dollarRate).toFixed(2)} Bs</span>
-  </span>
-
-  const SwitchButtons = () => <div className="flex bg-white rounded-full p-0.5 shadow-sm border border-gray-200">
-    <button
-      onClick={() => setCurrency('USD')}
-      className={`px-3 py-1 rounded-full transition-all duration-200 ${currency === 'USD'
-        ? 'bg-red-500 text-white shadow-sm'
-        : 'text-gray-500 hover:text-gray-700'
-        }`}
-    >
-      USD
-    </button>
-    <button
-      onClick={() => setCurrency('BS')}
-      className={`px-3 py-1 rounded-full transition-all duration-200 ${currency === 'BS'
-        ? 'bg-red-500 text-white shadow-sm'
-        : 'text-gray-500 hover:text-gray-700'
-        }`}
-    >
-      BS
-    </button>
-  </div>
+  const { getCartCount, toggleCart, user } = useStore();
 
   return (
     <header className="bg-gray-200 text-gray-800 top-0 left-0 right-0 z-50 shadow-md">
       {/* Top Banner */}
-      <div className="text-gray-800 text-sm">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center bg-gray-100 py-2">
-          <div className='flex gap-3'>
-            <PrecioDolar />
-            <Envio />
-          </div>
-          <SwitchButtons />
-        </div>
-      </div>
+      <TopBanner />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-3">
           <div className="text-3xl font-bold text-gray-800 flex items-center">

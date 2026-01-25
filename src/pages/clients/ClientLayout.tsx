@@ -1,10 +1,14 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Outlet } from "react-router-dom"
 import ClientSidebar from "../../components/ClientSidebar"
 import { FaBars } from 'react-icons/fa'
 import Guard from "../../components/Guard"
 
 const ClientLayout = () => {
+  useEffect(() => {
+    document.title = "Área de Clientes | Repuestos Oriente";
+  }, []);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   return (<Guard allow={['admin', 'client']} >
     <div className="flex h-screen bg-gray-50 overflow-hidden">

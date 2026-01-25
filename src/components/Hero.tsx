@@ -46,7 +46,20 @@ const Hero = () => {
   };
 
   return (
-    <div className="">
+    <div className="relative group hero-swiper-white-buttons">
+      <style>{`
+        .hero-swiper-white-buttons .swiper-button-next,
+        .hero-swiper-white-buttons .swiper-button-prev {
+          color: white !important;
+        }
+        .hero-swiper-white-buttons .swiper-pagination-bullet {
+          background: white !important;
+          opacity: 0.5;
+        }
+        .hero-swiper-white-buttons .swiper-pagination-bullet-active {
+          opacity: 1;
+        }
+      `}</style>
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         spaceBetween={0}
@@ -67,13 +80,13 @@ const Hero = () => {
               }}
             >
               <div className="absolute inset-0 bg-black/50"></div>
-              <div className="relative z-10 flex flex-col items-start justify-center h-full text-white p-8 sm:p-12 md:p-24">
-                <p className="text-base md:text-lg font-light tracking-widest">{slide.description1}</p>
-                <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold my-2">{slide.description2}</h2>
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-red-500 mb-6">{slide.title}</h1>
+              <div className="relative z-10 flex flex-col items-start justify-center h-full text-white p-6 sm:p-12 md:p-24">
+                <p className="text-xs sm:text-base md:text-lg font-light tracking-widest">{slide.description1}</p>
+                <h2 className="text-2xl sm:text-5xl md:text-6xl font-bold my-1 sm:my-2">{slide.description2}</h2>
+                <h1 className="text-2xl sm:text-5xl md:text-6xl font-bold text-red-500 mb-4 sm:mb-6">{slide.title}</h1>
                 <a 
                   href={slide.buttonLink || '#'}
-                  className="bg-white text-black font-bold py-2 px-6 md:py-3 md:px-8 rounded-full hover:bg-red-500 hover:text-white transition-colors text-sm md:text-base inline-block"
+                  className="bg-white text-black font-bold py-1.5 px-4 sm:py-3 sm:px-8 rounded-full hover:bg-red-500 hover:text-white transition-colors text-xs sm:text-base inline-block"
                 >
                   {slide.buttonText || 'CONOCE MÁS'}
                 </a>

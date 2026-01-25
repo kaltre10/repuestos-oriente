@@ -35,8 +35,8 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
 
   const { brands } = useBrands();
   const { models } = useModels();
-  const { categories: rawCategories } = useCategories();
-  const { subCategories: rawSubCategories } = useSubCategories();
+  const { categories: rawCategories } = useCategories(true);
+  const { subCategories: rawSubCategories } = useSubCategories(true);
 
   const categories = useMemo(() => {
     return [...rawCategories].sort((a, b) => a.category.localeCompare(b.category));

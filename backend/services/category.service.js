@@ -1,13 +1,36 @@
+import { Op } from 'sequelize';
 import models from '../models/index.js';
-const { Category } = models;
+const { Category, Product } = models;
 
 class CategoryService {
 
-  async getAllCategories() {
+  async getAllCategories(onlyActive = false) {
     try {
       const categories = await Category.findAll({
         order: [['createdAt', 'DESC']]
       });
+
+      if (onlyActive) {
+        // Obtenemos todos los productos con stock
+        const activeProducts = await Product.findAll({
+          where: {
+            amount: { [Op.gt]: 0 }
+          },
+          attributes: ['categories']
+        });
+
+        // Extraemos los nombres de categorías únicos de los productos activos
+        const activeCategoryNames = new Set();
+        activeProducts.forEach(product => {
+          if (product.categories) {
+            product.categories.split(',').forEach(cat => activeCategoryNames.add(cat.trim()));
+          }
+        });
+
+        // Filtramos las categorías que tienen al menos un producto activo
+        return categories.filter(cat => activeCategoryNames.has(cat.category));
+      }
+
       return categories;
     } catch (error) {
       throw new Error(`Error al obtener categorías: ${error.message}`);

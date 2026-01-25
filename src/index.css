@@ -35,6 +35,15 @@
     color: white;
     font-size: 20px;
 }
+
+.nav-mobile{
+    height: 70px;
+}
+
+.mb-70px{
+    margin-bottom: 70px;
+}
+
 .body-modal{
     width: auto;
     height: auto;

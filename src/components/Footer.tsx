@@ -29,7 +29,7 @@ const socials = [
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white text-sm pt-10 pb-6 px-4 md:px-20">
+    <footer className="mb-70px bg-gray-900 text-white text-sm pt-10 pb-6 px-4 md:px-20">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
 
         {/* Columna 1 */}

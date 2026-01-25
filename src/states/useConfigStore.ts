@@ -64,13 +64,13 @@ interface ConfigState {
   deleteModel: (id: number) => Promise<boolean>;
 
   // Categories Actions
-  fetchCategories: () => Promise<void>;
+  fetchCategories: (onlyActive?: boolean) => Promise<void>;
   addCategory: (categoryName: string) => Promise<boolean>;
   updateCategory: (id: number, categoryName: string) => Promise<boolean>;
   deleteCategory: (id: number) => Promise<boolean>;
 
   // SubCategories Actions
-  fetchSubCategories: () => Promise<void>;
+  fetchSubCategories: (onlyActive?: boolean) => Promise<void>;
   addSubCategory: (subCategoryName: string, categoryId: number) => Promise<boolean>;
   updateSubCategory: (id: number, subCategoryName: string, categoryId: number) => Promise<boolean>;
   deleteSubCategory: (id: number) => Promise<boolean>;
@@ -270,10 +270,10 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
   },
 
   // Categories Actions
-  fetchCategories: async () => {
+  fetchCategories: async (onlyActive = false) => {
     set({ loadingCategories: true, errorCategories: null });
     try {
-      const response = await request.get(`${apiUrl}/categories`);
+      const response = await request.get(`${apiUrl}/categories${onlyActive ? '?onlyActive=true' : ''}`);
       set({ categories: response.data.body.categories });
     } catch (err) {
       console.error('Error fetching categories:', err);
@@ -337,10 +337,10 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
   },
 
   // SubCategories Actions
-  fetchSubCategories: async () => {
+  fetchSubCategories: async (onlyActive = false) => {
     set({ loadingSubCategories: true, errorSubCategories: null });
     try {
-      const response = await request.get(`${apiUrl}/subcategories`);
+      const response = await request.get(`${apiUrl}/subcategories${onlyActive ? '?onlyActive=true' : ''}`);
       set({ subCategories: response.data.body.subCategories });
     } catch (err) {
       console.error('Error fetching subcategories:', err);

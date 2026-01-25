@@ -7,7 +7,8 @@ const asyncHandler = (fn) => (req, res, next) => {
 };
 
 const getSubCategories = asyncHandler(async (req, res) => {
-  const subCategories = await subCategoryService.getAllSubCategories();
+  const { onlyActive } = req.query;
+  const subCategories = await subCategoryService.getAllSubCategories(onlyActive === 'true');
   responser.success({
     res,
     body: { subCategories },

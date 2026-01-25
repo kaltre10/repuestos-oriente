@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useConfigStore } from '../states/useConfigStore';
 
-export const useCategories = () => {
+export const useCategories = (onlyActive = false) => {
   const {
     categories,
     loadingCategories: loading,
@@ -13,10 +13,8 @@ export const useCategories = () => {
   } = useConfigStore();
 
   useEffect(() => {
-    if (categories.length === 0) {
-      fetchCategories();
-    }
-  }, [categories.length, fetchCategories]);
+    fetchCategories(onlyActive);
+  }, [fetchCategories, onlyActive]);
 
   return {
     categories,

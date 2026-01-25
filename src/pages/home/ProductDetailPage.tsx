@@ -42,6 +42,12 @@ const ProductDetailPage = () => {
   } : null;
 
   useEffect(() => {
+    if (product?.name) {
+      document.title = `${product.name} | Repuestos Oriente`;
+    }
+  }, [product?.name]);
+
+  useEffect(() => {
     if (id) {
       fetchQuestions();
     }
@@ -271,14 +277,6 @@ const ProductDetailPage = () => {
                         <ShoppingCart size={22} />
                         Agregar al carrito
                       </button>
-
-                      <button className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-600">
-                        <Heart size={22} />
-                      </button>
-
-                      <button className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-600">
-                        <Share2 size={22} />
-                      </button>
                     </div>
                   </>
                 ) : (
@@ -438,10 +436,11 @@ const ProductDetailPage = () => {
           {/* Related Products Section */}
           <div className="mt-16">
             <h2 className="text-2xl font-bold text-gray-800 mb-8">Productos relacionados</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {products
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+              {[...products]
                 .filter(p => p.categories === productFromDB?.categories && p.id !== product.id)
-                .slice(0, 4)
+                .sort((a, b) => b.id - a.id)
+                .slice(0, 6)
                 .map(relatedProductRaw => {
                   const relatedProduct = {
                     ...relatedProductRaw,
@@ -454,18 +453,25 @@ const ProductDetailPage = () => {
                   return (
                     <div
                       key={relatedProduct.id}
-                      onClick={() => navigate(`/producto/${relatedProduct.id}`)}
-                      className="bg-white rounded-lg overflow-hidden shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+                      onClick={() => {
+                        navigate(`/producto/${relatedProduct.id}`);
+                        window.scrollTo(0, 0);
+                      }}
+                      className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-all group"
                     >
-                      <img
-                        src={relatedProduct.image}
-                        alt={relatedProduct.name}
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="p-4">
-                        <p className="text-sm text-gray-500 mb-1">{relatedProduct.category}</p>
-                        <h3 className="font-semibold text-gray-800 mb-2 truncate">{relatedProduct.name}</h3>
-                        <p className="text-red-500 font-bold">${Number(relatedProduct.price).toFixed(2)}</p>
+                      <div className="relative h-40 overflow-hidden">
+                        <img
+                          src={relatedProduct.image}
+                          alt={relatedProduct.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                      <div className="p-3">
+                        <p className="text-[10px] text-gray-400 uppercase font-bold mb-1 truncate">{relatedProduct.category}</p>
+                        <h3 className="text-sm font-semibold text-gray-700 mb-2 line-clamp-2 h-10 leading-tight">{relatedProduct.name}</h3>
+                        <p className="text-red-600 font-bold text-base">
+                          <FormattedPrice price={relatedProduct.price} />
+                        </p>
                       </div>
                     </div>
                   );

@@ -9,7 +9,7 @@ const MobileBottomNav = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 px-6 py-3 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+    <nav className="nav-mobile lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 px-6 py-3 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
       <div className="flex justify-between items-center max-w-md mx-auto">
         <Link 
           to="/" 

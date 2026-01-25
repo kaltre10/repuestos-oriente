@@ -5,7 +5,7 @@ import MobileBottomNav from '../../components/MobileBottomNav';
 
 const HomeLayout = () => {
   return (
-    <div>
+    <div className="">
       <MobileBottomNav />
       <Header />
       <Outlet />
