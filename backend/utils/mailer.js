@@ -33,3 +33,26 @@ export const sendResetPasswordEmail = async (email, token) => {
     throw new Error('Error al enviar el correo de recuperación');
   }
 };
+
+export const sendContactEmail = async ({ name, email, message }) => {
+  const mailOptions = {
+    from: `"Marketplace Contact" <${process.env.EMAIL_USER}>`,
+    to: 'manuelperez.0000@gmail.com',
+    subject: `Nuevo mensaje de contacto de ${name}`,
+    html: `
+      <h1>Nuevo mensaje de contacto</h1>
+      <p><strong>Nombre:</strong> ${name}</p>
+      <p><strong>Correo:</strong> ${email}</p>
+      <p><strong>Mensaje:</strong></p>
+      <p>${message}</p>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Contact email sent from ${email}`);
+  } catch (error) {
+    console.error('Error sending contact email:', error);
+    throw new Error('Error al enviar el correo de contacto');
+  }
+};

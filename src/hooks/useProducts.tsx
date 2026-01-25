@@ -28,10 +28,12 @@ export const useProducts = () => {
     getProducts();
   }, []);
 
-  const getProducts = async () => {
+  const getProducts = async (filters: { year?: string } = {}) => {
     try {
       setLoading(true)
-      const response = await request.get(`${apiUrl}/products`)
+      const { year } = filters;
+      const url = year ? `${apiUrl}/products?year=${year}` : `${apiUrl}/products`;
+      const response = await request.get(url)
       const fetchedProducts = response.data.body.products.map((p: any) => ({
         ...p,
         price: Number(p.price)
@@ -115,6 +117,7 @@ export const useProducts = () => {
       price: product.price,
       freeDelivery: product.freeDelivery,
       partNumber: product.partNumber,
+      garantia: (product as any).garantia || '',
       noBrand: !(product as any).brandId && !(product as any).modelId,
     });
     setShowForm(true);
@@ -140,6 +143,7 @@ export const useProducts = () => {
       price: 0,
       freeDelivery: false,
       partNumber: '',
+      garantia: '',
       noBrand: false,
     });
   };
@@ -250,9 +254,9 @@ export const useProducts = () => {
     formData: formData,
     formLoading: formLoading,
     formError: formError,
-
+    
     // Actions
-    getProducts,
+    getProducts: getProducts,
     updateProduct,
     deleteProduct,
     handleDelete,

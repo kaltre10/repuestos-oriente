@@ -127,17 +127,17 @@ const ProductDetailPage = () => {
   const productImages = product.images;
 
   return (
-        <>
-            <CartModal />
-            
-            <ImageGallery
-                images={productImages}
-                initialIndex={selectedImage}
-                isOpen={isGalleryOpen}
-                onClose={() => setIsGalleryOpen(false)}
-            />
+    <>
+      <CartModal />
 
-            <div className="min-h-screen bg-gray-50">
+      <ImageGallery
+        images={productImages}
+        initialIndex={selectedImage}
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+      />
+
+      <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Back Button */}
           <button
@@ -192,7 +192,14 @@ const ProductDetailPage = () => {
             <div className="space-y-6">
               <div>
                 <h1 className="text-3xl font-bold text-gray-800 mb-4">{product.name}</h1>
-
+                {/* Compatibility Info */}
+                {product.years && (
+                  <div className="mb-6">
+                    <p className="text-sm text-gray-600 font-medium">
+                      Este producto es compatible con vehiculos del año {product.years.split('-')[0]} hasta el año {product.years.split('-')[1] || product.years.split('-')[0]}
+                    </p>
+                  </div>
+                )}
                 {/* Rating */}
                 <div className="flex items-center gap-2 mb-4">
                   <div className="flex text-yellow-400">
@@ -200,13 +207,16 @@ const ProductDetailPage = () => {
                       <Star key={i} size={20} fill={i < product.rating ? 'currentColor' : 'none'} />
                     ))}
                   </div>
+
                   <span className="text-gray-600">({product.reviews} reseñas)</span>
                 </div>
 
                 {/* Price */}
-                <div className="text-4xl font-bold text-red-500 mb-6">
+                <div className="text-4xl font-bold text-red-500 mb-2">
                   <FormattedPrice price={product.price} />
                 </div>
+
+
               </div>
 
               {/* Description */}
@@ -327,15 +337,12 @@ const ProductDetailPage = () => {
               <div className="border-t pt-6 space-y-3 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  Envío gratuito en compras mayores a $20
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                  Devolución gratuita dentro de 30 días
+                  Envío gratuito en compras mayores a $200
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
-                  Garantía de 1 año
+
+                  {product.garantia && ` ${product.garantia}`}
                 </div>
               </div>
             </div>
@@ -435,7 +442,11 @@ const ProductDetailPage = () => {
 
           {/* Related Products Section */}
           <div className="mt-16">
-            <h2 className="text-2xl font-bold text-gray-800 mb-8">Productos relacionados</h2>
+            {[...products]
+              .filter(p => p.categories === productFromDB?.categories && p.id !== product.id)
+              .length > 0 &&
+              <h2 className="text-2xl font-bold text-gray-800 mb-8">Productos relacionados</h2>
+            }
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
               {[...products]
                 .filter(p => p.categories === productFromDB?.categories && p.id !== product.id)

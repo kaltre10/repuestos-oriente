@@ -13,6 +13,7 @@ import visitRoutes from './visit.routes.js';
 import paymentMethodRoutes from './paymentmethod.routes.js';
 import sliderRoutes from './slider.routes.js';
 import advertisingRoutes from './advertising.routes.js';
+import contactRoutes from './contact.routes.js';
 
 const router = express.Router();
 
@@ -34,5 +35,6 @@ router.use(`${apiVersion}/visits`, visitRoutes);
 router.use(`${apiVersion}/payment-methods`, paymentMethodRoutes);
 router.use(`${apiVersion}/sliders`, sliderRoutes);
 router.use(`${apiVersion}/advertising`, advertisingRoutes);
+router.use(`${apiVersion}/contact`, contactRoutes);
 
 export default router;

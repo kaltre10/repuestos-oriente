@@ -13,7 +13,7 @@ import { Dropdown, DropdownItem } from 'flowbite-react';
 
 const ProductsPage = () => {
     const navigate = useNavigate();
-    const { products, loading } = useProducts();
+    const { products, loading, getProducts } = useProducts();
     const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
     const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
 
@@ -39,6 +39,11 @@ const ProductsPage = () => {
     const [selectedSubcategory, setSelectedSubcategory] = useState('');
     const [filtersExpanded, setFiltersExpanded] = useState(false);
 
+    // Fetch products when year changes
+    useEffect(() => {
+        getProducts({ year: selectedYear });
+    }, [selectedYear]);
+
     const filteredProducts = useMemo(() => {
         let filtered = products.map((p: any) => ({
             ...p,
@@ -51,11 +56,12 @@ const ProductsPage = () => {
         }));
 
         // Apply filters
-        if (selectedYear) {
+        // No longer filtering by year here as it's done in the backend
+        /* if (selectedYear) {
             filtered = filtered.filter(product =>
                 product.years.includes(selectedYear) || product.name.includes(selectedYear)
             );
-        }
+        } */
 
         if (selectedBrand) {
             filtered = filtered.filter(product => product.brand === selectedBrand);

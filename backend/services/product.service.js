@@ -3,9 +3,11 @@ const { Product } = models;
 
 class ProductService {
 
-  async getAllProducts() {
+  async getAllProducts(filters = {}) {
     try {
-      const products = await Product.findAll({
+      const { year } = filters;
+      
+      let products = await Product.findAll({
         order: [['createdAt', 'DESC']],
         include: [{
           model: models.ProductImage,
@@ -13,6 +15,29 @@ class ProductService {
           attributes: ['image']
         }]
       });
+
+      if (year) {
+        const targetYear = parseInt(year);
+        products = products.filter(product => {
+          if (!product.years) return false;
+          
+          // Formato esperado: XXXX-XXXX
+          const range = product.years.split('-');
+          if (range.length === 2) {
+            const startYear = parseInt(range[0]);
+            const endYear = parseInt(range[1]);
+            return targetYear >= startYear && targetYear <= endYear;
+          }
+          
+          // Caso en que solo sea un año individual XXXX
+          if (range.length === 1) {
+            return parseInt(range[0]) === targetYear;
+          }
+
+          return false;
+        });
+      }
+
       return products;
     } catch (error) {
       throw new Error(`Error al obtener productos: ${error.message}`);

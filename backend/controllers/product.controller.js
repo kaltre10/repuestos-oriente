@@ -7,8 +7,9 @@ const asyncHandler = (fn) => (req, res, next) => {
 };
 
 const getProducts = asyncHandler(async (req, res) => {
-  const products = await productService.getAllProducts();
-  console.log('Fetching all products');
+  const { year } = req.query;
+  const products = await productService.getAllProducts({ year });
+  console.log('Fetching products', year ? `for year ${year}` : 'all');
   responser.success({
     res,
     body: { products },
@@ -40,7 +41,8 @@ const createProduct = asyncHandler(async (req, res) => {
     amount,
     price,
     freeDelivery,
-    partNumber
+    partNumber,
+    garantia
   } = req.body;
 
   // Validation
@@ -83,7 +85,8 @@ const createProduct = asyncHandler(async (req, res) => {
     amount: amount || 0,
     price,
     freeDelivery: freeDelivery || false,
-    partNumber
+    partNumber,
+    garantia: garantia || null
   };
 
   const newProduct = await productService.createProduct(productData);
@@ -111,7 +114,8 @@ const updateProduct = asyncHandler(async (req, res) => {
     amount,
     price,
     freeDelivery,
-    partNumber
+    partNumber,
+    garantia
   } = req.body;
 
   // Validation for price if provided
@@ -138,7 +142,8 @@ const updateProduct = asyncHandler(async (req, res) => {
     amount,
     price,
     freeDelivery,
-    partNumber
+    partNumber,
+    garantia
   };
 
   // Validation for amount if provided

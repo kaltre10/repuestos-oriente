@@ -14,7 +14,7 @@ export const startServer = async (app) => {
     try {
         await connectDB();
 
-        await sequelize.sync();
+        await sequelize.sync({ alter: true });
 
         // Seed brands, categories and models after sync
         await seedBrands();

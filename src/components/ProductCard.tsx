@@ -12,6 +12,7 @@ interface ProductCardProps {
     reviews: number;
     price: number;
     image: string;
+    years: string;
   };
   onImageClick?: (imageSrc: string) => void;
 }
@@ -44,8 +45,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div onClick={handleImageClick} className="cursor-pointer absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
       </div>
       <div className="p-4 flex flex-col flex-1">
-        <p className="text-gray-500 text-sm">{product.category}</p>
         <h3 onClick={handleImageClick} className="hover:underline cursor-pointer font-semibold mt-1 truncate text-gray-800">{product.name}</h3>
+        <div className='flex justify-between items-center'>
+          <p className="text-gray-500 text-sm">{product.category}</p>
+          <p className='text-gray-500 text-sm'>{product.years} </p>
+        </div>
         <div className="flex items-center mt-2">
           <div className="flex text-yellow-400">
             {[...Array(5)].map((_, i) => (
@@ -57,7 +61,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="mt-2 mb-4">
           <FormattedPrice price={product.price} className="text-red-500 font-bold text-lg" />
         </div>
-        
+
         <div className="mt-auto">
           {isInCart ? (
             <div className="flex items-center gap-2">

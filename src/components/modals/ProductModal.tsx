@@ -7,7 +7,10 @@ import { useSubCategories } from '../../hooks/useSubCategories';
 import { useImageUpload } from '../../hooks/useImageUpload';
 import ImageUploadSection from '../ImageUploadSection';
 import { useConfirm } from '../../hooks/useConfirm';
+import useNotify from '../../hooks/useNotify';
+
 const ProductModal = () => {
+  const { notify } = useNotify();
   const confirm = useConfirm();
   const modalRef = useRef<HTMLDivElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -154,6 +157,36 @@ const ProductModal = () => {
       modelId,
       model: selectedModel ? selectedModel.model : ''
     });
+  };
+
+  // Handle years input with specific format: XXXX-XXXX
+  const handleYearsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    
+    // Only allow numbers and "-"
+    const filteredValue = value.replace(/[^0-9-]/g, '');
+    
+    // Auto-format: Add "-" after 4 digits if not present
+    let formattedValue = filteredValue;
+    if (filteredValue.length === 4 && !filteredValue.includes('-') && value.length > formData.years.length) {
+      formattedValue = filteredValue + '-';
+    }
+    
+    // Limit length to 9 characters (XXXX-XXXX)
+    if (formattedValue.length <= 9) {
+      setFormData({
+        ...formData,
+        years: formattedValue
+      });
+    }
+
+    // Validation check for notification (only if we have enough characters to validate a full range)
+    if (formattedValue.length === 9) {
+      const yearRegex = /^\d{4}-\d{4}$/;
+      if (!yearRegex.test(formattedValue)) {
+        notify.info('El formato correcto para los años es: 2020-2024 (4 dígitos, guion, 4 dígitos)');
+      }
+    }
   };
 
   const handleNoBrandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -450,18 +483,37 @@ const ProductModal = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Garantía
+              </label>
+              <input
+                type="text"
+                name="garantia"
+                value={formData.garantia}
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  fieldErrors.garantia ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Ej: 6 meses, 1 año, etc."
+              />
+              {fieldErrors.garantia && (
+                <p className="mt-1 text-xs text-red-500">{fieldErrors.garantia}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Años *
               </label>
               <input
                 type="text"
                 name="years"
                 value={formData.years}
-                onChange={handleInputChange}
+                onChange={handleYearsChange}
                 required
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   fieldErrors.years ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="Ingresa los años (ej: 2020-2024)"
+                placeholder="XXXX-XXXX"
               />
               {fieldErrors.years && (
                 <p className="mt-1 text-xs text-red-500">{fieldErrors.years}</p>
