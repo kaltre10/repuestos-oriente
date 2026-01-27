@@ -39,7 +39,11 @@ const ProductDetailPage = () => {
       ? (productFromDB as any).images.map((img: any) => `${imagesUrl}${img.image}`)
       : ['/placeholder-product.png'],
     category: (productFromDB as any).categories,
-    discount: (productFromDB as any).discount || 0
+    discount: (productFromDB as any).discount || 0,
+    originalPrice: Number(productFromDB.price),
+    price: (productFromDB as any).discount > 0 
+      ? Number(productFromDB.price) * (1 - (Number(productFromDB.discount) / 100))
+      : Number(productFromDB.price)
   } : null;
 
   useEffect(() => {
@@ -214,20 +218,20 @@ const ProductDetailPage = () => {
 
                 {/* Price */}
                 <div className="mb-2">
-                  {product.discount > 0 && (
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-base text-gray-400 line-through">
-                        <FormattedPrice price={product.price} />
-                      </span>
-                      <span className="text-xl font-bold text-red-600">
-                        - {Intl.NumberFormat('es-ES', { style: 'percent', minimumFractionDigits: 0 }).format(product.discount / 100)} DE DESCUENTO
-                      </span>
+                    {product.discount > 0 && (
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-base text-gray-400 line-through">
+                          <FormattedPrice price={product.originalPrice} />
+                        </span>
+                        <span className="text-xl font-bold text-red-600">
+                          {product.discount}% OFF
+                        </span>
+                      </div>
+                    )}
+                    <div className="text-5xl font-extrabold text-red-600">
+                      <FormattedPrice price={product.price} />
                     </div>
-                  )}
-                  <div className="text-5xl font-extrabold text-red-600">
-                    <FormattedPrice price={product.price * (1 - (product.discount / 100))} />
                   </div>
-                </div>
               </div>
               {/* Description */}
               {product?.description &&

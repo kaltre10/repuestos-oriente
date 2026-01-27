@@ -12,6 +12,7 @@ interface ProductCardProps {
     rating: number;
     reviews: number;
     price: number;
+    discount?: number;
     image: string;
     years: string;
     images?: { image: string }[];
@@ -30,9 +31,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     ? `${imagesUrl}${product.images[0].image}`
     : (product.image?.startsWith('http') ? product.image : '/placeholder-product.png');
 
+  const basePrice = Number(product.price);
+  const discountPercent = product.discount ? Number(product.discount) : 0;
+  const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
+
   const handleAddToCart = () => {
     if (!isInCart) {
-      addToCart({ ...product, image: displayImage });
+      addToCart({ ...product, image: displayImage, price: discountedPrice });
     }
   };
 
@@ -64,8 +69,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
           <span className="text-gray-500 text-sm ml-2">{product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'}</span>
         </div>
-        <div className="mt-2 mb-4">
-          <FormattedPrice price={product.price} className="text-red-500 font-bold text-lg" />
+        <div className="mt-2 mb-4 flex flex-col">
+          {discountPercent > 0 ? (
+            <>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400 text-sm line-through">
+                  <FormattedPrice price={basePrice} />
+                </span>
+                <span className="text-red-600 text-xs font-bold bg-red-50 px-1.5 py-0.5 rounded">
+                  {discountPercent}% OFF
+                </span>
+              </div>
+              <FormattedPrice price={discountedPrice} className="text-red-600 font-bold text-xl leading-tight" />
+            </>
+          ) : (
+            <FormattedPrice price={basePrice} className="text-red-500 font-bold text-lg" />
+          )}
         </div>
 
         <div className="mt-auto">

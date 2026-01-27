@@ -48,7 +48,23 @@ const CartModal = () => {
                   <div className="flex-1">
                     <h3 className="font-medium text-gray-800">{item.name}</h3>
                     <p className="text-sm text-gray-500">{item.category}</p>
-                    <FormattedPrice price={item.price} className="text-red-500 font-semibold" />
+                    <div className="flex flex-col">
+                      {item.discount && item.discount > 0 ? (
+                        <>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-gray-400 line-through">
+                              <FormattedPrice price={Number(item.price) / (1 - (Number(item.discount) / 100))} />
+                            </span>
+                            <span className="text-[10px] font-bold text-red-600">
+                              {item.discount}% OFF
+                            </span>
+                          </div>
+                          <FormattedPrice price={item.price} className="text-red-500 font-semibold" />
+                        </>
+                      ) : (
+                        <FormattedPrice price={item.price} className="text-gray-800 font-semibold" />
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <button

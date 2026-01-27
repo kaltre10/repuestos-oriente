@@ -72,7 +72,10 @@ const BestSellers = () => {
 
   const handleAddToCart = (product: any) => {
     if (!cart.some(item => item.id === product.id)) {
-      addToCart(product);
+      const discountPercent = product.discount ? Number(product.discount) : 0;
+      const basePrice = Number(product.price);
+      const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
+      addToCart({ ...product, price: discountedPrice });
     }
   };
 
@@ -83,6 +86,9 @@ const BestSellers = () => {
   const renderListItem = (product: any) => {
     const cartItem = getCartItem(product.id);
     const isInCart = !!cartItem;
+    const basePrice = Number(product.price);
+    const discountPercent = product.discount ? Number(product.discount) : 0;
+    const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
 
     return (
       <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md flex">
@@ -98,17 +104,29 @@ const BestSellers = () => {
           <p className="text-gray-500 text-sm mb-1">{product.category}</p>
           <h3 onClick={() => navigate(`/producto/${product.id}`)} className="hover:underline cursor-pointer font-semibold text-lg mb-2 text-gray-800">{product.name}</h3>
           <div className="flex items-center mb-3">
-            <div className="flex text-yellow-400 mr-2">
+            <div className="flex text-yellow-400">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} size={16} fill={i < product.rating ? 'currentColor' : 'none'} />
               ))}
             </div>
-            <span className="text-gray-500 text-sm">{product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'}</span>
+            <span className="text-gray-500 text-sm ml-2">({product.reviews} reseñas)</span>
           </div>
-
-          {/* Price in top-right corner */}
-          <div className="absolute top-6 right-6">
-            <FormattedPrice price={product.price} className="text-red-500 font-bold text-xl" />
+          <div className="flex flex-col mb-4">
+            {discountPercent > 0 ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-400 line-through">
+                    <FormattedPrice price={basePrice} />
+                  </span>
+                  <span className="text-red-600 text-xs font-bold bg-red-50 px-1.5 py-0.5 rounded">
+                    {discountPercent}% OFF
+                  </span>
+                </div>
+                <FormattedPrice price={discountedPrice} className="text-red-500 font-bold text-2xl" />
+              </>
+            ) : (
+              <FormattedPrice price={basePrice} className="text-red-500 font-bold text-xl" />
+            )}
           </div>
 
           {/* Actions in bottom-right corner */}

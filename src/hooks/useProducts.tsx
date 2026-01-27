@@ -43,7 +43,8 @@ export const useProducts = () => {
       const response = await request.get(url)
       const fetchedProducts = response.data.body.products.map((p: any) => ({
         ...p,
-        price: Number(p.price)
+        price: Number(p.price),
+        discount: p.discount ? Number(p.discount) : 0
       }))
       setProducts(fetchedProducts)
       console.log("obteniendo productos: ,", fetchedProducts)
