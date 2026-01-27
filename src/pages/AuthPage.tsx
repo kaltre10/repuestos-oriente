@@ -12,7 +12,7 @@ const AuthPage = () => {
 
   if (isForgotPassword) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="mt-1 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white shadow sm:rounded-lg pb-4">
             <div className="bg-logo">
@@ -86,7 +86,7 @@ const AuthPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
 
 
       <div className="mt-1 sm:mx-auto sm:w-full sm:max-w-md">
