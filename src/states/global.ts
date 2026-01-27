@@ -9,6 +9,7 @@ interface Product {
   price: number;
   image: string;
   tag?: string;
+  discount?: number;
 }
 
 interface CartItem extends Product {

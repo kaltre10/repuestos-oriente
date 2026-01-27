@@ -178,7 +178,23 @@ const CheckoutPage = () => {
                       <div className="flex items-center justify-between mt-2">
                         <div className="">
                           <span className="text-xs text-gray-500">Precio unit: </span>
-                          <FormattedPrice price={item.price} className="text-xs text-gray-600" />
+                          <div className="inline-flex flex-col align-middle">
+                            {(item as any).discount && (item as any).discount > 0 ? (
+                              <>
+                                <div className="flex items-center gap-1">
+                                  <span className="text-[10px] text-gray-400 line-through leading-none">
+                                    <FormattedPrice price={Number(item.price) / (1 - (Number((item as any).discount) / 100))} />
+                                  </span>
+                                  <span className="text-[9px] font-bold text-red-600">
+                                    {(item as any).discount}% OFF
+                                  </span>
+                                </div>
+                                <FormattedPrice price={item.price} className="text-xs text-red-600 font-bold" />
+                              </>
+                            ) : (
+                              <FormattedPrice price={item.price} className="text-xs text-gray-600 font-bold" />
+                            )}
+                          </div>
                         </div>
                         <div className="text-gray-500">
                           <span className="text-xs ">Cantidad: </span>

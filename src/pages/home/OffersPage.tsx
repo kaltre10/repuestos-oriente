@@ -1,25 +1,33 @@
-import { useState, useMemo } from 'react';
-import { List, Grid2X2, Grid3X3, Tag } from 'lucide-react';
-import { products } from '../../data/products';
+import { useState, useMemo, useEffect } from 'react';
+import { List, Grid2X2, Grid3X3, Tag, Loader2 } from 'lucide-react';
 import ProductCard from '../../components/ProductCard';
-// import Header from '../../components/Header';
 import CartModal from '../../components/CartModal';
-// import Footer from '../../components/Footer';
-
-// Simulated offers data - in a real app this would come from an API
-const offersData = products.slice(0, 8).map(product => ({
-  ...product,
-  originalPrice: product.price,
-  discountPercentage: Math.floor(Math.random() * 30) + 10, // 10-40% discount
-  price: Math.round(product.price * (1 - (Math.floor(Math.random() * 30) + 10) / 100) * 100) / 100
-}));
+import { useProducts } from '../../hooks/useProducts';
+import { imagesUrl } from '../../utils/utils';
 
 const OffersPage = () => {
+  const { products, loading, getProducts } = useProducts();
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high' | 'discount'>('discount');
   const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
 
+  useEffect(() => {
+    getProducts({ onSale: true });
+  }, []);
+
   const filteredProducts = useMemo(() => {
-    let filtered = [...offersData];
+    if (!products || !Array.isArray(products)) return [];
+
+    let filtered = products
+      .filter((p: any) => (p.discount || 0) > 0)
+      .map((p: any) => ({
+        ...p,
+        rating: p.rating || 5,
+        reviews: p.reviews || 0,
+        image: p.images && p.images.length > 0
+          ? `${imagesUrl}${p.images[0].image}`
+          : '/placeholder-product.png',
+        category: p.categories
+      }));
 
     // Apply sorting
     switch (sortBy) {
@@ -33,12 +41,12 @@ const OffersPage = () => {
         filtered = [...filtered].sort((a, b) => b.price - a.price);
         break;
       case 'discount':
-        filtered = [...filtered].sort((a, b) => (b.discountPercentage || 0) - (a.discountPercentage || 0));
+        filtered = [...filtered].sort((a, b) => (b.discount || 0) - (a.discount || 0));
         break;
     }
 
     return filtered;
-  }, [sortBy]);
+  }, [products, sortBy]);
 
   const getGridClasses = () => {
     switch (gridLayout) {
@@ -121,18 +129,33 @@ const OffersPage = () => {
             </div>
           </div>
 
-          <div className={`grid ${getGridClasses()} gap-8`}>
-            {filteredProducts.map(product => (
-              <div key={product.id} className="relative">
-                {/* Discount badge */}
-                {product.discountPercentage && (
-                  <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold z-10">
-                    -{product.discountPercentage}%
-                  </div>
-                )}
-                <ProductCard product={product} />
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            {loading ? (
+              <div className="flex flex-col items-center gap-4">
+                <Loader2 className="w-12 h-12 text-red-500 animate-spin" />
+                <p className="text-gray-600 font-medium">Cargando ofertas...</p>
               </div>
-            ))}
+            ) : filteredProducts.length > 0 ? (
+              <div className={`grid ${getGridClasses()} gap-8 w-full`}>
+                {filteredProducts.map(product => (
+                  <div key={product.id} className="relative">
+                    {/* Discount badge */}
+                    {product.discount > 0 && (
+                      <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold z-10">
+                        -{product.discount}%
+                      </div>
+                    )}
+                    <ProductCard product={product as any} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center bg-white p-12 rounded-2xl shadow-sm border border-gray-100 max-w-md w-full">
+                <Tag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-800 mb-2">No hay ofertas disponibles</h3>
+                <p className="text-gray-500">Vuelve pronto para descubrir nuevos descuentos.</p>
+              </div>
+            )}
           </div>
 
           {/* Call to action */}

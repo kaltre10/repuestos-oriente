@@ -110,7 +110,10 @@ const ProductsPage = () => {
 
     const handleAddToCart = (product: any) => {
         if (!cart.some(item => item.id === product.id)) {
-            addToCart(product);
+            const discountPercent = product.discount ? Number(product.discount) : 0;
+            const basePrice = Number(product.price);
+            const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
+            addToCart({ ...product, price: discountedPrice });
         }
     };
 
@@ -121,6 +124,9 @@ const ProductsPage = () => {
     const renderListItem = (product: any) => {
         const cartItem = getCartItem(product.id);
         const isInCart = !!cartItem;
+        const basePrice = Number(product.price);
+        const discountPercent = product.discount ? Number(product.discount) : 0;
+        const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
 
         return (
             <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md flex">
@@ -145,7 +151,23 @@ const ProductsPage = () => {
                     </div>
 
                     {/* Price in top-right corner */}
-                    <FormattedPrice price={product.price} className="absolute top-6 right-6 text-red-500 font-bold text-xl" />
+                    <div className="absolute top-6 right-6 flex flex-col items-end">
+                        {discountPercent > 0 ? (
+                            <>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-400 line-through">
+                                        <FormattedPrice price={basePrice} />
+                                    </span>
+                                    <span className="text-red-600 text-xs font-bold bg-red-50 px-1.5 py-0.5 rounded">
+                                        {discountPercent}% OFF
+                                    </span>
+                                </div>
+                                <FormattedPrice price={discountedPrice} className="text-red-500 font-bold text-2xl" />
+                            </>
+                        ) : (
+                            <FormattedPrice price={basePrice} className="text-red-500 font-bold text-xl" />
+                        )}
+                    </div>
 
                     {/* Actions in bottom-right corner */}
                     <div className="absolute bottom-6 right-6">

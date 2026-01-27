@@ -2,6 +2,7 @@ import { Star, Plus, Minus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../states/global';
 import FormattedPrice from './FormattedPrice';
+import { imagesUrl } from '../utils/utils';
 
 interface ProductCardProps {
   product: {
@@ -11,8 +12,10 @@ interface ProductCardProps {
     rating: number;
     reviews: number;
     price: number;
+    discount?: number;
     image: string;
     years?: string;
+    images?: { image: string }[];
   };
   onImageClick?: (imageSrc: string) => void;
 }
@@ -24,9 +27,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const cartItem = cart.find(item => item.id === product.id);
   const isInCart = !!cartItem;
 
+  const displayImage = product.images && product.images.length > 0
+    ? `${imagesUrl}${product.images[0].image}`
+    : (product.image?.startsWith('http') ? product.image : '/placeholder-product.png');
+
+  const basePrice = Number(product.price);
+  const discountPercent = product.discount ? Number(product.discount) : 0;
+  const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
+
   const handleAddToCart = () => {
     if (!isInCart) {
-      addToCart(product);
+      addToCart({ ...product, image: displayImage, price: discountedPrice });
     }
   };
 
@@ -38,7 +49,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <div className="bg-white text-gray-800 rounded-lg overflow-hidden group shadow-md flex flex-col h-full">
       <div className="relative">
         <img
-          src={product.image}
+          src={displayImage}
           alt={product.name}
           className="w-full h-56 object-cover cursor-pointer"
         />
@@ -58,8 +69,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
           <span className="text-gray-500 text-sm ml-2">{product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'}</span>
         </div>
-        <div className="mt-2 mb-4">
-          <FormattedPrice price={product.price} className="text-red-500 font-bold text-lg" />
+        <div className="mt-2 mb-4 flex flex-col">
+          {discountPercent > 0 ? (
+            <>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400 text-sm line-through">
+                  <FormattedPrice price={basePrice} />
+                </span>
+                <span className="text-red-600 text-xs font-bold bg-red-50 px-1.5 py-0.5 rounded">
+                  {discountPercent}% OFF
+                </span>
+              </div>
+              <FormattedPrice price={discountedPrice} className="text-red-600 font-bold text-xl leading-tight" />
+            </>
+          ) : (
+            <FormattedPrice price={basePrice} className="text-red-500 font-bold text-lg" />
+          )}
         </div>
 
         <div className="mt-auto">

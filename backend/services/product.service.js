@@ -5,9 +5,19 @@ class ProductService {
 
   async getAllProducts(filters = {}) {
     try {
-      const { year } = filters;
+      const { year, onSale } = filters;
       
+      let where = {};
+      
+      if (onSale === 'true') {
+        const { Op } = models.Sequelize;
+        where.discount = {
+          [Op.gt]: 0
+        };
+      }
+
       let products = await Product.findAll({
+        where,
         order: [['createdAt', 'DESC']],
         include: [{
           model: models.ProductImage,
