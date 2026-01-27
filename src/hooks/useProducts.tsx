@@ -28,11 +28,18 @@ export const useProducts = () => {
     getProducts();
   }, []);
 
-  const getProducts = async (filters: { year?: string } = {}) => {
+  const getProducts = async (filters: { year?: string, onSale?: boolean } = {}) => {
     try {
       setLoading(true)
-      const { year } = filters;
-      const url = year ? `${apiUrl}/products?year=${year}` : `${apiUrl}/products`;
+      const { year, onSale } = filters;
+      let url = `${apiUrl}/products`;
+      const params = new URLSearchParams();
+      if (year) params.append('year', year);
+      if (onSale) params.append('onSale', 'true');
+      
+      const queryString = params.toString();
+      if (queryString) url += `?${queryString}`;
+
       const response = await request.get(url)
       const fetchedProducts = response.data.body.products.map((p: any) => ({
         ...p,

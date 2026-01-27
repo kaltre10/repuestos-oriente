@@ -38,7 +38,8 @@ const ProductDetailPage = () => {
     images: (productFromDB as any).images && (productFromDB as any).images.length > 0
       ? (productFromDB as any).images.map((img: any) => `${imagesUrl}${img.image}`)
       : ['/placeholder-product.png'],
-    category: (productFromDB as any).categories
+    category: (productFromDB as any).categories,
+    discount: (productFromDB as any).discount || 0
   } : null;
 
   useEffect(() => {
@@ -212,13 +213,22 @@ const ProductDetailPage = () => {
                 </div>
 
                 {/* Price */}
-                <div className="text-4xl font-bold text-red-500 mb-2">
-                  <FormattedPrice price={product.price} />
+                <div className="mb-2">
+                  {product.discount > 0 && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-base text-gray-400 line-through">
+                        <FormattedPrice price={product.price} />
+                      </span>
+                      <span className="text-xl font-bold text-red-600">
+                        - {Intl.NumberFormat('es-ES', { style: 'percent', minimumFractionDigits: 0 }).format(product.discount / 100)} DE DESCUENTO
+                      </span>
+                    </div>
+                  )}
+                  <div className="text-5xl font-extrabold text-red-600">
+                    <FormattedPrice price={product.price * (1 - (product.discount / 100))} />
+                  </div>
                 </div>
-
-
               </div>
-
               {/* Description */}
               {product?.description &&
                 <div>

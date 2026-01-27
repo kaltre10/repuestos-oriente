@@ -2,6 +2,7 @@ import { Star, Plus, Minus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../states/global';
 import FormattedPrice from './FormattedPrice';
+import { imagesUrl } from '../utils/utils';
 
 interface ProductCardProps {
   product: {
@@ -13,6 +14,7 @@ interface ProductCardProps {
     price: number;
     image: string;
     years: string;
+    images?: { image: string }[];
   };
   onImageClick?: (imageSrc: string) => void;
 }
@@ -24,9 +26,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const cartItem = cart.find(item => item.id === product.id);
   const isInCart = !!cartItem;
 
+  const displayImage = product.images && product.images.length > 0
+    ? `${imagesUrl}${product.images[0].image}`
+    : (product.image?.startsWith('http') ? product.image : '/placeholder-product.png');
+
   const handleAddToCart = () => {
     if (!isInCart) {
-      addToCart(product);
+      addToCart({ ...product, image: displayImage });
     }
   };
 
@@ -38,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <div className="bg-white text-gray-800 rounded-lg overflow-hidden group shadow-md flex flex-col h-full">
       <div className="relative">
         <img
-          src={product.image}
+          src={displayImage}
           alt={product.name}
           className="w-full h-56 object-cover cursor-pointer"
         />
