@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, ArrowLeft, ShoppingCart, Heart, Share2, Loader2, MessageSquare, Send, Plus, Minus, Trash2, Search } from 'lucide-react';
+import { Star, ArrowLeft, ShoppingCart, Loader2, MessageSquare, Send, Plus, Minus, Trash2, Search } from 'lucide-react';
 import { useProducts } from '../../hooks/useProducts';
 import { imagesUrl, apiUrl } from '../../utils/utils';
 import request from '../../utils/request';

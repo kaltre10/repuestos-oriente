@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { CreditCard, Smartphone, Hash, Image as ImageIcon, CheckCircle, AlertCircle, ChevronLeft } from 'lucide-react';
 import useStore from '../../states/global';
 import { apiUrl, bancos } from '../../utils/utils';
@@ -21,10 +21,10 @@ interface PaymentMethodDB {
 
 const PaymentPage = () => {
   const { notify } = useNotify()
-  const location = useLocation();
+  // const location = useLocation();
   const navigate = useNavigate();
   const { cart, clearCart, user, getCartTotal } = useStore();
-  const accountData = location.state?.accountData;
+  // const accountData = location.state?.accountData;
 
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethodDB[]>([]);
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethodDB | null>(null);

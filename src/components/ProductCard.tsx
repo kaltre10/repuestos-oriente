@@ -12,7 +12,7 @@ interface ProductCardProps {
     reviews: number;
     price: number;
     image: string;
-    years: string;
+    years?: string;
   };
   onImageClick?: (imageSrc: string) => void;
 }
