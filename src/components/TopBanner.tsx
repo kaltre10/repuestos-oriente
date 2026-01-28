@@ -4,12 +4,12 @@ import useStore from '../states/global';
 const TopBanner = () => {
 
     const { currency, setCurrency } = useStore();
-    const { dollarRate } = useDollarRate();
+    const { dollarRate, freeShippingThreshold } = useDollarRate();
 
     const Envio = () => <div>
         <span className="flex items-center gap-2">
             <Truck size={16} />
-            Envío gratis desde $200
+            Envío gratis desde ${Number(freeShippingThreshold).toFixed(2)}
         </span>
     </div>
 
@@ -55,7 +55,7 @@ const TopBanner = () => {
                     </div>
                     <div>
                         <span className="flex items-center gap-2">
-                            Envío gratis desde $200
+                            Envío gratis desde ${Number(freeShippingThreshold).toFixed(2)}
                         </span>
                         <span className="flex items-center gap-2 text-xs text-gray-500">
                             <img

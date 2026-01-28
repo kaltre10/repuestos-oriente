@@ -39,6 +39,8 @@ interface ConfigState {
   categories: Category[];
   subCategories: SubCategory[];
   dollarRate: string;
+  freeShippingThreshold: string;
+  shippingPrice: string;
   configId: number | null;
   loadingBrands: boolean;
   loadingModels: boolean;
@@ -75,10 +77,12 @@ interface ConfigState {
   updateSubCategory: (id: number, subCategoryName: string, categoryId: number) => Promise<boolean>;
   deleteSubCategory: (id: number) => Promise<boolean>;
 
-  // Dollar Actions
+  // Config Actions
   fetchDollarRate: () => Promise<void>;
-  saveDollarRate: (newRate: string) => Promise<boolean>;
+  saveConfig: (newRate: string, freeShippingThreshold: string, shippingPrice: string) => Promise<boolean>;
   setLocalDollarRate: (rate: string) => void;
+  setLocalFreeShippingThreshold: (threshold: string) => void;
+  setLocalShippingPrice: (price: string) => void;
 }
 
 const formatName = (name: string) => {
@@ -93,6 +97,8 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
   categories: [],
   subCategories: [],
   dollarRate: '0',
+  freeShippingThreshold: '200',
+  shippingPrice: '0',
   configId: null,
   loadingBrands: false,
   loadingModels: false,
@@ -409,7 +415,7 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
     }
   },
 
-  // Dollar Actions
+  // Config Actions
   fetchDollarRate: async () => {
     set({ loadingDollar: true, errorDollar: null });
     try {
@@ -418,38 +424,63 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
       if (configs && configs.length > 0) {
         set({ 
           dollarRate: configs[0].dolarRate.toString(),
+          freeShippingThreshold: configs[0].freeShippingThreshold.toString(),
+          shippingPrice: configs[0].shippingPrice.toString(),
           configId: configs[0].id 
         });
       }
     } catch (err) {
-      console.error('Error fetching dollar rate:', err);
-      set({ errorDollar: 'Error al obtener la tasa del dólar' });
+      console.error('Error fetching configs:', err);
+      set({ errorDollar: 'Error al obtener las configuraciones' });
     } finally {
       set({ loadingDollar: false });
     }
   },
 
-  saveDollarRate: async (newRate) => {
+  saveConfig: async (newRate, freeShippingThreshold, shippingPrice) => {
     set({ loadingDollar: true, errorDollar: null });
     try {
       const rateValue = parseFloat(newRate);
+      const freeShippingValue = parseFloat(freeShippingThreshold);
+      const shippingPriceValue = parseFloat(shippingPrice);
+      
       if (isNaN(rateValue) || rateValue <= 0) {
         throw new Error('La tasa del dólar debe ser un número mayor a 0');
       }
+      
+      if (isNaN(freeShippingValue) || freeShippingValue < 0) {
+        throw new Error('La cantidad de envío gratis debe ser un número mayor o igual a 0');
+      }
+      
+      if (isNaN(shippingPriceValue) || shippingPriceValue < 0) {
+        throw new Error('El precio de envío debe ser un número mayor o igual a 0');
+      }
 
       const { configId } = get();
+      const configData = {
+        dolarRate: rateValue,
+        freeShippingThreshold: freeShippingValue,
+        shippingPrice: shippingPriceValue
+      };
+      
       if (configId) {
-        await request.put(`${apiUrl}/configs/${configId}`, { dolarRate: rateValue });
+        await request.put(`${apiUrl}/configs/${configId}`, configData);
       } else {
-        const response = await request.post(`${apiUrl}/configs`, { dolarRate: rateValue });
+        const response = await request.post(`${apiUrl}/configs`, configData);
         const newConfig = response.data.body.config;
         set({ configId: newConfig.id });
       }
-      set({ dollarRate: newRate });
+      
+      set({ 
+        dollarRate: newRate,
+        freeShippingThreshold,
+        shippingPrice
+      });
+      
       return true;
     } catch (err: any) {
-      console.error('Error saving dollar rate:', err);
-      set({ errorDollar: err.message || 'Error al guardar la tasa del dólar' });
+      console.error('Error saving configs:', err);
+      set({ errorDollar: err.message || 'Error al guardar las configuraciones' });
       return false;
     } finally {
       set({ loadingDollar: false });
@@ -457,4 +488,6 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
   },
 
   setLocalDollarRate: (rate) => set({ dollarRate: rate }),
+  setLocalFreeShippingThreshold: (threshold : any) => set({ freeShippingThreshold: threshold }),
+  setLocalShippingPrice: (price: any) => set({ shippingPrice: price }),
 }));

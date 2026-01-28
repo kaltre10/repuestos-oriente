@@ -4,11 +4,15 @@ import { useConfigStore } from '../states/useConfigStore';
 export const useDollarRate = () => {
   const {
     dollarRate,
+    freeShippingThreshold,
+    shippingPrice,
     loadingDollar: loading,
     errorDollar: error,
     fetchDollarRate,
-    saveDollarRate,
-    setLocalDollarRate: setDollarRate
+    saveConfig,
+    setLocalDollarRate: setDollarRate,
+    setLocalFreeShippingThreshold,
+    setLocalShippingPrice
   } = useConfigStore();
 
   useEffect(() => {
@@ -20,10 +24,14 @@ export const useDollarRate = () => {
 
   return {
     dollarRate,
+    freeShippingThreshold,
+    shippingPrice,
     setDollarRate,
+    setLocalFreeShippingThreshold,
+    setLocalShippingPrice,
     loading,
     error,
-    saveDollarRate,
+    saveConfig,
     fetchDollarRate
   };
 };

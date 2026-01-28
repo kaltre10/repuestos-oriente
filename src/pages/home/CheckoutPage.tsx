@@ -5,13 +5,22 @@ import useStore from '../../states/global';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
 import useConfirmStore from '../../states/useConfirmStore';
+import { useDollarRate } from '../../hooks/useDollarRate';
 
 const CheckoutPage = () => {
   const { notify } = useNotify()
   const navigate = useNavigate();
   const { cart, getCartTotal, user, removeFromCart, incrementQuantity, decrementQuantity } = useStore();  
+  const { freeShippingThreshold, shippingPrice } = useDollarRate();
   // const [isModalOpen, setIsModalOpen] = useState(false); 
   // const [isProcessing, setIsProcessing] = useState(false);  
+  
+  // Calcular si el envío es gratis
+  const cartTotal = getCartTotal();
+  const freeShipping = cartTotal >= Number(freeShippingThreshold);
+  const shippingCost = freeShipping ? 0 : Number(shippingPrice);
+  const finalTotal = cartTotal + shippingCost;
+  
   const [accountData, setAccountData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -238,18 +247,35 @@ const CheckoutPage = () => {
               <div className="bg-gray-50 p-6 rounded-2xl space-y-3">
                 <div className="flex justify-between items-center text-gray-600">
                   <span>Subtotal</span>
-                  <FormattedPrice price={getCartTotal()} className="font-medium text-gray-800" />
+                  <FormattedPrice price={cartTotal} className="font-medium text-gray-800" />
                 </div>
                 <div className="flex justify-between items-center text-gray-600 pb-3 border-b border-gray-200">
                   <span>Envío</span>
-                  <span className="text-green-600 font-bold uppercase text-xs">Gratis</span>
+                  {freeShipping ? (
+                    <span className="text-green-600 font-bold uppercase text-xs">Gratis</span>
+                  ) : (
+                    <FormattedPrice price={shippingCost} className="text-gray-800 font-medium" />
+                  )}
                 </div>
                 <div className="flex justify-between items-center text-xl font-black pt-2">
                   <span className="text-gray-800">Total</span>
-                  <FormattedPrice price={getCartTotal()} className="text-red-600" />
+                  <FormattedPrice price={finalTotal} className="text-red-600" />
                 </div>
               </div>
+            
 
+                {!freeShipping && (
+                  <div className="mt-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 flex items-center justify-between animate-pulse">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-emerald-700 text-xs font-semibold">🚚 ¡Aprovecha!</span>
+                      <span className="text-emerald-600 text-xs">Envío gratis a partir de:</span>
+                    </div>
+                    <div className="bg-white px-3 py-1 rounded-lg shadow-sm border border-emerald-100">
+                      <FormattedPrice price={Number(freeShippingThreshold)} className="text-emerald-700 font-bold text-xs" />
+                    </div>
+                  </div>
+                )}
+              
               <button
                 onClick={handleSubmit}
                 className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-lg hover:shadow-red-200 mt-8 flex items-center justify-center space-x-2 group"
