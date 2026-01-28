@@ -21,7 +21,7 @@ const socials = [
   },
   {
     icon: SiWhatsapp,
-    link: "https://api.whatsapp.com/send?phone=584121234567"
+    link: "https://api.whatsapp.com/send?phone=584147673787"
   }
 ]
 
@@ -34,13 +34,13 @@ export default function Footer() {
 
         {/* Columna 1 */}
         <div>
-          <h3 className="text-red-600 uppercase font-semibold mb-4">REPUESTOS ORIENTE</h3>
+          <Link to='/'><h3 className="text-red-600 uppercase font-semibold mb-4">REPUESTOS ORIENTE</h3></Link>
           <p className="text-gray-400 mb-4">
             Proporcionamos repuestos automotrices de alta calidad con servicio confiable y soporte al cliente.
           </p>
 
           <ul className="space-y-1 text-gray-400 mb-4">
-            <li>📞 +58-412-123-4567</li>
+            <li>📞 +58-414-767-3787</li>
             <li>📧 info@repuestosoriente.com</li>
             <li>🕘 Lun–Vie, 8:00–17:00 (VET)</li>
           </ul>
@@ -65,7 +65,7 @@ export default function Footer() {
           <h3 className="text-red-600 uppercase font-semibold mb-4">Ayuda y Soporte</h3>
           <ul className="space-y-2">
             <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Información de Envío</Link></li>
-            <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Devoluciones</Link></li>
+            {/* <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Devoluciones</Link></li> */}
             <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Cómo Ordenar</Link></li>
             <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Cómo Rastrear</Link></li>
             <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Garantía de Calidad</Link></li>
@@ -77,7 +77,7 @@ export default function Footer() {
           <h3 className="text-red-600 uppercase font-semibold mb-4">Información de la Empresa</h3>
           <ul className="space-y-2">
             <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Sobre Nosotros</Link></li>
-            <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Nuestro Blog</Link></li>
+            {/* <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Nuestro Blog</Link></li> */}
             <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Carreras</Link></li>
             <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Ubicaciones</Link></li>
             <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Testimonios</Link></li>
@@ -100,10 +100,10 @@ export default function Footer() {
       <div className="border-t border-gray-700 pt-4 flex flex-col md:flex-row justify-between items-center text-gray-400">
         <p>© 2025 Repuestos Oriente. Todos los derechos reservados.</p>
 
-        <div className="flex items-center space-x-4 mt-4 md:mt-0">
+        {/* <div className="flex items-center space-x-4 mt-4 md:mt-0">
           <span>🌐 Español</span>
           <span>💲 VES</span>
-        </div>
+        </div> */}
       </div>
     </footer>
   );

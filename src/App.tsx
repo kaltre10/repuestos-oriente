@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Router from './pages/Router';
 import useNotify from './hooks/useNotify';
 import { GlobalConfirmModal } from './components/modals/GlobalConfirmModal';
@@ -9,7 +9,6 @@ import WhatsAppButton from './components/WhatsAppButton';
 const App: React.FC = () => {
 
   const { ToastContainer } = useNotify()
-
   return <>
     <AdvertisingModal />
     <ScrollToTop />

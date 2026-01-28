@@ -5,6 +5,7 @@ import useAuth from '../hooks/useAuth';
 import logo from '../assets/logo.png';
 
 const ResetPasswordPage = () => {
+  document.title = "Repuestos Oriente";
   const { token } = useParams<{ token: string }>();
   const { handleResetPassword, loading, error, successMessage } = useAuth();
   
@@ -55,7 +56,7 @@ const ResetPasswordPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-6 lg:px-8">
       <div className="mt-1 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white shadow sm:rounded-lg pb-4">
           <div className="bg-logo">

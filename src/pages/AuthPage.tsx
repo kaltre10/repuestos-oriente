@@ -4,20 +4,22 @@ import useAuth from '../hooks/useAuth';
 import logo from '../assets/logo.png'
 
 const AuthPage = () => {
-
+ 
   const { isLogin, handleSubmit, handleInputChange,
     formData, showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword,
     rememberCredentials, handleRemember, loading, error, setIsLogin,
     isForgotPassword, setIsForgotPassword, handleForgotPassword, successMessage } = useAuth()
-
+    document.title = `Repuestos Oriente - ${isLogin ? "Login" : "Registro"}`;
   if (isForgotPassword) {
     return (
-      <div className="h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="h-screen bg-gray-50 flex flex-col justify-center py-12 px-6 lg:px-8">
         <div className="mt-1 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white shadow sm:rounded-lg pb-4">
-            <div className="bg-logo">
-              <img src={logo} alt="Logo" />
-            </div>
+           
+              <div className="bg-logo">
+                 <Link to='/'><img src={logo} alt="Logo" /></Link>
+              </div>
+            
             <div className='px-8 py-2'>
               <div className="mb-5 text-center text-1xl font-extrabold text-gray-900">
                 Recuperar Contraseña
@@ -86,13 +88,11 @@ const AuthPage = () => {
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-
-
+    <div className={`${isLogin ? 'h-screen' : ''} bg-gray-50 flex flex-col justify-center py-12 px-6 lg:px-8`}>
       <div className="mt-1 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white shadow sm:rounded-lg pb-4">
           <div className="bg-logo">
-            <img src={logo} alt="Logo" />
+            <Link to='/'><img src={logo} alt="Logo" /></Link>
           </div>
           <div className='px-8 py-2'>
             <div className="mb-5 text-center text-1xl font-extrabold text-gray-900">
@@ -208,9 +208,9 @@ const AuthPage = () => {
                     type="checkbox"
                     checked={rememberCredentials}
                     onChange={(e) => handleRemember(e.target.checked)}
-                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded cursor-pointer"
                   />
-                  <label htmlFor="remember-credentials" className="ml-2 block text-sm text-gray-900">
+                  <label htmlFor="remember-credentials" className="ml-2 block text-sm text-gray-900 cursor-pointer">
                     Recordar
                   </label>
                 </div>

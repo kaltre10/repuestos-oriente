@@ -17,7 +17,7 @@ const CustomerService = () => {
               <MessageCircle className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-gray-800 mb-2">WhatsApp</h3>
-            <p className="text-sm text-gray-500">+58 412-123-4567</p>
+            <p className="text-sm text-gray-500">+58 414-767-3787</p>
           </div>
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 text-center">
             <div className="p-3 bg-blue-50 rounded-2xl text-blue-600 w-fit mx-auto mb-4">

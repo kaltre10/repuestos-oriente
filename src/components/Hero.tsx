@@ -73,23 +73,23 @@ const Hero = () => {
         {sliders.map((slide, index) => (
           <SwiperSlide key={index}>
             <div 
-              className="bg-cover bg-center"
+              className="bg-cover bg-center h-[275px] sm:h-[58vh]"
               style={{ 
                 backgroundImage: `url('${getImageUrl(slide.image)}')`, 
-                height: '55vh' 
+                // height: '55vh' 
               }}
             >
               <div className="absolute inset-0 bg-black/50"></div>
-              <div className="relative z-10 flex flex-col items-start justify-center h-full text-white p-6 sm:p-12 md:p-24">
+              <div className="relative z-10 flex flex-col items-start justify-center h-full text-white p-12 sm:p-12 md:p-24">
                 <p className="text-xs sm:text-base md:text-lg font-light tracking-widest">{slide.description1}</p>
                 <h2 className="text-2xl sm:text-5xl md:text-6xl font-bold my-1 sm:my-2">{slide.description2}</h2>
                 <h1 className="text-2xl sm:text-5xl md:text-6xl font-bold text-red-500 mb-4 sm:mb-6">{slide.title}</h1>
-                <a 
+                {slide.buttonText && (<a 
                   href={slide.buttonLink || '#'}
                   className="bg-white text-black font-bold py-1.5 px-4 sm:py-3 sm:px-8 rounded-full hover:bg-red-500 hover:text-white transition-colors text-xs sm:text-base inline-block"
                 >
                   {slide.buttonText || 'CONOCE MÁS'}
-                </a>
+                </a>)}
               </div>
             </div>
           </SwiperSlide>

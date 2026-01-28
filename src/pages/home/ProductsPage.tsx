@@ -19,6 +19,7 @@ const ProductsPage = () => {
 
     // Load saved grid layout from localStorage on component mount
     useEffect(() => {
+        document.title = "Repuestos Oriente - Productos";
         const savedLayout = localStorage.getItem('products-grid-layout');
         if (savedLayout && ['1', '3', '4'].includes(savedLayout)) {
             setGridLayout(savedLayout as '1' | '3' | '4');

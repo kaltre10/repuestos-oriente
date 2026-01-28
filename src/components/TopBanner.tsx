@@ -76,7 +76,7 @@ const TopBanner = () => {
     // Este se verá solo en pantallas desde 768px (md) en adelante
     const DesktopTop = () => (
         <div className="hidden md:block">
-            <div className="mx-auto px-4 lg:px-8 flex justify-between items-center bg-gray-100 py-2">
+            <div className="mx-auto px-4 lg:px-8 flex justify-between items-center bg-gray-100 py-1">
                 <div className='flex gap-6'>
                     <Envio />
                     <PrecioDolar />
@@ -87,7 +87,7 @@ const TopBanner = () => {
 
     return (<>
         <div className="text-gray-800 text-sm">
-            <div className="mx-auto px-4 lg:px-8 flex justify-between items-center bg-gray-100 py-2">
+            <div className="mx-auto px-4 lg:px-8 flex justify-between items-center bg-gray-100 py-1">
                 <div className='flex gap-3'>
                     <MobileTop />
                     <DesktopTop />

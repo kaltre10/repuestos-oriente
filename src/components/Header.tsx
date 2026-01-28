@@ -14,7 +14,7 @@ const Header = () => {
       {/* Top Banner */}
       <TopBanner />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-3">
+        <div className="flex items-center justify-between py-1">
           <div className="text-3xl font-bold text-gray-800 flex items-center">
             <Link to="/" className="flex items-center">
               <img className='logo rounded-full bg-red-500' src="./logo.png" alt="" />
@@ -75,7 +75,7 @@ const Header = () => {
         )}
 
         {/* Bottom Bar - Desktop Navigation */}
-        <div className="hidden lg:flex items-center justify-center h-12">
+        <div className="hidden lg:flex items-center justify-center h-10">
           <nav className="flex items-center space-x-8">
             <Link to="/" className="hover:text-red-500 transition-colors">INICIO</Link>
             <Link to="/productos" className="hover:text-red-500 transition-colors">PRODUCTOS</Link>

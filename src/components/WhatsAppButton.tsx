@@ -2,7 +2,7 @@ import React from 'react';
 import { SiWhatsapp } from 'react-icons/si';
 
 const WhatsAppButton: React.FC = () => {
-  const whatsappNumber = "584121234567"; // Número extraído del Footer.tsx
+  const whatsappNumber = "584147673787"; // Número extraído del Footer.tsx
   const whatsappLink = `https://api.whatsapp.com/send?phone=${whatsappNumber}`;
 
   return (

@@ -11,6 +11,7 @@ const OffersPage = () => {
   const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
 
   useEffect(() => {
+    document.title = "Repuestos Oriente - Ofertas";
     getProducts({ onSale: true });
   }, []);
 
