@@ -95,6 +95,10 @@ const PaymentPage = () => {
 
       if (response.data.success) {
         clearCart();
+        // Limpiar datos de localStorage al completar la compra exitosamente
+        localStorage.removeItem('checkoutAccountData');
+        localStorage.removeItem('checkoutShippingOption');
+        localStorage.removeItem('checkoutSelectedAddressId');
         notify.success('¡Compra realizada con éxito! Su pedido está siendo procesado.');
         navigate('/clients/purchases');
       } else {
