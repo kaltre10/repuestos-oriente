@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User as UserIcon, Mail, Phone, ShoppingBag, CheckCircle, AlertCircle } from 'lucide-react';
+import { User as UserIcon, Mail, Phone, ShoppingBag, CheckCircle, AlertCircle, Plus, Minus, Trash2 } from 'lucide-react';
 import useStore from '../../states/global';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
+import useConfirmStore from '../../states/useConfirmStore';
 
 const CheckoutPage = () => {
   const { notify } = useNotify()
   const navigate = useNavigate();
-  const { cart, getCartTotal, user } = useStore();  
+  const { cart, getCartTotal, user, removeFromCart, incrementQuantity, decrementQuantity } = useStore();  
   // const [isModalOpen, setIsModalOpen] = useState(false); 
   // const [isProcessing, setIsProcessing] = useState(false);  
   const [accountData, setAccountData] = useState({
@@ -161,21 +162,18 @@ const CheckoutPage = () => {
 
               <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 {cart.map((item) => (
-                  <div key={item.id} className="flex items-center space-x-4 pb-4 border-b border-gray-100 last:border-0">
+                  <div key={item.id} className="flex items-start space-x-4 pb-4 border-b border-gray-100 last:border-0">
                     <div className="relative group">
                       <img
                         src={item.image}
                         alt={item.name}
                         className="w-20 h-20 object-cover rounded-xl shadow-sm group-hover:scale-105 transition-transform"
                       />
-                      {/* <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full shadow-md">
-                        {item.quantity}
-                      </span> */}
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-gray-800 text-sm leading-tight mb-1">{item.name}</h3>
                       <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">{item.category}</p>
-                      <div className="flex items-center justify-between mt-2">
+                      <div className="mt-2">
                         <div className="">
                           <span className="text-xs text-gray-500">Precio unit: </span>
                           <div className="inline-flex flex-col align-middle">
@@ -196,10 +194,40 @@ const CheckoutPage = () => {
                             )}
                           </div>
                         </div>
-                        <div className="text-gray-500">
-                          <span className="text-xs ">Cantidad: </span>
-                          {item.quantity}
-                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      {/* Primera fila: Contador y botón de eliminar */}
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => decrementQuantity(item.id)}
+                          className="cursor-pointer p-1 hover:bg-gray-100 rounded transition-colors"
+                          disabled={item.quantity <= 1}
+                        >
+                          <Minus size={16} />
+                        </button>
+                        <span className="w-8 text-center">{item.quantity}</span>
+                        <button
+                          onClick={() => incrementQuantity(item.id)}
+                          className="cursor-pointer p-1 hover:bg-gray-100 rounded transition-colors"
+                        >
+                          <Plus size={16} />
+                        </button>
+                        <button
+                          onClick={async () => {
+                            const { ask } = useConfirmStore.getState();
+                            const confirmed = await ask('¿Estás seguro de que deseas eliminar este producto del carrito?');
+                            if (confirmed) {
+                              removeFromCart(item.id);
+                            }
+                          }}
+                          className="cursor-pointer p-1 hover:bg-red-100 text-red-500 rounded transition-colors ml-2"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      {/* Segunda fila: Precio del producto */}
+                      <div className="mt-2">
                         <FormattedPrice price={item.price * item.quantity} className="text-red-600 font-bold" />
                       </div>
                     </div>
