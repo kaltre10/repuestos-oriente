@@ -5,7 +5,7 @@ import Guard from '../../components/Guard';
 
 const AdminLayout = () => {
   useEffect(() => {
-    document.title = "Administrativo | Repuestos Oriente";
+    document.title = "Administrativo | Repuestos Picha";
   }, []);
 
   return (<Guard allow={['admin']} >

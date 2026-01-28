@@ -7,7 +7,7 @@ import { apiUrl } from '../../utils/utils';
 
 const HomePage: React.FC = () => {
   useEffect(() => {
-    document.title = "Repuestos Oriente - Inicio";
+    document.title = "Repuestos Picha - Inicio";
     const recordVisit = async () => {
       try {
         await request.post(`${apiUrl}/visits`, { path: '/' });

@@ -6,7 +6,7 @@ import Guard from "../../components/Guard"
 
 const ClientLayout = () => {
   useEffect(() => {
-    document.title = "Área de Clientes | Repuestos Oriente";
+    document.title = "Área de Clientes | Repuestos Picha";
   }, []);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

@@ -1,18 +1,15 @@
 import express from 'express';
 import { googleAuth, login, register, getUser, updateUser, changePassword, deleteUser, getUsers, createUser, forgotPassword, resetPassword } from '../controllers/user.controller.js';
-import responser from '../controllers/responser.js';
-
+import validateToken from '../midelwares/validateToken.js';
 const router = express.Router();
-
-router.get('/', (_req, res) => {
-  responser.success({ res, message: 'User API is working' });
-});
 
 router.post('/auth/google', googleAuth);
 router.post('/auth/login', login);
 router.post('/auth/register', register);
 router.post('/auth/forgot-password', forgotPassword);
 router.post('/auth/reset-password', resetPassword);
+
+router.use(validateToken);
 
 router.get('/users', getUsers);
 router.post('/users', createUser);

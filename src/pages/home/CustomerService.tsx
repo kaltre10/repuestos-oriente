@@ -1,5 +1,6 @@
 // import React from 'react';
 import { Headset, MessageCircle, FileText, Lock, Mail, Clock } from 'lucide-react';
+import { socials } from '../../utils/utils';
 
 const CustomerService = () => {
   return (
@@ -17,14 +18,14 @@ const CustomerService = () => {
               <MessageCircle className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-gray-800 mb-2">WhatsApp</h3>
-            <p className="text-sm text-gray-500">+58 412-123-4567</p>
+            <p className="text-sm text-gray-500">+ {socials.whatsapp}</p>
           </div>
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 text-center">
             <div className="p-3 bg-blue-50 rounded-2xl text-blue-600 w-fit mx-auto mb-4">
               <Mail className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-gray-800 mb-2">Email</h3>
-            <p className="text-sm text-gray-500">soporte@repuestosoriente.com</p>
+            <p className="text-sm text-gray-500">{socials.email}</p>
           </div>
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 text-center">
             <div className="p-3 bg-red-50 rounded-2xl text-red-600 w-fit mx-auto mb-4">

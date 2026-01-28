@@ -1,27 +1,23 @@
 import { Link } from "react-router-dom";
 import {
   SiInstagram,
-  SiFacebook,
-  SiYoutube,
+  SiTiktok,
   SiWhatsapp
 } from "react-icons/si";
+import { socials } from "../utils/utils";
 
-const socials = [
+const _socials = [
   {
     icon: SiInstagram,
-    link: "https://www.instagram.com/repuestosoriente/"
-  },
-  {
-    icon: SiFacebook,
-    link: "https://www.facebook.com/repuestosoriente/"
-  },
-  {
-    icon: SiYoutube,
-    link: "https://www.youtube.com/channel/UCi431n3h3h3h3h3h3h3h3"
+    link: socials.instagram
   },
   {
     icon: SiWhatsapp,
-    link: "https://api.whatsapp.com/send?phone=584121234567"
+    link: `https://api.whatsapp.com/send?phone=${socials.whatsapp}`
+  },
+  {
+    icon: SiTiktok,
+    link: socials.tiktok
   }
 ]
 
@@ -34,19 +30,19 @@ export default function Footer() {
 
         {/* Columna 1 */}
         <div>
-          <h3 className="text-red-600 uppercase font-semibold mb-4">REPUESTOS ORIENTE</h3>
+          <h3 className="text-red-600 uppercase font-semibold mb-4">REPUESTOS PICHA</h3>
           <p className="text-gray-400 mb-4">
             Proporcionamos repuestos automotrices de alta calidad con servicio confiable y soporte al cliente.
           </p>
 
           <ul className="space-y-1 text-gray-400 mb-4">
-            <li>📞 +58-412-123-4567</li>
-            <li>📧 info@repuestosoriente.com</li>
+            <li>📞 +{socials.whatsapp}</li>
+            <li>📧 {socials.email}</li>
             <li>🕘 Lun–Vie, 8:00–17:00 (VET)</li>
           </ul>
 
           <div className="flex space-x-4 text-gray-400">
-            {socials.map(({ icon: Icon, link }) => (
+            {_socials.map(({ icon: Icon, link }) => (
               <a
                 key={link}
                 href={link}
@@ -97,13 +93,8 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-gray-700 pt-4 flex flex-col md:flex-row justify-between items-center text-gray-400">
-        <p>© 2025 Repuestos Oriente. Todos los derechos reservados.</p>
-
-        <div className="flex items-center space-x-4 mt-4 md:mt-0">
-          <span>🌐 Español</span>
-          <span>💲 VES</span>
-        </div>
+      <div className="border-t border-gray-700 pt-4 flex justify-center text-gray-400">
+        <p>© 2025 Repuestos Picha. Todos los derechos reservados.</p>
       </div>
     </footer>
   );

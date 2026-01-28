@@ -5,6 +5,9 @@ import crypto from 'crypto';
 import models from '../models/index.js';
 import { sendResetPasswordEmail } from '../utils/mailer.js';
 import { Op } from 'sequelize';
+import dotenv from 'dotenv';
+dotenv.config();
+
 const { User } = models;
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -221,9 +224,9 @@ class UserService {
   // Generate JWT token
   generateToken(user) {
     return jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '7d' }
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || 'd34efsdf45lts45343ec5re345t',
+      { expiresIn: '50d' }
     );
   }
 
