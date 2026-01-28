@@ -197,7 +197,7 @@ const CheckoutPage = () => {
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center space-x-3 mb-8">
             <CheckCircle className="text-red-600 w-8 h-8" />
-            <h1 className="text-3xl font-bold text-gray-800">Finalizar Compra</h1>
+            <h1 className="text-3xl font-bold text-gray-800">Información de  Compra</h1>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">

@@ -35,9 +35,25 @@ const Sales = () => {
       if (dateRange.end) params.append('endDate', dateRange.end);
 
       const response = await request.get(`${apiUrl}/sales?${params.toString()}`);
-      setSales(response.data.body.sales);
-    } catch (error) {
+      
+      // Verificar que la respuesta sea exitosa y contenga datos
+      if (response.data.success && response.data.body && response.data.body.sales) {
+        setSales(response.data.body.sales);
+      } else if (response.data.body && response.data.body.sales) {
+        // Si no hay campo success pero hay datos, usarlos directamente (por compatibilidad)
+        setSales(response.data.body.sales);
+      } else if (response.data.sales) {
+        // Si los datos están directamente en response.data (estructura diferente)
+        setSales(response.data.sales);
+      } else {
+        // Si no hay datos, establecer array vacío
+        setSales([]);
+        console.error('No se encontraron datos de ventas en la respuesta:', response.data);
+      }
+    } catch (error: any) {
       console.error('Error fetching sales:', error);
+      notify.error('Error al cargar el registro de ventas');
+      setSales([]);
     } finally {
       setLoading(false);
     }

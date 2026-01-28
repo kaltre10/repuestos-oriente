@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, Smartphone, Hash, Image as ImageIcon, CheckCircle, AlertCircle, ChevronLeft } from 'lucide-react';
+import { CreditCard, Smartphone, Hash, Image as ImageIcon, CheckCircle, AlertCircle, ChevronLeft, Mail, Phone } from 'lucide-react';
 import useStore from '../../states/global';
 import { apiUrl, bancos } from '../../utils/utils';
 import request from '../../utils/request';
@@ -10,12 +10,11 @@ import useNotify from '../../hooks/useNotify';
 interface PaymentMethodDB {
   id: number;
   name: string;
-  type: 'Pago Movil' | 'Zelle' | 'Transferencia' | 'Efectivo';
-  bank?: string;
-  email?: string;
-  accountNumber?: string;
-  phone?: string;
-  ci_rif?: string;
+  type: string;
+  paymentType?: {
+    name: string;
+  };
+  properties: Record<string, string>;
   isActive: boolean;
 }
 
@@ -40,12 +39,30 @@ const PaymentPage = () => {
 
   const fetchPaymentMethods = async () => {
     try {
+      setLoadingMethods(true);
       const response = await request.get(`${apiUrl}/payment-methods?onlyActive=true`);
-      // Acceder a response.data.body.paymentMethods según el formato del responser.js
-      const methods = response.data.body?.paymentMethods || [];
-      setPaymentMethods(methods);
-      if (methods.length > 0) {
-        setSelectedMethod(methods[0]);
+      if (response.data.success) {
+        const validatedMethods = response.data.body.paymentMethods.map((method: any) => {
+          let properties = method.properties || {};
+          if (typeof properties === 'string') {
+            try {
+              properties = JSON.parse(properties);
+            } catch (e) {
+              properties = {};
+            }
+          }
+          if (typeof properties !== 'object' || properties === null || Array.isArray(properties)) {
+            properties = {};
+          }
+          return {
+            ...method,
+            properties
+          };
+        });
+        setPaymentMethods(validatedMethods);
+        if (validatedMethods.length > 0) {
+          setSelectedMethod(validatedMethods[0]);
+        }
       }
     } catch (error) {
       console.error('Error fetching payment methods:', error);
@@ -59,6 +76,20 @@ const PaymentPage = () => {
     if (!code) return '';
     const banco = bancos.find(b => b.codigo === code);
     return banco ? banco.nombre : code;
+  };
+
+  const getPropertyIcon = (key: string) => {
+    const keyLower = key.toLowerCase();
+    if (keyLower.includes('banco')) return <CreditCard className="w-4 h-4" />;
+    if (keyLower.includes('teléfono') || keyLower.includes('phone') || keyLower.includes('celular') || keyLower.includes('movil')) return <Phone className="w-4 h-4" />;
+    if (keyLower.includes('email') || keyLower.includes('correo')) return <Mail className="w-4 h-4" />;
+    if (keyLower.includes('cuenta') || keyLower.includes('numero') || keyLower.includes('num')) return <Hash className="w-4 h-4" />;
+    if (keyLower.includes('ci') || keyLower.includes('rif') || keyLower.includes('identificacion')) return <Hash className="w-4 h-4" />;
+    return <CreditCard className="w-4 h-4" />;
+  };
+
+  const formatPropertyName = (key: string) => {
+    return key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -168,39 +199,57 @@ const PaymentPage = () => {
               <div className="bg-red-600 p-8 rounded-2xl shadow-xl text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                 <h2 className="text-xl font-bold mb-6 flex items-center">
-                  {selectedMethod.type === 'Pago Movil' ? <Smartphone className="mr-2" /> : <CreditCard className="mr-2" />}
+                  {/* Obtener tipo de pago de manera segura */}
+                  {(() => {
+                    const paymentType = selectedMethod.type || '';
+                    const lowerType = paymentType.toLowerCase();
+                    return lowerType.includes('pago movil') || lowerType.includes('movil');
+                  })() && <Smartphone className="mr-2" />}
+                  {(() => {
+                    const paymentType = selectedMethod.type || '';
+                    const lowerType = paymentType.toLowerCase();
+                    return lowerType.includes('zelle') || lowerType.includes('transferencia');
+                  })() && <CreditCard className="mr-2" />}
+                  {(() => {
+                    const paymentType = selectedMethod.type || '';
+                    const lowerType = paymentType.toLowerCase();
+                    return lowerType.includes('efectivo');
+                  })() && <span className="mr-2">💵</span>}
                   Datos para el pago
                 </h2>
 
                 <div className="space-y-4 relative z-10">
-                  {selectedMethod.bank && (
-                    <div>
-                      <p className="text-red-100 text-sm">Banco</p>
-                      <p className="font-bold text-lg">{getBankName(selectedMethod.bank)}</p>
+                  {/* Método de pago en efectivo */}
+                  {(() => {
+                    const paymentType = selectedMethod.type || '';
+                    const lowerType = paymentType.toLowerCase();
+                    return lowerType.includes('efectivo');
+                  })() ? (
+                    <div className="bg-white/10 p-4 rounded-lg">
+                      <p className="font-medium">Pague en efectivo al recibir su pedido.</p>
+                      <p className="text-sm text-red-100 mt-2">Nuestro repartidor se pondrá en contacto con usted para coordinar la entrega.</p>
                     </div>
-                  )}
-                  {selectedMethod.phone && (
-                    <div>
-                      <p className="text-red-100 text-sm">Teléfono</p>
-                      <p className="font-bold text-lg">{selectedMethod.phone}</p>
-                    </div>
-                  )}
-                  {selectedMethod.ci_rif && (
-                    <div>
-                      <p className="text-red-100 text-sm">Cédula / RIF</p>
-                      <p className="font-bold text-lg">{selectedMethod.ci_rif}</p>
-                    </div>
-                  )}
-                  {selectedMethod.email && (
-                    <div>
-                      <p className="text-red-100 text-sm">Email</p>
-                      <p className="font-bold text-lg">{selectedMethod.email}</p>
-                    </div>
-                  )}
-                  {selectedMethod.accountNumber && (
-                    <div>
-                      <p className="text-red-100 text-sm">Número de Cuenta</p>
-                      <p className="font-bold text-base break-all">{selectedMethod.accountNumber}</p>
+                  ) : (
+                    // Para otros métodos de pago con propiedades dinámicas
+                    <div className="space-y-3">
+                      {Object.entries(selectedMethod.properties).map(([key, value]) => {
+                        // Formatear el valor si es un banco
+                        const displayValue = key.toLowerCase().includes('banco') ? getBankName(value) : value;
+                        
+                        return (
+                          <div key={key} className="bg-white/10 p-3 rounded-lg transition-all hover:bg-white/15">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-md bg-white/20 flex items-center justify-center text-white">
+                                {getPropertyIcon(key)}
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-red-100 text-xs uppercase font-semibold">{formatPropertyName(key)}</p>
+                                <p className="font-bold text-lg break-all">{displayValue}</p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
