@@ -11,6 +11,7 @@ import defineSale from './Sale.js';
 import defineQuestion from './Question.js';
 import defineVisit from './Visit.js';
 import definePaymentMethod from './Paymentmethod.js';
+import definePaymentType from './Paymenttype.js';
 import defineSlider from './Slider.js';
 import defineAdvertising from './Advertising.js';
 
@@ -47,11 +48,12 @@ const models = {
   Config: defineConfig(sequelize),
   Sale: defineSale(sequelize),
   Question: defineQuestion(sequelize),
-    Visit: defineVisit(sequelize),
-    PaymentMethod: definePaymentMethod(sequelize),
-    Slider: defineSlider(sequelize),
-    Advertising: defineAdvertising(sequelize),
-  };
+  Visit: defineVisit(sequelize),
+  PaymentMethod: definePaymentMethod(sequelize),
+  PaymentType: definePaymentType(sequelize),
+  Slider: defineSlider(sequelize),
+  Advertising: defineAdvertising(sequelize),
+};
 
 // Define associations
 models.Sale.belongsTo(models.Product, {
@@ -116,6 +118,17 @@ models.SubCategory.belongsTo(models.Category, {
   as: 'category'
 });
 
+// Payment associations
+models.PaymentMethod.belongsTo(models.PaymentType, {
+  foreignKey: 'paymentTypeId',
+  as: 'paymentType'
+});
+
+models.PaymentType.hasMany(models.PaymentMethod, {
+  foreignKey: 'paymentTypeId',
+  as: 'paymentMethods'
+});
+
 // Define associations if any
 Object.keys(models).forEach((modelName) => {
   if (models[modelName].associate) {
@@ -152,6 +165,7 @@ export const {
   Question,
   Visit,
   PaymentMethod,
+  PaymentType,
   Slider,
   Advertising,
 } = models;
