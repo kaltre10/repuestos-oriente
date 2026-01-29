@@ -9,7 +9,8 @@ router.post('/auth/register', register);
 router.post('/auth/forgot-password', forgotPassword);
 router.post('/auth/reset-password', resetPassword);
 
-router.use(validateToken);
+// Aplicar middleware de validación de token solo a rutas de usuario
+router.use('/users', validateToken);
 
 router.get('/users', getUsers);
 router.post('/users', createUser);

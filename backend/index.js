@@ -6,6 +6,9 @@ import { corsOptions, startServer } from './utils/utils.js';
 import responser from './controllers/responser.js';
 import morgan from 'morgan';
 
+// Configurar zona horaria de Venezuela
+process.env.TZ = 'America/Caracas';
+
 import router from './routes/router.js';
 
 const app = express();

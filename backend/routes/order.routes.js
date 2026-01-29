@@ -1,9 +1,7 @@
 import express from 'express';
 import { getOrders, getOrder, getOrdersByBuyerId, createOrder, updateOrder, deleteOrder } from '../controllers/order.controller.js';
-import validateToken from '../midelwares/validateToken.js';
 
 const router = express.Router();
-router.use(validateToken);
 
 router.get('/', getOrders);
 router.get('/:id', getOrder);

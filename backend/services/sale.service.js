@@ -6,8 +6,6 @@ class SaleService {
 
   async getAllSales(filters = {}) {
     try {
-      console.log('=== INICIANDO CONSULTA DE VENTAS ===');
-      console.log('Filtros recibidos:', filters);
       
       const { startDate, endDate, status, paymentMethod } = filters;
       
@@ -16,18 +14,18 @@ class SaleService {
       
       // Filtro por fecha
       if (startDate && endDate) {
-        console.log('Aplicando filtro de fecha:', startDate, 'a', endDate);
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        start.setHours(0, 0, 0, 0);
-        end.setDate(end.getDate() + 1);
-        end.setHours(0, 0, 0, 0);
+        
+        // Crear fechas con la zona horaria configurada (America/Caracas)
+        // Parsear fechas en formato YYYY-MM-DD con horas locales
+        const start = new Date(`${startDate}T00:00:00`);
+        const end = new Date(`${endDate}T23:59:59.999`);
+        
+        
         where.saleDate = { [Op.between]: [start, end] };
       }
       
       // Filtro por método de pago
       if (paymentMethod) {
-        console.log('Aplicando filtro de método de pago:', paymentMethod);
         where.paymentMethod = paymentMethod;
       }
       
@@ -37,20 +35,22 @@ class SaleService {
         include: [
           { model: models.Product, as: 'product' },
           { model: models.User, as: 'buyer' },
-          { model: models.Order, as: 'order' }
+          { 
+            model: models.Order, 
+            as: 'order',
+            where: status ? { status } : {} // Aplicar filtro de status a la orden
+          }
         ],
         order: [['saleDate', 'DESC']]
       });
       
-      console.log('Resultado de la consulta:', sales.length, 'ventas encontradas');
+     
       if (sales.length > 0) {
         console.log('Primera venta encontrada:', JSON.stringify(sales[0], null, 2));
       }
       
-      console.log('=== FIN CONSULTA DE VENTAS ===');
       return sales;
     } catch (error) {
-      console.error('Error en getAllSales:', error);
       throw new Error(`Error al obtener ventas: ${error.message}`);
     }
   }

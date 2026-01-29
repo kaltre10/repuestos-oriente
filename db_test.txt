@@ -1,0 +1,40 @@
+INSERT INTO `products` (`id`, `name`, `brand`, `model`, `brandId`, `modelId`, `productBrand`, `categories`, `subcategories`, `years`, `description`, `discount`, `amount`, `price`, `freeDelivery`, `partNumber`, `garantia`, `createdAt`, `updatedAt`) VALUES
+(1, 'Filtro de Aceite Sintético', 'Bosch', 'F-001', 1, 101, 'Bosch', 'Filtros', 'Filtros de Aceite', '2015-2023', 'Filtro de aceite de alta eficiencia para motor. Material sintético con válvula de bypass.', '15.50', 45, '29.99', 1, 'BO-F001-2023', '2 años', '2024-01-15 10:30:00', '2024-01-15 10:30:00'),
+(2, 'Pastillas de Freno Delanteras', 'Brembo', 'P85006', 2, 201, 'Brembo', 'Frenos', 'Pastillas de Freno', '2018-2024', 'Pastillas de freno cerámicas de alto rendimiento. Bajo nivel de ruido y polvo.', '0.00', 28, '89.99', 1, 'BR-P85006', '1 año', '2024-01-16 14:20:00', '2024-01-16 14:20:00'),
+(3, 'Batería 12V 60Ah', 'Varta', 'Blue Dynamic 560401076', 3, 301, 'Varta', 'Baterías', 'Baterías de Automóvil', '2010-2024', 'Batería de arranque libre de mantenimiento. Tecnología AGM.', '25.00', 32, '149.99', 0, 'VAR-560401076', '3 años', '2024-01-17 09:15:00', '2024-01-18 11:45:00'),
+(4, 'Aceite Motor 5W-30 Sintético', 'Mobil', '1 ESP 5W-30', 4, 401, 'Mobil', 'Lubricantes', 'Aceites Motor', '2005-2024', 'Aceite sintético completo. 4 litros. Protección superior del motor.', '12.99', 120, '44.99', 1, 'MOB-1ESP-5W30', NULL, '2024-01-18 16:30:00', '2024-01-18 16:30:00'),
+(5, 'Amortiguador Delantero Derecho', 'KYB', 'EXCEL-G 341320', 5, 501, 'KYB', 'Suspensión', 'Amortiguadores', '2015-2022', 'Amortiguador gas monotubo. Compatible con múltiples modelos.', '40.00', 18, '129.99', 0, 'KYB-341320', '18 meses', '2024-01-19 11:10:00', '2024-01-20 13:25:00'),
+(6, 'Kit Correa Distribución', 'Gates', 'TCKWP328A', 6, 601, 'Gates', 'Motor', 'Distribución', '2012-2019', 'Kit completo: correa, tensores y bomba de agua. Alta durabilidad.', '0.00', 15, '199.99', 1, 'GAT-TCKWP328A', '2 años', '2024-01-20 08:45:00', '2024-01-20 08:45:00'),
+(7, 'Bujías Iridium', 'NGK', 'IFR5T11', 7, 701, 'NGK', 'Encendido', 'Bujías', '2016-2024', 'Bujías Iridium de alto rendimiento. 4 unidades.', '10.00', 60, '49.99', 1, 'NGK-IFR5T11', '3 años', '2024-01-21 15:20:00', '2024-01-22 10:15:00'),
+(8, 'Faro LED Delantero Derecho', 'HELLA', '1EL 009 624-021', 8, 801, 'HELLA', 'Iluminación', 'Faros', '2019-2023', 'Faro LED completo con DRL. Cierre hermético.', '55.00', 9, '299.99', 0, 'HEL-1EL009624021', '2 años', '2024-01-22 13:40:00', '2024-01-23 09:30:00'),
+(9, 'Disco Freno Delantero', 'ATE', '24.0130-0165.1', 9, 901, 'ATE', 'Frenos', 'Discos de Freno', '2014-2021', 'Disco ventilado perforado. Diámetro 312mm.', '30.00', 25, '89.99', 1, 'ATE-24013001651', '1 año', '2024-01-23 10:05:00', '2024-01-24 14:50:00'),
+(10, 'Filtro Aire Habitáculo', 'MANN-FILTER', 'CUK 2939', 10, 1001, 'MANN-FILTER', 'Filtros', 'Filtros Habitáculo', '2017-2024', 'Filtro carbón activo. Elimina olores y partículas.', '5.50', 75, '24.99', 1, 'MAN-CUK2939', NULL, '2024-01-24 12:30:00', '2024-01-24 12:30:00'),
+(11, 'Radiador Aluminio', 'Nissens', '80350A', 11, 1101, 'Nissens', 'Refrigeración', 'Radiadores', '2010-2018', 'Radiador aluminio. Alta disipación térmica.', '75.00', 7, '189.99', 0, 'NIS-80350A', '2 años', '2024-01-25 09:50:00', '2024-01-25 09:50:00'),
+(12, 'Alternador 120A', 'Valeo', 'TI 19807', 12, 1201, 'Valeo', 'Eléctrico', 'Alternadores', '2015-2020', 'Alternador recondicionado. Garantía completa.', '0.00', 12, '249.99', 1, 'VAL-TI19807', '12 meses', '2024-01-26 14:15:00', '2024-01-26 14:15:00'),
+(13, 'Líquido Refrigerante Verde', 'Prestone', 'AF 850', 13, 1301, 'Prestone', 'Refrigeración', 'Líquidos', '2000-2024', 'Anticongelante concentrado. 5 litros. Protege hasta -37°C.', '8.00', 200, '19.99', 1, 'PRE-AF850', NULL, '2024-01-27 11:25:00', '2024-01-28 08:40:00'),
+(14, 'Rótula Suspensión', 'Lemförder', '33915 01', 14, 1401, 'Lemförder', 'Suspensión', 'Rótulas', '2011-2017', 'Rótula original. Incluye tornillería.', '20.00', 35, '45.99', 0, 'LEM-3391501', '18 meses', '2024-01-28 16:00:00', '2024-01-29 10:20:00'),
+(15, 'Bomba Combustible', 'Pierburg', '7.24871.03.0', 15, 1501, 'Pierburg', 'Combustible', 'Bombas', '2013-2019', 'Bomba eléctrica. Presión 3.5 bar. Alta durabilidad.', '60.00', 11, '159.99', 1, 'PIE-724871030', '2 años', '2024-01-29 13:45:00', '2024-01-30 12:10:00'),
+(16, 'Sensor ABS Delantero', 'Febi Bilstein', '08971', 16, 1601, 'Febi Bilstein', 'Frenos', 'Sensores', '2014-2022', 'Sensor velocidad rueda. Conector original.', '15.00', 22, '39.99', 1, 'FEB-08971', '1 año', '2024-02-01 10:30:00', '2024-02-01 10:30:00'),
+(17, 'Aceite Transmisión ATF', 'Ravenol', 'ATF 6', 17, 1701, 'Ravenol', 'Transmisión', 'Aceites', '2012-2023', 'Aceite transmisión automática. 1 litro.', '0.00', 85, '18.99', 1, 'RAV-ATF6', NULL, '2024-02-02 14:20:00', '2024-02-02 14:20:00'),
+(18, 'Juego Junta Culata', 'Elring', '044.490', 18, 1801, 'Elring', 'Motor', 'Juntas', '2008-2015', 'Kit completo juntas motor. Material original.', '45.00', 8, '129.99', 0, 'ELR-044490', '2 años', '2024-02-03 09:15:00', '2024-02-04 11:30:00'),
+(19, 'Termostato Motor', 'Mahle', 'TH 30 82', 19, 1901, 'Mahle', 'Refrigeración', 'Termostatos', '2016-2021', 'Termostato 87°C. Funcionamiento preciso.', '12.50', 40, '34.99', 1, 'MAH-TH3082', '18 meses', '2024-02-04 16:10:00', '2024-02-04 16:10:00'),
+(20, 'Silenciador Escape Trasero', 'Walker', '22153', 20, 2001, 'Walker', 'Escape', 'Silenciadores', '2010-2018', 'Silenciador acero aluminizado. Fácil instalación.', '80.00', 6, '179.99', 0, 'WAL-22153', '2 años', '2024-02-05 11:40:00', '2024-02-06 15:25:00');
+
+INSERT INTO `users` (`id`, `googleId`, `email`, `password`, `name`, `phone`, `address`, `profilePicture`, `resetPasswordToken`, `resetPasswordExpires`, `role`, `createdAt`, `updatedAt`) VALUES
+(1, NULL, 'kaltre10@gmail.com', '$2b$10$MzSUMaKzw2FhLRuNIwuSheOiqJsldbV.z.pKrNbNL89kJqaQ5E81K', 'Jason', NULL, NULL, NULL, NULL, NULL, 'admin', '2026-01-28 04:06:29', '2026-01-28 04:06:29'),
+(2, NULL, 'kaltre11@gmail.com', '$2b$10$qmW8iPP2DuDfJQmNEFTP0uI.YWl6S.U/Z1N0EmrUOqHBn.brDzBQG', 'jason', '', '[{\"id\":\"1769593042393\",\"address\":\"\",\"coordinates\":[10.4806,-66.9036],\"primary\":false},{\"id\":\"1769595972662\",\"address\":\"Tucupita, Parroquia Monseñor Argimiro García, Municipio Tucupita, Estado Delta Amacuro, 6401, Venezuela\",\"coordinates\":[9.0660268,-62.0542973]},{\"id\":\"1769595995324\",\"address\":\"Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela\",\"coordinates\":[10.5060934,-66.9146008]}]', NULL, NULL, NULL, 'client', '2026-01-28 07:04:59', '2026-01-28 10:26:46');
+
+INSERT INTO `payment_types` (`id`, `name`, `properties`, `createdAt`, `updatedAt`) VALUES
+(2, 'Transferencia Bancaria', '[\"Nombre de cuenta\",\"Tipo de cuenta\",\"Numero de cuenta\",\"Moneda\"]', '2026-01-28 06:08:23', '2026-01-28 06:17:44'),
+(8, 'Zelle', '[\"correo\"]', '2026-01-28 07:01:13', '2026-01-28 07:01:13');
+
+INSERT INTO `payment_methods` (`id`, `name`, `properties`, `isActive`, `createdAt`, `updatedAt`, `paymentTypeId`) VALUES
+(1, 'Transferencia Bancaria Banesco', '{\"Nombre de cuenta\":\"Banesco\",\"Tipo de cuenta\":\"Ahorro\",\"Numero de cuenta\":\"123456789\",\"Moneda\":\"Bs\"}', 1, '2026-01-28 06:32:29', '2026-01-28 06:32:44', 2),
+(2, 'Zelle', '{\"correo\":\"zelle@gmail.com\"}', 1, '2026-01-28 07:01:48', '2026-01-28 07:01:48', 8);
+
+
+
+INSERT INTO `configs` (`id`, `dolarRate`, `freeShippingThreshold`, `shippingPrice`, `createdAt`, `updatedAt`) VALUES
+(1, '359.9000', '200.00', '0.00', '2026-01-28 07:04:40', '2026-01-29 00:57:27');
+
+
