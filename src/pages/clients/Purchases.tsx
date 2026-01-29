@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { ShoppingBag, Package, Calendar, Clock, ChevronRight, AlertCircle, ExternalLink, X, CreditCard, Hash, Image as ImageIcon, Upload, CheckCircle2 } from 'lucide-react';
+import { ShoppingBag, Package, Calendar, Clock, ChevronRight, AlertCircle, ExternalLink, X, CreditCard, Hash, Image as ImageIcon, Upload, CheckCircle2, Star } from 'lucide-react';
 import useStore from '../../states/global';
 import { apiUrl, imagesUrl } from '../../utils/utils';
 import request from '../../utils/request';
@@ -229,8 +229,8 @@ const Purchases = () => {
             <button
               onClick={() => setCurrency('USD')}
               className={`px-3 py-1 rounded-full text-xs font-bold transition-all duration-200 ${currency === 'USD'
-                  ? 'bg-red-500 text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-red-500 text-white shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
                 }`}
             >
               USD
@@ -238,8 +238,8 @@ const Purchases = () => {
             <button
               onClick={() => setCurrency('BS')}
               className={`px-3 py-1 rounded-full text-xs font-bold transition-all duration-200 ${currency === 'BS'
-                  ? 'bg-red-500 text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-red-500 text-white shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
                 }`}
             >
               BS
@@ -294,6 +294,9 @@ const Purchases = () => {
                             ? `Pedido de ${group.length} productos`
                             : mainPurchase.product.name}
                         </h3>
+                        <div className='bg-amber-200 p-4'>
+
+                        </div>
                         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest truncate">
                           {group.length > 1
                             ? `${group.reduce((sum, item) => sum + item.quantity, 0)} artículos en total`
@@ -318,6 +321,13 @@ const Purchases = () => {
                         <CreditCard className="w-3.5 h-3.5 mr-1.5 md:mr-2 text-red-500" />
                         <span className="font-semibold uppercase">{mainPurchase.paymentMethod}</span>
                       </div>
+                    </div>
+                    <span className='text-red-400'>{mainPurchase.rating === null && "No as calificado esta compra"} </span>
+               
+                    <div className='flex text-amber-500'>
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} size={16} fill={mainPurchase.rating !== null && i > mainPurchase.rating ? 'currentColor' : 'none'} />
+                      ))}
                     </div>
 
                     <div className="pt-2 flex items-center justify-between border-t border-gray-50">
@@ -392,6 +402,7 @@ const Purchases = () => {
                           <span className="text-[10px] md:text-xs font-bold text-gray-500">Cant: {item.quantity}</span>
                           <FormattedPrice price={item.product.price * item.quantity} className="font-black text-sm md:text-base text-red-600" />
                         </div>
+
                       </div>
                     </div>
                   ))}
