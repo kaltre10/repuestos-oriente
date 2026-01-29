@@ -196,7 +196,7 @@ const Profile = () => {
     
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1&countrycodes=ve`
       );
       const data = await response.json();
       
@@ -308,7 +308,7 @@ const Profile = () => {
         
         // Obtener dirección de la ubicación seleccionada (reverse geocoding)
         fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}&countrycodes=ve`
         )
           .then(response => response.json())
           .then(data => {
@@ -343,7 +343,7 @@ const Profile = () => {
     
     // Obtener dirección de la nueva ubicación
     fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newLocation[0]}&lon=${newLocation[1]}`
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newLocation[0]}&lon=${newLocation[1]}&countrycodes=ve`
     )
       .then(response => response.json())
       .then(data => {
