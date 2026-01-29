@@ -9,8 +9,8 @@ export default (sequelize) => {
     },
     googleId: {
       type: DataTypes.STRING,
-      unique: true,
-      allowNull: true,
+      unique: "googleIdUnique",
+      allowNull: true
     },
     email: {
       type: DataTypes.STRING,

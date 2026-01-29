@@ -61,7 +61,7 @@ const Profile = () => {
     if (user) {
       // Inicializar con direcciones existentes o una dirección por defecto si no hay ninguna
       let initialAddresses: Address[] = [];
-      
+
       // Intentar parsear user.address si es una cadena JSON
       if (typeof user.address === 'string' && user.address) {
         try {
@@ -77,7 +77,7 @@ const Profile = () => {
             coordinates: [10.4806, -66.9036] // Caracas por defecto
           }];
         }
-      } 
+      }
       // Si no hay direcciones, usar una dirección por defecto
       else {
         initialAddresses = [{
@@ -86,7 +86,7 @@ const Profile = () => {
           coordinates: [10.4806, -66.9036] // Caracas por defecto
         }];
       }
-      
+
       setFormData({
         name: user.name || '',
         phone: user.phone || '',
@@ -103,7 +103,7 @@ const Profile = () => {
       address: '',
       coordinates: [10.4806, -66.9036] // Caracas por defecto
     };
-    
+
     setEditingAddress(tempAddress);
     setLocation(tempAddress.coordinates);
     setAddressResult(tempAddress.address);
@@ -123,25 +123,25 @@ const Profile = () => {
   // Función para guardar la dirección actual (nueva o editada)
   const saveCurrentAddress = () => {
     if (!editingAddress) return;
-    
+
     const updatedAddress: Address = {
       id: editingAddress.id,
       address: addressResult,
       coordinates: location
     };
-    
+
     // Verificar si la dirección ya existe en el formData
     const exists = formData.addresses.some(addr => addr.id === updatedAddress.id);
-    
+
     setFormData(prev => ({
       ...prev,
-      addresses: exists 
-        ? prev.addresses.map(addr => 
-            addr.id === updatedAddress.id ? updatedAddress : addr
-          )
+      addresses: exists
+        ? prev.addresses.map(addr =>
+          addr.id === updatedAddress.id ? updatedAddress : addr
+        )
         : [...prev.addresses, updatedAddress]
     }));
-    
+
     setEditingAddress(null);
   };
 
@@ -149,14 +149,14 @@ const Profile = () => {
   const deleteAddress = async (addressId: string) => {
     // Usar modal de confirmación antes de eliminar
     const confirmed = await useConfirmStore.getState().ask('¿Estás seguro de que deseas eliminar esta dirección?');
-    
+
     if (!confirmed) return;
-    
+
     setFormData(prev => ({
       ...prev,
       addresses: prev.addresses.filter(addr => addr.id !== addressId)
     }));
-    
+
     // Si se está editando la dirección que se está eliminando, limpiar el estado
     if (editingAddress?.id === addressId) {
       setEditingAddress(null);
@@ -191,17 +191,17 @@ const Profile = () => {
       setShowResults(false);
       return;
     }
-    
+
     setIsSearching(true); // Iniciar loader
-    
+
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`
       );
       const data = await response.json();
-      
+
       console.log('Search results:', data);
-      
+
       if (Array.isArray(data) && data.length > 0) {
         setSearchResults(data);
         setShowResults(true);
@@ -224,17 +224,17 @@ const Profile = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
-    
+
     // Mostrar el mapa automáticamente al empezar a escribir
     if (value.trim() && !showMap) {
       setShowMap(true);
     }
-    
+
     // Limpiar timeout anterior
     if (window.searchTimeout) {
       clearTimeout(window.searchTimeout);
     }
-    
+
     // Buscar en tiempo real con debounce de 500ms
     if (value.trim()) {
       window.searchTimeout = setTimeout(() => {
@@ -254,7 +254,7 @@ const Profile = () => {
     setSearchQuery(result.display_name);
     setSearchResults([]);
     setShowResults(false);
-    
+
     // Si se está editando una dirección, actualizarla
     if (editingAddress) {
       const updatedAddress: Address = {
@@ -262,14 +262,14 @@ const Profile = () => {
         address: result.display_name,
         coordinates: newLocation
       };
-      
+
       setFormData(prev => ({
         ...prev,
-        addresses: prev.addresses.map(addr => 
+        addresses: prev.addresses.map(addr =>
           addr.id === updatedAddress.id ? updatedAddress : addr
         )
       }));
-      
+
       setEditingAddress(updatedAddress);
     }
   };
@@ -278,7 +278,7 @@ const Profile = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        searchInputRef.current && 
+        searchInputRef.current &&
         resultsContainerRef.current &&
         !searchInputRef.current.contains(event.target as Node) &&
         !resultsContainerRef.current.contains(event.target as Node)
@@ -305,7 +305,7 @@ const Profile = () => {
       click(e) {
         const newLocation: [number, number] = [e.latlng.lat, e.latlng.lng];
         setLocation(newLocation);
-        
+
         // Obtener dirección de la ubicación seleccionada (reverse geocoding)
         fetch(
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`
@@ -340,7 +340,7 @@ const Profile = () => {
   const handleMarkerDrag = (e: any) => {
     const newLocation: [number, number] = [e.target.getLatLng().lat, e.target.getLatLng().lng];
     setLocation(newLocation);
-    
+
     // Obtener dirección de la nueva ubicación
     fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newLocation[0]}&lon=${newLocation[1]}`
@@ -378,7 +378,7 @@ const Profile = () => {
         phone: formData.phone,
         address: JSON.stringify(formData.addresses)
       };
-      
+
       const response = await request.put(`${apiUrl}/users/${user.id}`, profileData);
       const updatedUser = response.data.body.user;
       const newUserState = { ...user, ...updatedUser };
@@ -391,9 +391,9 @@ const Profile = () => {
 
       setMessage({ type: 'success', text: 'Perfil actualizado exitosamente' });
     } catch (error: any) {
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.message || 'Error al actualizar el perfil' 
+      setMessage({
+        type: 'error',
+        text: error.response?.data?.message || 'Error al actualizar el perfil'
       });
     } finally {
       setLoading(false);
@@ -425,9 +425,9 @@ const Profile = () => {
         confirmPassword: '',
       });
     } catch (error: any) {
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.message || 'Error al actualizar la contraseña' 
+      setMessage({
+        type: 'error',
+        text: error.response?.data?.message || 'Error al actualizar la contraseña'
       });
     } finally {
       setPasswordLoading(false);
@@ -442,12 +442,11 @@ const Profile = () => {
             <FaUser /> Mi Perfil
           </h2>
         </div>
-        
+
         <div className="">
           {message.text && (
-            <div className={`mb-6 p-4 rounded-md text-sm ${
-              message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
-            }`}>
+            <div className={`mb-6 p-4 rounded-md text-sm ${message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+              }`}>
               {message.text}
             </div>
           )}
@@ -482,80 +481,91 @@ const Profile = () => {
                 />
               </div>
             </div>
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-red-600 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                {loading ? 'Guardando...' : <><FaSave /> Guardar Cambios</>}
+              </button>
+            </div> <hr className='border-gray-300 my-6' />
 
             <div className="col-span-1 md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                <FaMapMarkerAlt className="text-gray-400" /> Direcciones de Envío
-              </label>
-              
-              {/* Botón de agregar dirección debajo del título */}
-              <div className="mb-4">
-                <button
-                  type="button"
-                  onClick={addAddress}
-                  className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md"
-                >
-                  <FaPlus className="h-4 w-4" /> 
-                  Agregar Dirección
-                </button>
+              <div className='flex justify-between w-full rounded-lg mb-6'>
+                <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <FaMapMarkerAlt className="text-gray-400" /> Direcciones de Envío
+                </label>
+
+                {/* Botón de agregar dirección debajo del título */}
+                <div className="mb-4">
+                  <button
+                    type="button"
+                    onClick={addAddress}
+                    className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                  >
+                    <FaPlus className="h-4 w-4" />
+                    Agregar Dirección
+                  </button>
+                </div>
               </div>
-              
+
               {/* Lista de direcciones */}
               <div className="mb-6 space-y-3">
                 {formData.addresses
                   .filter(address => address.address.trim() !== '')
                   .map((address) => (
-                  <div key={address.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 bg-white">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start gap-2">
-                          <p className="text-sm text-gray-600 line-clamp-3">{address.address}</p>
-                          {address.primary && (
-                            <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full flex items-center gap-1 mt-0.5 whitespace-nowrap">
-                              <FaStar className="h-3 w-3" /> Principal
-                            </span>
-                          )}
+                    <div key={address.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 bg-white">
+                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start gap-2">
+                            <p className="text-sm text-gray-600 line-clamp-3">{address.address}</p>
+                            {address.primary && (
+                              <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full flex items-center gap-1 mt-0.5 whitespace-nowrap">
+                                <FaStar className="h-3 w-3" /> Principal
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Botones de acción con iconos */}
+                        <div className="flex gap-2">
+                          {/* Botón Principal */}
+                          <button
+                            type="button"
+                            onClick={() => setAsPrimary(address.id)}
+                            title={address.primary ? "Ya es principal" : "Establecer como principal"}
+                            className={`p-2 rounded-full transition-all duration-200 ${address.primary ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100' : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-50'}`}
+                            disabled={address.primary}
+                          >
+                            <FaStar className="h-5 w-5" />
+                          </button>
+
+                          {/* Botón Editar */}
+                          <button
+                            type="button"
+                            onClick={() => editAddress(address)}
+                            title="Editar dirección"
+                            className="p-2 rounded-full text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all duration-200"
+                          >
+                            <FaEdit className="h-5 w-5" />
+                          </button>
+
+                          {/* Botón Eliminar */}
+                          <button
+                            type="button"
+                            onClick={() => deleteAddress(address.id)}
+                            title="Eliminar dirección"
+                            className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-200"
+                          >
+                            <FaTrash className="h-5 w-5" />
+                          </button>
                         </div>
                       </div>
-                      
-                      {/* Botones de acción con iconos */}
-                      <div className="flex gap-2">
-                        {/* Botón Principal */}
-                        <button
-                          type="button"
-                          onClick={() => setAsPrimary(address.id)}
-                          title={address.primary ? "Ya es principal" : "Establecer como principal"}
-                          className={`p-2 rounded-full transition-all duration-200 ${address.primary ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100' : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-50'}`}
-                          disabled={address.primary}
-                        >
-                          <FaStar className="h-5 w-5" />
-                        </button>
-                        
-                        {/* Botón Editar */}
-                        <button
-                          type="button"
-                          onClick={() => editAddress(address)}
-                          title="Editar dirección"
-                          className="p-2 rounded-full text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all duration-200"
-                        >
-                          <FaEdit className="h-5 w-5" />
-                        </button>
-                        
-                        {/* Botón Eliminar */}
-                        <button
-                          type="button"
-                          onClick={() => deleteAddress(address.id)}
-                          title="Eliminar dirección"
-                          className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-200"
-                        >
-                          <FaTrash className="h-5 w-5" />
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
-              
+
               {/* Formulario para agregar/editar dirección */}
               {editingAddress && (
                 <div className="border border-gray-200 rounded-xl p-6 mb-6 bg-white shadow-sm">
@@ -578,7 +588,7 @@ const Profile = () => {
                       </svg>
                     </button>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -597,70 +607,70 @@ const Profile = () => {
                             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm hover:shadow-md"
                           />
                           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                          
+
                           {/* Dropdown de resultados - Asegurado por encima del mapa */}
-                            {isSearching ? (
-                              <div
-                                className="absolute z-[99999] mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl"
-                                style={{ 
-                                  zIndex: 99999,
-                                  position: 'absolute',
-                                  top: '100%',
-                                  left: 0,
-                                  right: 0,
-                                  borderRadius: '0.5rem',
-                                  border: '1px solid #e5e7eb',
-                                  margin: '0.25rem 0 0 0',
-                                  width: '100%',
-                                  boxSizing: 'border-box',
-                                  pointerEvents: 'auto',
-                                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-                                }}
-                              >
-                                <div className="px-4 py-3 flex items-center justify-center text-sm text-gray-500">
-                                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                  </svg>
-                                  Buscando direcciones...
+                          {isSearching ? (
+                            <div
+                              className="absolute z-[99999] mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl"
+                              style={{
+                                zIndex: 99999,
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                right: 0,
+                                borderRadius: '0.5rem',
+                                border: '1px solid #e5e7eb',
+                                margin: '0.25rem 0 0 0',
+                                width: '100%',
+                                boxSizing: 'border-box',
+                                pointerEvents: 'auto',
+                                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                              }}
+                            >
+                              <div className="px-4 py-3 flex items-center justify-center text-sm text-gray-500">
+                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Buscando direcciones...
+                              </div>
+                            </div>
+                          ) : showResults && searchResults.length > 0 && (
+                            <div
+                              ref={resultsContainerRef}
+                              className="absolute z-[99999] mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto"
+                              style={{
+                                zIndex: 99999,
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                right: 0,
+                                borderRadius: '0.5rem',
+                                border: '1px solid #e5e7eb',
+                                maxHeight: '15rem',
+                                overflowY: 'auto',
+                                margin: '0.25rem 0 0 0',
+                                width: '100%',
+                                boxSizing: 'border-box',
+                                pointerEvents: 'auto',
+                                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                              }}
+                            >
+                              {searchResults.map((result, index) => (
+                                <div
+                                  key={index}
+                                  onClick={() => handleSelectAddress(result)}
+                                  className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors text-sm border-b border-gray-100 last:border-b-0"
+                                >
+                                  {result.display_name}
                                 </div>
-                              </div>
-                            ) : showResults && searchResults.length > 0 && (
-                              <div
-                                ref={resultsContainerRef}
-                                className="absolute z-[99999] mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto"
-                                style={{ 
-                                  zIndex: 99999,
-                                  position: 'absolute',
-                                  top: '100%',
-                                  left: 0,
-                                  right: 0,
-                                  borderRadius: '0.5rem',
-                                  border: '1px solid #e5e7eb',
-                                  maxHeight: '15rem',
-                                  overflowY: 'auto',
-                                  margin: '0.25rem 0 0 0',
-                                  width: '100%',
-                                  boxSizing: 'border-box',
-                                  pointerEvents: 'auto',
-                                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-                                }}
-                              >
-                                {searchResults.map((result, index) => (
-                                  <div
-                                    key={index}
-                                    onClick={() => handleSelectAddress(result)}
-                                    className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors text-sm border-b border-gray-100 last:border-b-0"
-                                  >
-                                    {result.display_name}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Resultado de la dirección */}
                     {addressResult && (
                       <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -674,7 +684,7 @@ const Profile = () => {
                         </p>
                       </div>
                     )}
-                    
+
                     {/* Mapa */}
                     <div className="border border-gray-200 rounded-lg overflow-hidden h-80 shadow-sm">
                       <MapContainer
@@ -710,7 +720,7 @@ const Profile = () => {
                       </MapContainer>
                     </div>
                   </div>
-                  
+
                   {/* Botones para guardar o cancelar */}
                   <div className="flex gap-3 justify-end pt-4 border-t border-gray-100">
                     <button
@@ -735,15 +745,7 @@ const Profile = () => {
               )}
             </div>
 
-            <div className="flex justify-start">
-              <button
-                type="submit"
-                disabled={loading}
-                className="bg-red-600 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50"
-              >
-                {loading ? 'Guardando...' : <><FaSave /> Guardar Cambios</>}
-              </button>
-            </div>
+
           </form>
         </div>
       </div>

@@ -13,7 +13,7 @@ const Guard = ({ children, allow }: any) => {
             const permit = allow.includes(role)
             console.log("permit: ", permit)
             setIsAllow(permit)
-            if (!permit) navigate('/')
+            if (!permit) navigate('/auth')
         } else {
             navigate('/')
         }

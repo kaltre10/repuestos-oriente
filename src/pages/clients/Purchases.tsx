@@ -196,7 +196,7 @@ const Purchases = () => {
 
   if (error) {
     return (
-      <div className="p-6 bg-white rounded-2xl shadow-sm p-12 border border-gray-100 text-center">
+      <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 text-center">
         <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
           <AlertCircle className="w-10 h-10 text-red-600" />
         </div>
@@ -214,7 +214,7 @@ const Purchases = () => {
 
   if (purchases.length === 0) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-12 border border-gray-100 text-center p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 text-center p-6">
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
           <ShoppingBag className="w-10 h-10 text-gray-300" />
         </div>
@@ -320,8 +320,8 @@ const Purchases = () => {
                             : `Ref: ${mainPurchase.product.partNumber || 'N/A'}`}
                         </p>
                       </div>
-                      <div className={`self-start sm:self-center px-3 py-1 rounded-full text-[10px] md:text-xs font-black border uppercase tracking-wider ${getStatusColor(mainPurchase.status)}`}>
-                        {translateStatus(mainPurchase.status)}
+                      <div className={`self-start sm:self-center px-3 py-1 rounded-full md:text-xs font-black border uppercase tracking-wider ${getStatusColor(mainPurchase.status || 'Desconocido')}`}>
+                        {translateStatus(mainPurchase.status || 'Desconocido')}
                       </div>
                     </div>
 
@@ -507,8 +507,8 @@ const Purchases = () => {
                     )}
                     <div className="flex justify-between items-center text-xs md:text-sm">
                       <span className="text-gray-500 font-medium">Estado:</span>
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-black uppercase border ${getStatusColor(selectedPurchase.status)}`}>
-                        {translateStatus(selectedPurchase.status)}
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase border ${getStatusColor(selectedPurchase.status || 'Desconocido')}`}>
+                        {translateStatus(selectedPurchase.status || 'Desconocido')}
                       </span>
                     </div>
                   </div>

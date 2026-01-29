@@ -1,5 +1,5 @@
 import { connectDB } from '../models/index.js';
-/* import { sequelize } from '../models/index.js'; */
+import { sequelize } from '../models/index.js';
 import { seedBrands } from './seedBrands.js';
 import { seedCategories } from './seedCategories.js';
 import { seedModels } from './seedModels.js';
@@ -14,7 +14,7 @@ export const startServer = async (app) => {
     try {
         await connectDB();
 
-        /* await sequelize.sync({ alter: true }); */
+        await sequelize.sync({ alter: true });
 
         // Seed brands, categories and models after sync
         await seedBrands();
