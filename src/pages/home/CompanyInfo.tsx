@@ -1,4 +1,5 @@
 // import React from 'react';
+
 import { Building2, Target, Users, MapPin, Newspaper } from 'lucide-react';
 import { socials } from '../../utils/utils';
 const CompanyInfo = () => {
@@ -36,7 +37,7 @@ const CompanyInfo = () => {
             </p>
           </section>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid gap-8">
             {/* Misión y Visión */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
               <div className="flex items-center gap-4 mb-6">
@@ -51,7 +52,7 @@ const CompanyInfo = () => {
             </div>
 
             {/* Blog/Noticias */}
-            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+            {/* <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 bg-red-50 rounded-xl text-red-600">
                   <Newspaper className="w-6 h-6" />
@@ -61,7 +62,7 @@ const CompanyInfo = () => {
               <p className="text-gray-600 leading-relaxed">
                 Mantente al día con las últimas tendencias del mundo automotriz, consejos de mantenimiento y guías técnicas preparadas por nuestros expertos.
               </p>
-            </div>
+            </div> */}
           </div>
 
           {/* Ubicaciones */}

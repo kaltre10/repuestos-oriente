@@ -31,9 +31,9 @@ const getPaymentMethod = asyncHandler(async (req, res) => {
 });
 
 const createPaymentMethod = asyncHandler(async (req, res) => {
-  const { name, type, bank, email, accountNumber, phone, ci_rif, isActive } = req.body;
+  const { name, paymentTypeId, properties, isActive } = req.body;
 
-  if (!type) {
+  if (!paymentTypeId) {
     return responser.error({
       res,
       message: 'El tipo de método de pago es requerido',
@@ -43,12 +43,8 @@ const createPaymentMethod = asyncHandler(async (req, res) => {
 
   const paymentMethod = await methodsService.createPaymentMethod({
     name,
-    type,
-    bank,
-    email,
-    accountNumber,
-    phone,
-    ci_rif,
+    paymentTypeId,
+    properties,
     isActive,
   });
 

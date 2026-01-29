@@ -6,11 +6,14 @@ import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
 
+// Sale interface updated for the new Order table structure
+// The status field is now in the Order table, not in the Sale table
+// Making status optional for backward compatibility during transition
 interface Sale {
   id: number;
   dailyRate: number;
   quantity: number;
-  status: string;
+  status?: string; // Optional for backward compatibility - will be removed once Order table is fully implemented
   buyerId: number;
   paymentMethod: string;
   saleDate: string;
@@ -19,6 +22,9 @@ interface Sale {
   referenceNumber: string | null;
   receiptImage: string | null;
   createdAt: string;
+  discount: number;
+  unitPrice: number;
+  originalPrice: number;
   product: {
     id: number;
     name: string;
@@ -26,6 +32,12 @@ interface Sale {
     partNumber: string;
     images?: { image: string }[];
   };
+  order?: {
+    id: number;
+    shippingCost: number;
+    total: number;
+  };
+  // The order status will be inherited from the Order table via buyerId and saleDate
 }
 
 const Purchases = () => {
@@ -41,15 +53,16 @@ const Purchases = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Group purchases by date and payment reference/method to simulate "orders"
+  // Group purchases by buyerId and saleDate to match orders from the new Order table
+  // Each group represents an order with multiple products
   const groupedPurchases = useMemo(() => {
     const groups: { [key: string]: Sale[] } = {};
 
     purchases.forEach(purchase => {
-      // Create a key based on date (minute precision) and reference/method
+      // Create a key based on buyerId and date (minute precision) - this represents an "order"
       const date = new Date(purchase.saleDate);
       const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
-      const groupKey = `${dateKey}_${purchase.paymentMethod}_${purchase.referenceNumber || 'no-ref'}`;
+      const groupKey = `${purchase.buyerId}_${dateKey}`;
 
       if (!groups[groupKey]) {
         groups[groupKey] = [];
@@ -71,6 +84,7 @@ const Purchases = () => {
     try {
       const response = await request.get(`${apiUrl}/sales/user/${user.id}`);
       if (response.data) {
+        console.log(response.data.body.sales)
         setPurchases(response.data.body.sales);
       } else {
         setError('No se pudieron cargar las compras');
@@ -116,10 +130,9 @@ const Purchases = () => {
   const handleUploadReceipt = async () => {
     if (!selectedFile || !selectedPurchase) return;
 
-    // Get all sales in the same group as selectedPurchase
+    // Get all sales in the same group (order) as selectedPurchase
     const currentGroup = groupedPurchases.find(g =>
-      g[0].paymentMethod === selectedPurchase.paymentMethod &&
-      g[0].referenceNumber === selectedPurchase.referenceNumber &&
+      g[0].buyerId === selectedPurchase.buyerId &&
       new Date(g[0].saleDate).getTime() === new Date(selectedPurchase.saleDate).getTime()
     );
 
@@ -254,7 +267,11 @@ const Purchases = () => {
       <div className="grid gap-4 md:gap-6">
         {groupedPurchases.map((group, index) => {
           const mainPurchase = group[0];
-          const totalAmount = group.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+         
+          // Use the pre-calculated total from the Order table
+          const totalAmount = mainPurchase.order?.total || group.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+          // Get shipping cost from the order if available, otherwise assume 0
+          const shippingCost = mainPurchase.order?.shippingCost || 0;
 
           return (
             <div
@@ -381,32 +398,90 @@ const Purchases = () => {
                   <Package className="w-4 h-4 md:w-5 md:h-5 text-red-500" />
                   Productos
                 </h3>
-                <div className="space-y-3">
-                  {groupedPurchases.find(g =>
-                    g[0].paymentMethod === selectedPurchase.paymentMethod &&
-                    g[0].referenceNumber === selectedPurchase.referenceNumber &&
+                {(() => {
+                  const currentGroup = groupedPurchases.find(g =>
+                    g[0].buyerId === selectedPurchase.buyerId &&
                     new Date(g[0].saleDate).getTime() === new Date(selectedPurchase.saleDate).getTime()
-                  )?.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl border border-gray-100 bg-white">
-                      <img
-                        src={item.product.images && item.product.images.length > 0
-                          ? `${imagesUrl}${item.product.images[0].image}`
-                          : 'https://via.placeholder.com/150'}
-                        alt={item.product.name}
-                        className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg md:rounded-xl"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-gray-900 text-xs md:text-sm truncate">{item.product.name}</h4>
-                        <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-wider truncate">Ref: {item.product.partNumber || 'N/A'}</p>
-                        <div className="flex items-center justify-between mt-0.5 md:mt-1">
-                          <span className="text-[10px] md:text-xs font-bold text-gray-500">Cant: {item.quantity}</span>
-                          <FormattedPrice price={item.product.price * item.quantity} className="font-black text-sm md:text-base text-red-600" />
+                  ) || [];
+                  
+                  // Use pre-calculated totals from the Order table if available
+                  const shippingCost = selectedPurchase.order?.shippingCost || 0;
+                  const subtotal = currentGroup.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+                  const total = selectedPurchase.order?.total || subtotal + shippingCost;
+                  console.log(selectedPurchase)
+                  return (
+                    <>
+                      <div className="space-y-3">
+                        {currentGroup.map((item) => {
+                          // Calculate item discount details
+                          const itemOriginalSubtotal = item.originalPrice * item.quantity;
+                          const itemDiscountAmount = (item.originalPrice * item.discount / 100) * item.quantity;
+                          const itemFinalSubtotal = item.unitPrice * item.quantity;
+                          
+                          return (
+                            <div key={item.id} className="flex items-center gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl border border-gray-100 bg-white">
+                              <img
+                                src={item.product.images && item.product.images.length > 0
+                                  ? `${imagesUrl}${item.product.images[0].image}`
+                                  : 'https://via.placeholder.com/150'}
+                                alt={item.product.name}
+                                className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg md:rounded-xl"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-bold text-gray-900 text-xs md:text-sm truncate">{item.product.name}</h4>
+                                <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-wider truncate">Ref: {item.product.partNumber || 'N/A'}</p>
+                                <div className="flex items-center justify-between mt-0.5 md:mt-1">
+                                  <span className="text-[10px] md:text-xs font-bold text-gray-500">Cant: {item.quantity}</span>
+                                  <div className="text-right">
+                                    {item.discount > 0 && (
+                                      <div className="flex items-center justify-end gap-1.5">
+                                        <FormattedPrice 
+                                          price={item.originalPrice} 
+                                          className="line-through text-gray-400 text-[10px] md:text-xs"
+                                        />
+                                        <span className="bg-red-100 text-red-600 text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded">-{item.discount}%</span>
+                                      </div>
+                                    )}
+                                    <FormattedPrice 
+                                      price={item.unitPrice * item.quantity} 
+                                      className="font-black text-sm md:text-base text-red-600"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      {/* Order Summary */}
+                      <div className="bg-gray-50 rounded-xl md:rounded-2xl p-4 space-y-3">
+                        <h3 className="text-base md:text-lg font-bold text-gray-900 flex items-center gap-2">
+                          <CreditCard className="w-4 h-4 md:w-5 md:h-5 text-red-500" />
+                          Resumen del Pedido
+                        </h3>
+                        <div className="space-y-2 text-xs md:text-sm">
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-500 font-medium">Subtotal:</span>
+                            <FormattedPrice price={subtotal} />
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-500 font-medium">Envío:</span>
+                            <FormattedPrice price={shippingCost} />
+                          </div>
+                          <div className="pt-2 border-t border-gray-200 flex justify-between items-center">
+                            <span className="text-gray-900 font-bold text-sm md:text-base">Total:</span>
+                            <FormattedPrice
+                              price={total}
+                              className="text-lg md:text-xl font-black text-red-600"
+                            />
+                          </div>
                         </div>
 
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    </>
+                  );
+                })()}
               </div>
 
               {/* Payment Info & Receipt Grid */}
@@ -435,17 +510,6 @@ const Purchases = () => {
                       <span className={`px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-black uppercase border ${getStatusColor(selectedPurchase.status)}`}>
                         {translateStatus(selectedPurchase.status)}
                       </span>
-                    </div>
-                    <div className="pt-2 border-t border-gray-200 flex justify-between items-center">
-                      <span className="text-gray-900 font-bold text-sm md:text-base">Total:</span>
-                      <FormattedPrice
-                        price={groupedPurchases.find(g =>
-                          g[0].paymentMethod === selectedPurchase.paymentMethod &&
-                          g[0].referenceNumber === selectedPurchase.referenceNumber &&
-                          new Date(g[0].saleDate).getTime() === new Date(selectedPurchase.saleDate).getTime()
-                        )?.reduce((sum, item) => sum + (item.product.price * item.quantity), 0) || 0}
-                        className="text-lg md:text-xl font-black text-red-600"
-                      />
                     </div>
                   </div>
                 </div>

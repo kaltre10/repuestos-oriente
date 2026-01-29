@@ -17,7 +17,7 @@ export default (sequelize) => {
     },
     status: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 'pending',
     },
     buyerId: {
@@ -41,6 +41,14 @@ export default (sequelize) => {
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
+    orderId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'orders',
+        key: 'id'
+      }
+    },
     productId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -48,6 +56,19 @@ export default (sequelize) => {
         model: 'products',
         key: 'id'
       }
+    },
+    discount: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: false,
+      defaultValue: 0,
+    },
+    unitPrice: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    originalPrice: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
     },
     rating: {
       type: DataTypes.INTEGER,

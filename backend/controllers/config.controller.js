@@ -24,7 +24,7 @@ const getConfig = asyncHandler(async (req, res) => {
 });
 
 const createConfig = asyncHandler(async (req, res) => {
-  const { dolarRate } = req.body;
+  const { dolarRate, freeShippingThreshold, shippingPrice } = req.body;
 
   if (!dolarRate || dolarRate <= 0) {
     return responser.error({
@@ -34,7 +34,28 @@ const createConfig = asyncHandler(async (req, res) => {
     });
   }
 
-  const newConfig = await configService.createConfig({ dolarRate });
+  // Validate freeShippingThreshold and shippingPrice if provided
+  if (freeShippingThreshold !== undefined && freeShippingThreshold < 0) {
+    return responser.error({
+      res,
+      message: 'El umbral de envío gratis debe ser mayor o igual a 0',
+      status: 400,
+    });
+  }
+
+  if (shippingPrice !== undefined && shippingPrice < 0) {
+    return responser.error({
+      res,
+      message: 'El precio de envío debe ser mayor o igual a 0',
+      status: 400,
+    });
+  }
+
+  const newConfig = await configService.createConfig({
+    dolarRate,
+    freeShippingThreshold: freeShippingThreshold || 0, // Default to 0 if not provided
+    shippingPrice: shippingPrice || 0 // Default to 0 if not provided
+  });
   responser.success({
     res,
     message: 'Configuración creada con éxito',
@@ -44,17 +65,46 @@ const createConfig = asyncHandler(async (req, res) => {
 
 const updateConfig = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { dolarRate } = req.body;
+  const { dolarRate, freeShippingThreshold, shippingPrice } = req.body;
 
-  if (dolarRate !== undefined && dolarRate <= 0) {
-    return responser.error({
-      res,
-      message: 'La tasa del dólar debe ser mayor a 0',
-      status: 400,
-    });
+  // Create update data object
+  const updateData = {};
+
+  // Only add fields to update if they are provided
+  if (dolarRate !== undefined) {
+    if (dolarRate <= 0) {
+      return responser.error({
+        res,
+        message: 'La tasa del dólar debe ser mayor a 0',
+        status: 400,
+      });
+    }
+    updateData.dolarRate = dolarRate;
   }
 
-  const updatedConfig = await configService.updateConfig(id, { dolarRate });
+  if (freeShippingThreshold !== undefined) {
+    if (freeShippingThreshold < 0) {
+      return responser.error({
+        res,
+        message: 'El umbral de envío gratis debe ser mayor o igual a 0',
+        status: 400,
+      });
+    }
+    updateData.freeShippingThreshold = freeShippingThreshold;
+  }
+
+  if (shippingPrice !== undefined) {
+    if (shippingPrice < 0) {
+      return responser.error({
+        res,
+        message: 'El precio de envío debe ser mayor o igual a 0',
+        status: 400,
+      });
+    }
+    updateData.shippingPrice = shippingPrice;
+  }
+
+  const updatedConfig = await configService.updateConfig(id, updateData);
   responser.success({
     res,
     message: 'Configuración actualizada con éxito',

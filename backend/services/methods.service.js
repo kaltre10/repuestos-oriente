@@ -5,6 +5,12 @@ class PaymentMethodService {
   async getAllPaymentMethods() {
     try {
       const paymentMethods = await PaymentMethod.findAll({
+        include: [
+          {
+            model: models.PaymentType,
+            as: 'paymentType',
+          }
+        ],
         order: [['createdAt', 'DESC']],
       });
       return paymentMethods;
@@ -16,6 +22,12 @@ class PaymentMethodService {
   async getActivePaymentMethods() {
     try {
       const paymentMethods = await PaymentMethod.findAll({
+        include: [
+          {
+            model: models.PaymentType,
+            as: 'paymentType',
+          }
+        ],
         where: { isActive: true },
         order: [['createdAt', 'DESC']],
       });
@@ -27,7 +39,14 @@ class PaymentMethodService {
 
   async getPaymentMethodById(id) {
     try {
-      const paymentMethod = await PaymentMethod.findByPk(id);
+      const paymentMethod = await PaymentMethod.findByPk(id, {
+        include: [
+          {
+            model: models.PaymentType,
+            as: 'paymentType',
+          }
+        ]
+      });
       if (!paymentMethod) {
         throw new Error('Método de pago no encontrado');
       }

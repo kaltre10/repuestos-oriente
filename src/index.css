@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "flowbite/src/themes/default";
+@import "leaflet/dist/leaflet.css";
 
 @layer base {
   button, a {

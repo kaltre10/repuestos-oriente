@@ -9,7 +9,6 @@ import WhatsAppButton from './components/WhatsAppButton';
 const App: React.FC = () => {
 
   const { ToastContainer } = useNotify()
-
   return <>
     <AdvertisingModal />
     <ScrollToTop />

@@ -61,7 +61,7 @@ export default function Footer() {
           <h3 className="text-red-600 uppercase font-semibold mb-4">Ayuda y Soporte</h3>
           <ul className="space-y-2">
             <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Información de Envío</Link></li>
-            <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Devoluciones</Link></li>
+            {/* <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Devoluciones</Link></li> */}
             <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Cómo Ordenar</Link></li>
             <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Cómo Rastrear</Link></li>
             <li><Link to="/ayuda-soporte" className="hover:text-red-500 transition-colors">Garantía de Calidad</Link></li>
@@ -73,7 +73,7 @@ export default function Footer() {
           <h3 className="text-red-600 uppercase font-semibold mb-4">Información de la Empresa</h3>
           <ul className="space-y-2">
             <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Sobre Nosotros</Link></li>
-            <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Nuestro Blog</Link></li>
+            {/* <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Nuestro Blog</Link></li> */}
             <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Carreras</Link></li>
             <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Ubicaciones</Link></li>
             <li><Link to="/informacion-empresa" className="hover:text-red-500 transition-colors">Testimonios</Link></li>

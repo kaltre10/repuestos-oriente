@@ -1,8 +1,10 @@
 import saleService from '../services/sale.service.js';
+import orderService from '../services/order.service.js';
 import userService from '../services/user.service.js';
 import visitService from '../services/visit.service.js';
 import configService from '../services/config.service.js';
 import responser from './responser.js';
+import models from '../models/index.js';
 
 // Async handler wrapper
 const asyncHandler = (fn) => (req, res, next) => {
@@ -162,7 +164,9 @@ const createCheckout = asyncHandler(async (req, res) => {
     items, // Array of { productId, quantity }
     buyerId,
     paymentMethod,
-    referenceNumber
+    referenceNumber,
+    shippingCost,
+    freeShipping
   } = req.body;
 
   // If items is sent as a string (common with FormData), parse it
@@ -201,23 +205,85 @@ const createCheckout = asyncHandler(async (req, res) => {
     dailyRate = 1;
   }
 
-  const salesData = items.map(item => ({
-    dailyRate,
-    quantity: item.quantity,
-    status: 'pending', 
+  // Convert shippingCost to number and handle empty/undefined values
+  const calculatedShippingCost = parseFloat(shippingCost) || 0;
+
+  // Get all product IDs from items
+  const productIds = items.map(item => item.productId);
+  
+  // Get products with their details to calculate prices with discounts
+  const products = await models.Product.findAll({
+    where: { id: productIds },
+    attributes: ['id', 'price', 'discount']
+  });
+  
+  // Create a map for quick product lookup
+  const productMap = new Map();
+  products.forEach(product => {
+    productMap.set(product.id, product);
+  });
+  
+  // Calculate subtotal for the order
+  let subtotal = 0;
+  const salesData = items.map(item => {
+    const product = productMap.get(item.productId);
+    if (!product) {
+      throw new Error(`Product with id ${item.productId} not found`);
+    }
+    
+    // Calculate discount and unit price
+    const discountPercent = parseFloat(product.discount) || 0;
+    const originalPrice = parseFloat(product.price);
+    const discountAmount = (originalPrice * discountPercent) / 100;
+    const unitPriceWithDiscount = originalPrice - discountAmount;
+    
+    // Calculate subtotal for this item
+    const itemSubtotal = unitPriceWithDiscount * item.quantity;
+    subtotal += itemSubtotal;
+    
+    return {
+      dailyRate,
+      quantity: item.quantity,
+      status: 'pending', // For backward compatibility
+      orderId: null, // Will be set after order creation
+      buyerId,
+      paymentMethod,
+      referenceNumber,
+      receiptImage,
+      productId: item.productId,
+      discount: discountPercent,
+      unitPrice: unitPriceWithDiscount,
+      originalPrice: originalPrice,
+      saleDate: new Date()
+    };
+  });
+  
+  // Calculate total including shipping cost
+  const total = subtotal + calculatedShippingCost;
+
+  // Step 1: Create an Order record for this checkout with total amount
+  const order = await orderService.createOrder({
+    status: 'pending',
     buyerId,
-    paymentMethod,
-    referenceNumber,
-    receiptImage,
-    productId: item.productId,
-    saleDate: new Date()
+    shippingCost: calculatedShippingCost,
+    total: total // Total including shipping
+  });
+  
+  // Set the orderId for all sales
+  const salesWithOrderId = salesData.map(sale => ({
+    ...sale,
+    orderId: order.id
   }));
 
-  const newSales = await saleService.createMultipleSales(salesData);
+  // Step 2: Create the Sale records with the orderId set to the newly created Order's id
+  const newSales = await saleService.createMultipleSales(salesWithOrderId);
   responser.success({
     res,
     message: 'Checkout realizado con éxito',
-    body: { sales: newSales },
+    body: { 
+      order: { ...order.dataValues, sales: newSales }, // Return the Order with its associated Sales
+      sales: newSales 
+    },
   });
 });
 
@@ -227,9 +293,9 @@ const getStats = asyncHandler(async (req, res) => {
   const users = await userService.getAllUsers();
   const visitsCount = await visitService.getVisitsCount(startDate, endDate);
   
-  // Total sales calculation (price * quantity)
+  // Total sales calculation using unitPrice (with discount applied)
   const totalSales = sales.reduce((acc, sale) => {
-    const price = sale.product?.price || 0;
+    const price = sale.unitPrice || sale.product?.price || 0;
     return acc + (Number(price) * Number(sale.quantity));
   }, 0);
 
@@ -243,7 +309,7 @@ const getStats = asyncHandler(async (req, res) => {
       visitsCount: visitsCount,
       salesData: sales.map(s => ({
         date: s.createdAt,
-        amount: Number(s.product?.price || 0) * Number(s.quantity)
+        amount: Number(s.unitPrice || s.product?.price || 0) * Number(s.quantity)
       }))
     },
   });

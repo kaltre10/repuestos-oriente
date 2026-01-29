@@ -9,6 +9,7 @@ import ImageGallery from '../../components/ImageGallery';
 import useStore from '../../states/global';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
+import { useDollarRate } from '../../hooks/useDollarRate';
 
 const ProductDetailPage = () => {
   const { notify } = useNotify()
@@ -16,6 +17,7 @@ const ProductDetailPage = () => {
   const navigate = useNavigate();
   const { addToCart, cart, user, incrementQuantity, decrementQuantity, removeFromCart } = useStore();
   const { products, loading } = useProducts();
+  const { freeShippingThreshold } = useDollarRate();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
@@ -351,7 +353,7 @@ const ProductDetailPage = () => {
               <div className="border-t pt-6 space-y-3 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  Envío gratuito en compras mayores a $200
+                  Envío gratuito en compras mayores a ${Number(freeShippingThreshold).toFixed(2)}
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>

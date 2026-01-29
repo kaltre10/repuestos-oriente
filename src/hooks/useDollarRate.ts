@@ -4,26 +4,33 @@ import { useConfigStore } from '../states/useConfigStore';
 export const useDollarRate = () => {
   const {
     dollarRate,
+    freeShippingThreshold,
+    shippingPrice,
     loadingDollar: loading,
     errorDollar: error,
     fetchDollarRate,
-    saveDollarRate,
-    setLocalDollarRate: setDollarRate
+    saveConfig,
+    setLocalDollarRate: setDollarRate,
+    setLocalFreeShippingThreshold,
+    setLocalShippingPrice
   } = useConfigStore();
 
   useEffect(() => {
-    // Solo fetch si la tasa es '0' (no cargada aún)
-    if (dollarRate === '0') {
-      fetchDollarRate();
-    }
-  }, [dollarRate, fetchDollarRate]);
+    // Fetch dollar rate and shipping price on every mount
+    // This ensures we always have the latest values from the server
+    fetchDollarRate();
+  }, [fetchDollarRate]);
 
   return {
     dollarRate,
+    freeShippingThreshold,
+    shippingPrice,
     setDollarRate,
+    setLocalFreeShippingThreshold,
+    setLocalShippingPrice,
     loading,
     error,
-    saveDollarRate,
+    saveConfig,
     fetchDollarRate
   };
 };

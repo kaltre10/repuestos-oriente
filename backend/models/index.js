@@ -8,9 +8,11 @@ import defineProduct from './Product.js';
 import defineProductImage from './ProductImage.js';
 import defineConfig from './Config.js';
 import defineSale from './Sale.js';
+import defineOrder from './Order.js';
 import defineQuestion from './Question.js';
 import defineVisit from './Visit.js';
 import definePaymentMethod from './Paymentmethod.js';
+import definePaymentType from './Paymenttype.js';
 import defineSlider from './Slider.js';
 import defineAdvertising from './Advertising.js';
 
@@ -46,12 +48,14 @@ const models = {
   ProductImage: defineProductImage(sequelize),
   Config: defineConfig(sequelize),
   Sale: defineSale(sequelize),
+  Order: defineOrder(sequelize),
   Question: defineQuestion(sequelize),
-    Visit: defineVisit(sequelize),
-    PaymentMethod: definePaymentMethod(sequelize),
-    Slider: defineSlider(sequelize),
-    Advertising: defineAdvertising(sequelize),
-  };
+  Visit: defineVisit(sequelize),
+  PaymentMethod: definePaymentMethod(sequelize),
+  PaymentType: definePaymentType(sequelize),
+  Slider: defineSlider(sequelize),
+  Advertising: defineAdvertising(sequelize),
+};
 
 // Define associations
 models.Sale.belongsTo(models.Product, {
@@ -59,19 +63,46 @@ models.Sale.belongsTo(models.Product, {
   as: 'product'
 });
 
-models.Sale.belongsTo(models.User, {
+// Sale belongs to Order - this is the key association for the new structure
+models.Sale.belongsTo(models.Order, {
+  foreignKey: 'orderId',
+  as: 'order'
+});
+
+// Order has many Sales
+models.Order.hasMany(models.Sale, {
+  foreignKey: 'orderId',
+  as: 'sales'
+});
+
+// Order belongs to User
+models.Order.belongsTo(models.User, {
   foreignKey: 'buyerId',
   as: 'buyer'
 });
 
+// User has many Orders
+models.User.hasMany(models.Order, {
+  foreignKey: 'buyerId',
+  as: 'orders'
+});
+
+// User has many Sales (for backward compatibility)
+models.User.hasMany(models.Sale, {
+  foreignKey: 'buyerId',
+  as: 'purchases'
+});
+
+// Product has many Sales
 models.Product.hasMany(models.Sale, {
   foreignKey: 'productId',
   as: 'sales'
 });
 
-models.User.hasMany(models.Sale, {
+// Sale belongs to User (for backward compatibility)
+models.Sale.belongsTo(models.User, {
   foreignKey: 'buyerId',
-  as: 'purchases'
+  as: 'buyer'
 });
 
 models.Product.hasMany(models.ProductImage, {
@@ -116,6 +147,17 @@ models.SubCategory.belongsTo(models.Category, {
   as: 'category'
 });
 
+// Payment associations
+models.PaymentMethod.belongsTo(models.PaymentType, {
+  foreignKey: 'paymentTypeId',
+  as: 'paymentType'
+});
+
+models.PaymentType.hasMany(models.PaymentMethod, {
+  foreignKey: 'paymentTypeId',
+  as: 'paymentMethods'
+});
+
 // Define associations if any
 Object.keys(models).forEach((modelName) => {
   if (models[modelName].associate) {
@@ -149,9 +191,11 @@ export const {
   ProductImage,
   Config,
   Sale,
+  Order,
   Question,
   Visit,
   PaymentMethod,
+  PaymentType,
   Slider,
   Advertising,
 } = models;

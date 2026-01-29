@@ -4,15 +4,18 @@ import request from '../../utils/request';
 import { apiUrl, bancos } from '../../utils/utils';
 import useNotify from '../../hooks/useNotify';
 
+interface PaymentType {
+  id: number;
+  name: string;
+  properties: string[];
+}
+
 interface PaymentMethod {
   id: number;
   name: string;
-  type: 'Pago Movil' | 'Zelle' | 'Transferencia' | 'Efectivo';
-  bank?: string;
-  email?: string;
-  accountNumber?: string;
-  phone?: string;
-  ci_rif?: string;
+  paymentTypeId: number;
+  paymentType?: PaymentType;
+  properties: Record<string, string>;
   isActive: boolean;
 }
 
@@ -31,7 +34,29 @@ const Payments = () => {
       setLoading(true);
       const response = await request.get(`${apiUrl}/payment-methods?onlyActive=true`);
       if (response.data.success) {
-        setPaymentMethods(response.data.body.paymentMethods);
+        const validatedMethods = response.data.body.paymentMethods.map((method: any) => {
+          let properties = method.properties || {};
+          if (typeof properties === 'string') {
+            try {
+              properties = JSON.parse(properties);
+            } catch (e) {
+              properties = {};
+            }
+          }
+          if (typeof properties !== 'object' || properties === null || Array.isArray(properties)) {
+            properties = {};
+          }
+          const validatedPaymentType = method.paymentType ? {
+            ...method.paymentType,
+            properties: Array.isArray(method.paymentType.properties) ? method.paymentType.properties : []
+          } : undefined;
+          return {
+            ...method,
+            properties,
+            paymentType: validatedPaymentType
+          };
+        });
+        setPaymentMethods(validatedMethods);
       }
     } catch (error) {
       console.error('Error fetching payment methods:', error);
@@ -54,24 +79,22 @@ const Payments = () => {
     return banco ? banco.nombre : code;
   };
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'Pago Movil': return <Smartphone className="w-6 h-6" />;
-      case 'Zelle': return <Mail className="w-6 h-6" />;
-      case 'Transferencia': return <CreditCard className="w-6 h-6" />;
-      case 'Efectivo': return <Banknote className="w-6 h-6" />;
-      default: return <CreditCard className="w-6 h-6" />;
-    }
+  const getIcon = (typeName: string) => {
+    const type = typeName.toLowerCase();
+    if (type.includes('pago movil') || type.includes('movil')) return <Smartphone className="w-6 h-6" />;
+    if (type.includes('zelle')) return <Mail className="w-6 h-6" />;
+    if (type.includes('transferencia') || type.includes('banco')) return <CreditCard className="w-6 h-6" />;
+    if (type.includes('efectivo')) return <Banknote className="w-6 h-6" />;
+    return <CreditCard className="w-6 h-6" />;
   };
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'Pago Movil': return 'bg-purple-100 text-purple-700 border-purple-200';
-      case 'Zelle': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'Transferencia': return 'bg-green-100 text-green-700 border-green-200';
-      case 'Efectivo': return 'bg-orange-100 text-orange-700 border-orange-200';
-      default: return 'bg-gray-100 text-gray-700 border-gray-200';
-    }
+  const getTypeColor = (typeName: string) => {
+    const type = typeName.toLowerCase();
+    if (type.includes('pago movil') || type.includes('movil')) return 'bg-purple-100 text-purple-700 border-purple-200';
+    if (type.includes('zelle')) return 'bg-blue-100 text-blue-700 border-blue-200';
+    if (type.includes('transferencia') || type.includes('banco')) return 'bg-green-100 text-green-700 border-green-200';
+    if (type.includes('efectivo')) return 'bg-orange-100 text-orange-700 border-orange-200';
+    return 'bg-gray-100 text-gray-700 border-gray-200';
   };
 
   const CopyButton = ({ text, id }: { text: string; id: string }) => (
@@ -116,7 +139,7 @@ const Payments = () => {
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-4 mb-8">
           <Info className="w-6 h-6 text-blue-500 shrink-0" />
           <p className="text-sm text-blue-700 leading-relaxed">
-            Utiliza estos datos para realizar tu transferencia o pago móvil. Una vez realizado, recuerda adjuntar el comprobante en tu sección de <strong>Mis Compras</strong>.
+            Utiliza estos datos para realizar tu pago. Una vez realizado, recuerda adjuntar el comprobante en tu sección de <strong>Mis Compras</strong>.
           </p>
         </div>
 
@@ -128,11 +151,11 @@ const Payments = () => {
                 className="group relative bg-gray-50 hover:bg-white border border-gray-100 hover:border-red-200 rounded-3xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-red-500/5"
               >
                 <div className="flex justify-between items-start mb-6">
-                  <div className={`p-3 rounded-2xl border ${getTypeColor(method.type)} transition-colors`}>
-                    {getIcon(method.type)}
+                  <div className={`p-3 rounded-2xl border ${getTypeColor(method.paymentType?.name || '')} transition-colors`}>
+                    {getIcon(method.paymentType?.name || '')}
                   </div>
-                  <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${getTypeColor(method.type)}`}>
-                    {method.type}
+                  <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${getTypeColor(method.paymentType?.name || '')}`}>
+                    {method.paymentType?.name || 'Otro'}
                   </span>
                 </div>
 
@@ -142,74 +165,39 @@ const Payments = () => {
                   </h3>
                   
                   <div className="grid grid-cols-1 gap-3">
-                    {method.bank && (
-                      <div className="flex items-center gap-3 text-sm text-gray-600 bg-white/50 p-2 rounded-2xl hover:bg-white transition-colors border border-transparent hover:border-gray-100">
-                        <div className="w-8 h-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-gray-400">
-                          <CreditCard className="w-4 h-4" />
+                    {Object.entries(method.properties).map(([key, value]) => {
+                      // Obtener el ícono apropiado según la clave
+                      const getPropertyIcon = () => {
+                        const keyLower = key.toLowerCase();
+                        if (keyLower.includes('banco')) return <CreditCard className="w-4 h-4" />;
+                        if (keyLower.includes('teléfono') || keyLower.includes('phone') || keyLower.includes('celular') || keyLower.includes('movil')) return <Phone className="w-4 h-4" />;
+                        if (keyLower.includes('email') || keyLower.includes('correo')) return <Mail className="w-4 h-4" />;
+                        if (keyLower.includes('cuenta') || keyLower.includes('numero') || keyLower.includes('num')) return <Hash className="w-4 h-4" />;
+                        if (keyLower.includes('ci') || keyLower.includes('rif') || keyLower.includes('identificacion')) return <Hash className="w-4 h-4" />;
+                        return <CreditCard className="w-4 h-4" />;
+                      };
+                      
+                      // Formatear el valor si es un banco
+                      const displayValue = key.toLowerCase().includes('banco') ? getBankName(value) : value;
+                      
+                      // Capitalizar el nombre de la propiedad para mostrar
+                      const displayKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
+                      
+                      return (
+                        <div key={key} className="flex items-center gap-3 text-sm text-gray-600 bg-white/50 p-2 rounded-2xl hover:bg-white transition-colors border border-transparent hover:border-gray-100">
+                          <div className="w-8 h-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-gray-400">
+                            {getPropertyIcon()}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-[10px] font-bold text-gray-400 uppercase">{displayKey}</p>
+                            <p className="font-semibold text-gray-700 break-all">{displayValue}</p>
+                          </div>
+                          <CopyButton text={displayValue} id={`${key}-${method.id}`} />
                         </div>
-                        <div className="flex-1">
-                          <p className="text-[10px] font-bold text-gray-400 uppercase">Banco</p>
-                          <p className="font-semibold text-gray-700">{getBankName(method.bank)}</p>
-                        </div>
-                        <CopyButton text={getBankName(method.bank)} id={`bank-${method.id}`} />
-                      </div>
-                    )}
-
-                    {method.phone && (
-                      <div className="flex items-center gap-3 text-sm text-gray-600 bg-white/50 p-2 rounded-2xl hover:bg-white transition-colors border border-transparent hover:border-gray-100">
-                        <div className="w-8 h-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-gray-400">
-                          <Phone className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-[10px] font-bold text-gray-400 uppercase">Teléfono</p>
-                          <p className="font-semibold text-gray-700">{method.phone}</p>
-                        </div>
-                        <CopyButton text={method.phone} id={`phone-${method.id}`} />
-                      </div>
-                    )}
-
-                    {method.email && (
-                      <div className="flex items-center gap-3 text-sm text-gray-600 bg-white/50 p-2 rounded-2xl hover:bg-white transition-colors border border-transparent hover:border-gray-100">
-                        <div className="w-8 h-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-gray-400">
-                          <Mail className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-[10px] font-bold text-gray-400 uppercase">Correo / Zelle</p>
-                          <p className="font-semibold text-gray-700">{method.email}</p>
-                        </div>
-                        <CopyButton text={method.email} id={`email-${method.id}`} />
-                      </div>
-                    )}
-
-                    {method.accountNumber && (
-                      <div className="flex items-center gap-3 text-sm text-gray-600 bg-white/50 p-2 rounded-2xl hover:bg-white transition-colors border border-transparent hover:border-gray-100">
-                        <div className="w-8 h-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-gray-400">
-                          <Hash className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-[10px] font-bold text-gray-400 uppercase">Número de Cuenta</p>
-                          <p className="font-semibold text-gray-700 break-all">{method.accountNumber}</p>
-                        </div>
-                        <CopyButton text={method.accountNumber} id={`acc-${method.id}`} />
-                      </div>
-                    )}
-
-                    {method.ci_rif && (
-                      <div className="flex items-center gap-3 text-sm text-gray-600 bg-white/50 p-2 rounded-2xl hover:bg-white transition-colors border border-transparent hover:border-gray-100">
-                        <div className="w-8 h-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-gray-400">
-                          <Hash className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-[10px] font-bold text-gray-400 uppercase">C.I. / RIF</p>
-                          <p className="font-semibold text-gray-700">{method.ci_rif}</p>
-                        </div>
-                        <CopyButton text={method.ci_rif} id={`ci-${method.id}`} />
-                      </div>
-                    )}
+                      );
+                    })}
                   </div>
                 </div>
-
-                
               </div>
             ))
           ) : (

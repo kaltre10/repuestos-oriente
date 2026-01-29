@@ -1,12 +1,52 @@
-import { useState, useEffect } from 'react';
-import { Search, Loader2, ShoppingBag, User, Calendar, ExternalLink, CheckCircle, Clock, XCircle, Filter, Trash2 } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Search, Loader2, ShoppingBag, User, Calendar, ExternalLink, CheckCircle, Clock, XCircle, Filter, Trash2, ChevronRight, AlertCircle, X, CreditCard, Hash, Image as ImageIcon, Upload, CheckCircle2, Mail } from 'lucide-react';
 import { apiUrl, imagesUrl } from '../../utils/utils';
 import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
 
+// Sale interface updated for the new Order table structure
+// The status field is now in the Order table, not in the Sale table
+// Making status optional for backward compatibility during transition
+interface Sale {
+  id: number;
+  dailyRate: number;
+  quantity: number;
+  status?: string; // Optional for backward compatibility - will be removed once Order table is fully implemented
+  buyerId: number;
+  paymentMethod: string;
+  referenceNumber: string | null;
+  receiptImage: string | null;
+  saleDate: string;
+  productId: number;
+  rating: number | null;
+  createdAt: string;
+  updatedAt: string;
+  discount: number;
+  unitPrice: number;
+  originalPrice: number;
+  product: {
+    id: number;
+    name: string;
+    price: string;
+    partNumber: string;
+    images?: { image: string }[];
+  };
+  buyer: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  order?: {
+    id: number;
+    shippingCost: number;
+    total: number;
+  };
+  // The order status will be inherited from the Order table via buyerId and saleDate
+}
+
 const Sales = () => {
-  const [sales, setSales] = useState<any[]>([]);
+  const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -14,10 +54,14 @@ const Sales = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [paymentMethodFilter, setPaymentMethodFilter] = useState('');
   const [dateRange, setDateRange] = useState({ 
-    start: new Date(Date.now() - 86400000).toISOString().split('T')[0], 
+    start: '2020-01-01', 
     end: new Date().toISOString().split('T')[0] 
   });
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Modal states
+  const [selectedPurchase, setSelectedPurchase] = useState<Sale | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { notify } = useNotify()
 
@@ -29,26 +73,175 @@ const Sales = () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (statusFilter) params.append('status', statusFilter);
-      if (paymentMethodFilter) params.append('paymentMethod', paymentMethodFilter);
-      if (dateRange.start) params.append('startDate', dateRange.start);
-      if (dateRange.end) params.append('endDate', dateRange.end);
+      
+      // Agregar logging de los parámetros que se van a enviar
+      console.log('Filtros a enviar:', {
+        statusFilter,
+        paymentMethodFilter,
+        dateRange
+      });
+      
+      // Asegurar que se envían todos los filtros correctamente
+      if (statusFilter && statusFilter !== '') params.append('status', statusFilter);
+      if (paymentMethodFilter && paymentMethodFilter !== '') params.append('paymentMethod', paymentMethodFilter);
+      
+      // Logging específico para las fechas
+      console.log('Fecha start original:', dateRange.start);
+      console.log('Fecha end original:', dateRange.end);
+      
+      // Asegurar que las fechas se envían en formato YYYY-MM-DD
+      if (dateRange.start) {
+        const startDate = new Date(dateRange.start);
+        const formattedStart = startDate.toISOString().split('T')[0];
+        params.append('startDate', formattedStart);
+        console.log('Fecha start formateada:', formattedStart);
+      }
+      
+      if (dateRange.end) {
+        const endDate = new Date(dateRange.end);
+        const formattedEnd = endDate.toISOString().split('T')[0];
+        params.append('endDate', formattedEnd);
+        console.log('Fecha end formateada:', formattedEnd);
+      }
+      
+      // Construir URL completa para logging
+      const fullUrl = `${apiUrl}/sales?${params.toString()}`;
+      console.log('URL de solicitud:', fullUrl);
 
-      const response = await request.get(`${apiUrl}/sales?${params.toString()}`);
-      setSales(response.data.body.sales);
-    } catch (error) {
-      console.error('Error fetching sales:', error);
+      const response = await request.get(fullUrl);
+      
+      // Logging detallado de la respuesta
+      console.log('Respuesta completa de la API:', response);
+      console.log('Status de la respuesta:', response.status);
+      console.log('Headers de la respuesta:', response.headers);
+      console.log('Datos de la respuesta:', response.data);
+      
+      // Verificar si la respuesta tiene un campo success
+      if (response.data && typeof response.data === 'object') {
+        if (response.data.success === false) {
+          console.error('La API devolvió un error:', response.data.message);
+          notify.error(response.data.message || 'Error al obtener las ventas');
+          setSales([]);
+          return;
+        }
+      }
+      
+      // Manejar estructura de respuesta más simple
+      // Logging detallado del tipo de response.data
+      console.log('Tipo de response.data:', typeof response.data);
+      console.log('Es array response.data:', Array.isArray(response.data));
+      console.log('Contenido response.data:', response.data);
+      
+      // Verificar la estructura completa de la respuesta
+      console.log('Estructura completa de la respuesta:', JSON.stringify(response.data, null, 2));
+      
+      // Verificar si hay body y sales
+      console.log('¿Tiene body?:', !!response.data.body);
+      console.log('¿Tiene sales dentro de body?:', !!response.data.body?.sales);
+      console.log('Tipo de sales:', typeof response.data.body?.sales);
+      
+      // Usar la misma estructura que Purchases.tsx
+      if (response.data && response.data.body && Array.isArray(response.data.body.sales)) {
+        console.log(`Se recibieron ${response.data.body.sales.length} ventas`);
+        setSales(response.data.body.sales);
+      } else if (response.data && response.data.body && response.data.body.sales) {
+        // Si sales existe pero no es un array, intentar convertirlo
+        try {
+          const salesArray = Array.isArray(response.data.body.sales) ? response.data.body.sales : [response.data.body.sales];
+          console.log(`Se recibieron ${salesArray.length} ventas después de conversion`);
+          setSales(salesArray);
+        } catch (e) {
+          console.error('Error al convertir sales a array:', e);
+          setSales([]);
+          notify.info('No se encontraron registros de ventas con los filtros actuales');
+        }
+      } else {
+        console.log('Estructura de respuesta inesperada:', response.data);
+        setSales([]);
+        notify.info('No se encontraron registros de ventas con los filtros actuales');
+      }
+    } catch (error: any) {
+      console.error('Error completo al obtener ventas:', error);
+      console.error('Mensaje de error:', error.message);
+      console.error('Respuesta de error:', error.response?.data);
+      console.error('Status de error:', error.response?.status);
+      
+      // Mostrar mensaje de error más específico
+      let errorMessage = 'Error al cargar el registro de ventas';
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+        
+        // Manejo especial para error de token inválido
+        if (errorMessage.includes('token')) {
+          errorMessage = 'Sesión expirada. Por favor, inicie sesión nuevamente.';
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      notify.error(errorMessage);
+      setSales([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Group sales by buyerId and saleDate to match orders from the new Order table
+  // Each group represents an order with multiple products
+  const groupedSales = useMemo(() => {
+    const groups: { [key: string]: Sale[] } = {};
+
+    sales.forEach(sale => {
+      // Create a key based on buyerId and date (minute precision) - this represents an "order"
+      const date = new Date(sale.saleDate);
+      const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
+      const groupKey = `${sale.buyerId}_${dateKey}`;
+
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(sale);
+    });
+
+    return Object.values(groups).sort((a, b) =>
+      new Date(b[0].saleDate).getTime() - new Date(a[0].saleDate).getTime()
+    );
+  }, [sales]);
+
+  // Filter sales after grouping
+  const filteredSales = groupedSales.filter(group => {
+    const groupText = `${group[0].buyer?.name || ''} ${group[0].product?.name || ''} ${group[0].referenceNumber || ''}`;
+    return groupText.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  // Agregar efecto para verificar el estado de sales y filteredSales
+  useEffect(() => {
+    console.log('--- VERIFICACIÓN DE VENTAS ---');
+    console.log('Ventas recibidas del backend:', sales);
+    console.log('Cantidad de ventas:', sales.length);
+    
+    // Verificar la estructura de algunas ventas
+    if (sales.length > 0) {
+      console.log('Estructura de la primera venta:', sales[0]);
+      console.log('¿Tiene order?:', !!sales[0].order);
+      console.log('¿Tiene buyer?:', !!sales[0].buyer);
+      console.log('¿Tiene product?:', !!sales[0].product);
+    }
+    
+    console.log('Ventas agrupadas:', groupedSales);
+    console.log('Cantidad de ventas agrupadas:', groupedSales.length);
+    console.log('Resultado filteredSales:', filteredSales);
+    console.log('Cantidad de ventas filtradas:', filteredSales.length);
+    console.log('Término de búsqueda actual:', searchTerm);
+    console.log('--- FIN VERIFICACIÓN ---');
+  }, [sales, searchTerm, groupedSales, filteredSales]);
+
   const clearFilters = () => {
     const today = new Date().toISOString().split('T')[0];
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
     setStatusFilter('');
     setPaymentMethodFilter('');
-    setDateRange({ start: yesterday, end: today });
+    setDateRange({ start: '2020-01-01', end: today });
     setSearchTerm('');
   };
 
@@ -61,12 +254,6 @@ const Sales = () => {
       notify.error('Error al actualizar el estado de la venta');
     }
   };
-
-  const filteredSales = sales.filter(sale =>
-    sale.product?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sale.buyer?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sale.referenceNumber?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
@@ -190,99 +377,127 @@ const Sales = () => {
           <p className="text-gray-600 font-medium">Cargando registro de ventas...</p>
         </div>
       ) : filteredSales.length > 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-100">
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Producto</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Cliente</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Detalles Pago</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Monto Total</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {filteredSales.map((sale) => (
-                  <tr key={sale.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                          {sale.product?.images?.[0] ? (
-                            <img
-                              src={`${imagesUrl}${sale.product.images[0].image}`}
-                              alt={sale.product.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                              <ShoppingBag size={20} />
-                            </div>
-                          )}
+        <div className="grid gap-4 md:gap-6">
+          {filteredSales.map((group, index) => {
+            const mainSale = group[0];
+            // Use pre-calculated total from Order table if available, otherwise calculate it
+            const totalAmount = mainSale.order?.total || group.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+            const totalItems = group.reduce((sum, item) => sum + item.quantity, 0);
+            
+            // Define status color classes similar to Purchases.tsx
+            const getStatusColor = (status: string) => {
+              switch (status.toLowerCase()) {
+                case 'completed': return 'bg-green-100 text-green-700 border-green-200';
+                case 'pending': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+                case 'cancelled': return 'bg-red-100 text-red-700 border-red-200';
+                default: return 'bg-gray-100 text-gray-700 border-gray-200';
+              }
+            };
+            
+            const translateStatus = (status: string) => {
+              switch (status.toLowerCase()) {
+                case 'completed': return 'Completada';
+                case 'pending': return 'Pendiente';
+                case 'cancelled': return 'Cancelada';
+                default: return status;
+              }
+            };
+            
+            const openModal = () => {
+              setSelectedPurchase(mainSale);
+              setIsModalOpen(true);
+            };
+            
+            return (
+              <div
+                key={index}
+                onClick={openModal}
+                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all group cursor-pointer"
+              >
+                <div className="p-4 md:p-6">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+                    {/* Product Image Stack */}
+                    <div className="w-full md:w-32 h-24 md:h-32 flex-shrink-0 relative">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        {group.slice(0, 3).map((item, i) => (
+                          <img
+                            key={item.id}
+                            src={item.product.images && item.product.images.length > 0
+                              ? `${imagesUrl}${item.product.images[0].image}`
+                              : 'https://via.placeholder.com/150'}
+                            alt={item.product.name}
+                            className="absolute w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl shadow-md border-2 border-white transition-all duration-300"
+                            style={{
+                              zIndex: 3 - i,
+                              transform: `translateX(${i * 12}px) translateY(${i * -4}px) rotate(${i * 2}deg)`,
+                              opacity: 1 - (i * 0.2)
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Details */}
+                    <div className="flex-1 space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <h3 className="text-lg md:text-xl font-bold text-gray-900 group-hover:text-red-600 transition-colors truncate">
+                            {group.length > 1
+                              ? `Pedido de ${group.length} productos`
+                              : mainSale.product.name}
+                          </h3>
+                          <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest truncate">
+                            <span>Cliente: {mainSale.buyer.name}</span>
+                            <span className="hidden sm:inline">•</span>
+                            <span>{totalItems} artículos en total</span>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-semibold text-gray-800 text-sm line-clamp-1">{sale.product?.name}</p>
-                          <p className="text-xs text-gray-400">Cant: {sale.quantity}</p>
+                        <div className={`self-start sm:self-center px-3 py-1 rounded-full text-[10px] md:text-xs font-black border uppercase tracking-wider ${getStatusColor(mainSale.status)}`}>
+                          {translateStatus(mainSale.status)}
                         </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                          <User size={14} className="text-gray-400" /> {sale.buyer?.name}
-                        </span>
-                        <span className="text-xs text-gray-400">{sale.buyer?.email}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-xs font-bold text-gray-600 uppercase">{sale.paymentMethod}</span>
-                        {sale.referenceNumber && (
-                          <span className="text-xs text-gray-400 font-mono">Ref: {sale.referenceNumber}</span>
-                        )}
-                        {sale.receiptImage && (
-                          <a
-                            href={`${apiUrl}${sale.receiptImage}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-blue-600 hover:underline flex items-center gap-1"
-                          >
-                            <ExternalLink size={12} /> Ver Comprobante
-                          </a>
+                      
+                      <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm">
+                        <div className="flex items-center text-gray-500 bg-gray-50 px-2 md:px-3 py-1 md:py-1.5 rounded-lg">
+                          <Calendar className="w-3.5 h-3.5 mr-1.5 md:mr-2 text-red-500" />
+                          <span className="font-semibold">
+                            {new Date(mainSale.saleDate).toLocaleDateString()}
+                            <span className="ml-1 text-gray-400">
+                              {new Date(mainSale.saleDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex items-center text-gray-500 bg-gray-50 px-2 md:px-3 py-1 md:py-1.5 rounded-lg">
+                          <CreditCard className="w-3.5 h-3.5 mr-1.5 md:mr-2 text-red-500" />
+                          <span className="font-semibold uppercase">{mainSale.paymentMethod}</span>
+                        </div>
+                        {mainSale.referenceNumber && (
+                          <div className="flex items-center text-gray-500 bg-gray-50 px-2 md:px-3 py-1 md:py-1.5 rounded-lg">
+                            <Hash className="w-3.5 h-3.5 mr-1.5 md:mr-2 text-red-500" />
+                            <span className="font-semibold">{mainSale.referenceNumber}</span>
+                          </div>
                         )}
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <FormattedPrice
-                          price={sale.quantity * sale.product?.price}
-                          className="text-sm font-bold text-red-600"
-                        />
-                        <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                          <Calendar size={10} /> {new Date(sale.createdAt).toLocaleDateString()}
-                        </span>
+                      
+                      <div className="pt-2 flex items-center justify-between border-t border-gray-50">
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-gray-400 text-xs md:text-sm font-medium">Total:</span>
+                          <FormattedPrice
+                            price={totalAmount}
+                            className="text-xl md:text-2xl font-black text-red-600"
+                          />
+                        </div>
+                        <div className="flex items-center text-gray-400 group-hover:text-red-600 font-bold text-xs md:text-sm transition-colors">
+                          <span className="hidden sm:inline">Ver detalles</span>
+                          <ChevronRight className="w-4 h-4 ml-1" />
+                        </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {getStatusBadge(sale.status)}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <select
-                        className="text-xs border border-gray-200 rounded px-2 py-1 bg-white focus:ring-2 focus:ring-red-500 outline-none"
-                        value={sale.status}
-                        onChange={(e) => handleUpdateStatus(sale.id, e.target.value)}
-                      >
-                        <option value="pending">Pendiente</option>
-                        <option value="completed">Completada</option>
-                        <option value="cancelled">Cancelada</option>
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200 shadow-sm">
@@ -301,6 +516,328 @@ const Sales = () => {
               Limpiar búsqueda
             </button>
           )}
+        </div>
+      )}
+      
+      {/* Detail Modal */}
+      {isModalOpen && selectedPurchase && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div
+            className="bg-white w-full max-w-2xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[95vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-4 md:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+              <div className="min-w-0">
+                <h2 className="text-xl md:text-2xl font-black text-gray-900 truncate">Detalles del Pedido</h2>
+                <p className="text-gray-500 text-xs md:text-sm font-medium">
+                  {new Date(selectedPurchase.saleDate).toLocaleDateString()} a las {new Date(selectedPurchase.saleDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="flex items-center justify-center w-8 h-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+              {/* Order Status */}
+              {(() => {
+                const currentGroup = groupedSales.find(g =>
+                  g[0].buyerId === selectedPurchase.buyerId &&
+                  new Date(g[0].saleDate).getTime() === new Date(selectedPurchase.saleDate).getTime()
+                );
+                
+                if (!currentGroup) return null;
+                
+                // In the new structure, we update the order status in the Order table
+                // This will automatically affect all sales in the order via buyerId relationship
+                const handleUpdateOrderStatus = async (newStatus: string) => {
+                  try {
+                    // Create order data based on the group
+                    const orderData = {
+                      buyerId: currentGroup[0].buyerId,
+                      status: newStatus,
+                      // The backend should calculate shipping cost and total amount
+                      // We're only sending the status update here
+                    };
+                    
+                    // In the future, when Order table is implemented, use this endpoint instead:
+                    // await request.put(`${apiUrl}/orders/${orderId}`, { status: newStatus });
+                    
+                    // For now, we'll use the existing endpoint to update all sales in the group
+                    // This will be replaced with a single order update when backend is ready
+                    await Promise.all(
+                      currentGroup.map(sale => handleUpdateStatus(sale.id, newStatus))
+                    );
+                  } catch (error) {
+                    console.error('Error updating order status:', error);
+                    notify.error('Error al actualizar el estado del pedido');
+                  }
+                };
+                
+                // Get the order status from the first sale (temporary until Order table is implemented)
+                const orderStatus = currentGroup[0].status;
+                
+                return (
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-700">Estado del Pedido</h3>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {(() => {
+                            switch (orderStatus.toLowerCase()) {
+                              case 'completed': return 'El pedido ha sido completado';
+                              case 'pending': return 'El pedido está pendiente de procesamiento';
+                              case 'cancelled': return 'El pedido ha sido cancelado';
+                              default: return `Estado: ${orderStatus}`;
+                            }
+                          })()}
+                        </p>
+                      </div>
+                      <select
+                        className="border border-gray-200 rounded px-3 py-1.5 bg-white focus:ring-2 focus:ring-red-500 outline-none text-sm"
+                        value={orderStatus}
+                        onChange={(e) => handleUpdateOrderStatus(e.target.value)}
+                      >
+                        <option value="pending">Pendiente</option>
+                        <option value="completed">Completada</option>
+                        <option value="cancelled">Cancelada</option>
+                      </select>
+                    </div>
+                  </div>
+                );
+              })()}
+              
+              {/* Customer Information */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5">
+                  <User className="w-4 h-4 text-red-500" />
+                  Información del Cliente
+                </h3>
+                <div className="bg-white rounded-xl p-4 border border-gray-100">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2">
+                      <div className="text-gray-500 mt-0.5">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{selectedPurchase.buyer.name}</p>
+                        <p className="text-xs text-gray-500">ID: {selectedPurchase.buyerId}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="text-gray-500 mt-0.5">
+                        <Mail className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{selectedPurchase.buyer.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Payment Information */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5">
+                  <CreditCard className="w-4 h-4 text-red-500" />
+                  Detalles de Pago
+                </h3>
+                <div className="bg-white rounded-xl p-4 border border-gray-100">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Método de Pago</span>
+                        <span className="font-medium text-gray-900 uppercase">{selectedPurchase.paymentMethod}</span>
+                      </div>
+                      {selectedPurchase.referenceNumber && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-500">Referencia</span>
+                          <span className="font-mono font-medium text-gray-900">{selectedPurchase.referenceNumber}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Fecha de Compra</span>
+                        <span className="font-medium text-gray-900">{new Date(selectedPurchase.saleDate).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Hora</span>
+                        <span className="font-medium text-gray-900">{new Date(selectedPurchase.saleDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {selectedPurchase.receiptImage && (
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Comprobante de Pago</h4>
+                      <a
+                        href={`${apiUrl}${selectedPurchase.receiptImage}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
+                      >
+                        <ImageIcon className="w-4 h-4" />
+                        Ver Comprobante
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Products List */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5">
+                  <ShoppingBag className="w-4 h-4 text-red-500" />
+                  Productos del Pedido
+                </h3>
+                
+                {/* Find all sales in the same group (order) as selectedPurchase */}
+                {(() => {
+                  const currentGroup = groupedSales.find(g =>
+                    g[0].buyerId === selectedPurchase.buyerId &&
+                    new Date(g[0].saleDate).getTime() === new Date(selectedPurchase.saleDate).getTime()
+                  );
+                  
+                  if (!currentGroup) return null;
+                  
+                  // Calculate order totals with discounts
+                  const totalItems = currentGroup.reduce((sum, item) => sum + item.quantity, 0);
+                  // Calculate subtotal using unitPrice (with discount already applied)
+                  const subtotal = currentGroup.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+                  // Get shipping cost from the order if available, otherwise assume 0
+                  const shippingCost = selectedPurchase.order?.shippingCost || 0;
+                  // Use pre-calculated total from Order table if available, otherwise calculate it
+                  const totalAmount = selectedPurchase.order?.total || subtotal + shippingCost;
+                  
+                  return (
+                    <div className="space-y-3">
+                      {/* Order Summary */}
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-xs text-gray-500">Número de Pedido</p>
+                            <p className="text-sm font-semibold text-gray-900">{currentGroup[0].buyerId}-{new Date(currentGroup[0].saleDate).getTime()}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Fecha y Hora</p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {new Date(currentGroup[0].saleDate).toLocaleDateString()} {new Date(currentGroup[0].saleDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Total de Artículos</p>
+                            <p className="text-sm font-semibold text-gray-900">{totalItems}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Método de Pago</p>
+                            <p className="text-sm font-semibold text-gray-900 uppercase">{currentGroup[0].paymentMethod}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Products List */}
+                      <div className="space-y-2">
+                        {currentGroup.map((sale) => {
+                          // Calculate item discount details
+                          const itemOriginalPrice = sale.originalPrice;
+                          const itemFinalPrice = sale.unitPrice;
+                          const itemDiscountPercent = sale.discount;
+                          
+                          return (
+                            <div key={sale.id} className="bg-white rounded-xl p-4 border border-gray-100 flex flex-col md:flex-row gap-4">
+                              <div className="w-16 h-16 flex-shrink-0">
+                                <img
+                                  src={sale.product.images && sale.product.images.length > 0
+                                    ? `${imagesUrl}${sale.product.images[0].image}`
+                                    : 'https://via.placeholder.com/150'}
+                                  alt={sale.product.name}
+                                  className="w-full h-full object-cover rounded-lg"
+                                />
+                              </div>
+                              
+                              <div className="flex-1 space-y-2">
+                                <div>
+                                  <h4 className="text-sm font-medium text-gray-900">{sale.product.name}</h4>
+                                  <p className="text-xs text-gray-500">{sale.product.partNumber}</p>
+                                </div>
+                                
+                                <div className="flex items-center justify-between">
+                                  <div className="space-y-1">
+                                    <div className="flex items-center gap-4 text-sm">
+                                      <div className="text-gray-500">Cantidad: <span className="font-medium text-gray-900">{sale.quantity}</span></div>
+                                      <div className="text-right">
+                                        {itemDiscountPercent > 0 && (
+                                          <div className="flex items-center gap-1.5">
+                                            <FormattedPrice 
+                                              price={itemOriginalPrice}
+                                              className="line-through text-gray-400 text-xs"
+                                            />
+                                            <span className="bg-red-100 text-red-600 text-xs font-bold px-1.5 py-0.5 rounded">-{itemDiscountPercent}%</span>
+                                          </div>
+                                        )}
+                                        <FormattedPrice
+                                          price={itemFinalPrice}
+                                          className="text-sm font-medium text-red-600"
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                 
+                                  <div className="flex items-center">
+                                    <div className="text-right">
+                                      <FormattedPrice
+                                        price={sale.quantity * itemFinalPrice}
+                                        className="text-sm font-bold text-red-600"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      {/* Order Total with shipping */}
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-500">Subtotal:</span>
+                          <FormattedPrice price={subtotal} className="font-medium text-gray-900" />
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-500">Costo de Envío:</span>
+                          <FormattedPrice price={shippingCost} className="font-medium text-gray-900" />
+                        </div>
+                        <div className="pt-2 border-t border-gray-200 flex justify-between items-center">
+                          <span className="text-sm font-medium text-gray-700">Total del Pedido:</span>
+                          <FormattedPrice
+                            price={totalAmount}
+                            className="text-xl font-black text-red-600"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="p-4 md:p-6 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-5 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
