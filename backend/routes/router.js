@@ -23,6 +23,9 @@ const router = express.Router();
 const apiVersion = '/api/v1';
 
 // Mount all route modules
+router.use(`${apiVersion}/sales`, saleRoutes);
+router.use(`${apiVersion}/sliders`, sliderRoutes);
+
 router.use(apiVersion, userRoutes);
 router.use(apiVersion, productRoutes);
 router.use(apiVersion, brandRoutes);
@@ -40,5 +43,6 @@ router.use(`${apiVersion}/payment-types`, paymentTypeRoutes);
 router.use(`${apiVersion}/sliders`, sliderRoutes);
 router.use(`${apiVersion}/advertising`, advertisingRoutes);
 router.use(`${apiVersion}/contact`, contactRoutes);
+
 
 export default router;

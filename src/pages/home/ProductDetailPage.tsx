@@ -50,7 +50,7 @@ const ProductDetailPage = () => {
 
   useEffect(() => {
     if (product?.name) {
-      document.title = `${product.name} | Repuestos Oriente`;
+      document.title = `${product.name} | Repuestos Picha`;
     }
   }, [product?.name]);
 

@@ -33,3 +33,10 @@ export const bancos = [
   { "codigo": "0191", "nombre": "BNC Banco Nacional de Crédito" },
   { "codigo": "0601", "nombre": "Instituto Municipal de Crédito Popular" }
 ]
+
+export const socials = {
+  whatsapp: "584147673787",
+  instagram: "https://www.instagram.com/autorepuestospicha",
+  tiktok: "https://www.tiktok.com/@repuestospicha",
+  email:"repusetospicha@gmail.com"
+}

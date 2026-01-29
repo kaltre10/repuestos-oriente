@@ -1,27 +1,18 @@
 // import React from 'react';
-import { Building2, Target, Users, MapPin } from 'lucide-react';
 
+import { Building2, Target, Users, MapPin, Newspaper } from 'lucide-react';
+import { socials } from '../../utils/utils';
 const CompanyInfo = () => {
   const locations = [
     {
-      title: "Sede Principal - Caracas",
-      address: "Av. Francisco de Miranda, Edificio Galipán, Chacao, Caracas.",
-      phone: "+58 212-1234567",
-      mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3923.1812!2d-66.8584!3d10.4910!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8c2a58ad!2sChacao%2C%20Caracas!5e0!3m2!1ses!2sve!4v1706000000000!5m2!1ses!2sve"
+      title: "Sede Principal - Monagas",
+      address: "Av. Rivas con Sucre, Maturín, Monagas, Venezuela",
+      phone: `+${socials.whatsapp}`,
+      mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d983.0468382781642!2d-63.18219990581234!3d9.75019223877798!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8c3340b64c367651%3A0xa14dca2631f88973!2sAuto%20Repuestos%20Picha%2C%20C.a!5e0!3m2!1ses-419!2sve!4v1769551742752!5m2!1ses-419!2sve"
     },
-    {
-      title: "Sucursal Valencia",
-      address: "Av. Bolívar Norte, Sector El Viñedo, Valencia, Carabobo.",
-      phone: "+58 241-1234567",
-      mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3926.3712!2d-68.0044!3d10.2110!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e806!2sValencia!5e0!3m2!1ses!2sve!4v1706000000000!5m2!1ses!2sve"
-    },
-    {
-      title: "Sucursal Puerto La Cruz",
-      address: "Av. Municipal, Sector Los Cerezos, Puerto La Cruz, Anzoátegui.",
-      phone: "+58 281-1234567",
-      mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3920.1712!2d-64.6244!3d10.2110!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8c2d7!2sPuerto%20La%20Cruz!5e0!3m2!1ses!2sve!4v1706000000000!5m2!1ses!2sve"
-    }
   ];
+
+
 
   return (
     <div className="bg-gray-50 min-h-screen py-12 px-4 md:px-20">
@@ -29,7 +20,7 @@ const CompanyInfo = () => {
         <div className="text-center mb-12">
           <Building2 className="w-16 h-16 text-red-600 mx-auto mb-4" />
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Información de la Empresa</h1>
-          <p className="text-lg text-gray-600">Conoce más sobre Repuestos Oriente y nuestro compromiso</p>
+          <p className="text-lg text-gray-600">Conoce más sobre Repuestos Picha y nuestro compromiso</p>
         </div>
 
         <div className="space-y-12">
@@ -42,7 +33,7 @@ const CompanyInfo = () => {
               <h2 className="text-2xl font-bold text-gray-800">Sobre Nosotros</h2>
             </div>
             <p className="text-gray-600 leading-relaxed">
-              Repuestos Oriente es líder en la distribución de autopartes en la región. Con más de 15 años de experiencia, nos dedicamos a ofrecer soluciones integrales para el mantenimiento automotriz, brindando confianza y calidad a cada uno de nuestros clientes.
+              Repuestos Picha es líder en la distribución de autopartes en la región. Con más de 15 años de experiencia, nos dedicamos a ofrecer soluciones integrales para el mantenimiento automotriz, brindando confianza y calidad a cada uno de nuestros clientes.
             </p>
           </section>
 
@@ -82,7 +73,7 @@ const CompanyInfo = () => {
               </div>
               <h2 className="text-2xl font-bold text-gray-800">Nuestras Tiendas</h2>
             </div>
-            
+
             <div className="grid grid-cols-1 gap-8">
               {locations.map((loc, index) => (
                 <div key={index} className="flex flex-col lg:flex-row gap-6 border-b border-gray-100 pb-8 last:border-0 last:pb-0">

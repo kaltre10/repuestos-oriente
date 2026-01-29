@@ -1,18 +1,15 @@
 import { Router } from 'express';
 import advertisingController from '../controllers/advertising.controller.js';
+import validateToken from '../midelwares/validateToken.js';
 
 const router = Router();
 
-router.route('/')
-  .get(advertisingController.getAdvertising)
-  .post(advertisingController.createAdvertising);
-
-router.route('/active')
-  .get(advertisingController.getActiveAdvertising);
-
-router.route('/:id')
-  .get(advertisingController.getAdvertisingById)
-  .put(advertisingController.updateAdvertising)
-  .delete(advertisingController.deleteAdvertising);
+router.get("/", advertisingController.getAdvertising)
+router.get('/:id', advertisingController.getAdvertisingById)
+router.get('/active', advertisingController.getActiveAdvertising)
+router.use(validateToken)
+router.post("/", advertisingController.createAdvertising)
+router.put('/:id', advertisingController.updateAdvertising)
+router.delete('/:id', advertisingController.deleteAdvertising)
 
 export default router;

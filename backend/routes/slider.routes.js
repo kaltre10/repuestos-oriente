@@ -1,15 +1,14 @@
 import { Router } from 'express';
 import sliderController from '../controllers/slider.controller.js';
+import validateToken from '../midelwares/validateToken.js';
 
 const router = Router();
 
-router.route('/')
-  .get(sliderController.getSliders)
-  .post(sliderController.createSlider);
-
-router.route('/:id')
-  .get(sliderController.getSliderById)
-  .put(sliderController.updateSlider)
-  .delete(sliderController.deleteSlider);
+router.get("/",sliderController.getSliders)
+router.get('/:id',sliderController.getSliderById)
+router.use(validateToken);
+router.post('/',sliderController.createSlider);
+router.put('/:id', sliderController.updateSlider)
+router.delete('/:id', sliderController.deleteSlider);
 
 export default router;

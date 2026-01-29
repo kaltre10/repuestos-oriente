@@ -5,9 +5,10 @@ import { uploadMidelware } from '../midelwares/uploadMidelware.js';
 import validateToken from '../midelwares/validateToken.js';
 
 const router = Router();
-
-router.post('/images/upload', validateToken, uploadMidelware.array('images', 5), upload);
-router.delete('/images/:id', validateToken, deleteImage);
 router.get('/images/product/:productId', getByProduct);
+router.use(validateToken);
+
+router.post('/images/upload', uploadMidelware.array('images', 5), upload);
+router.delete('/images/:id', deleteImage);
 
 export default router;
