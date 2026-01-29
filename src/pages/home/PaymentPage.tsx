@@ -6,6 +6,8 @@ import { apiUrl, bancos } from '../../utils/utils';
 import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
+import { useDollarRate } from '../../hooks/useDollarRate';
+import { useLocation } from 'react-router-dom';
 
 interface PaymentMethodDB {
   id: number;
@@ -20,10 +22,17 @@ interface PaymentMethodDB {
 
 const PaymentPage = () => {
   const { notify } = useNotify()
-  // const location = useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
   const { cart, clearCart, user, getCartTotal } = useStore();
-  // const accountData = location.state?.accountData;
+  const { freeShippingThreshold, shippingPrice } = useDollarRate();
+  const accountData = location.state?.accountData;
+  
+  // Calcular si el envío es gratis
+  const cartTotal = getCartTotal();
+  const freeShipping = cartTotal >= Number(freeShippingThreshold);
+  const shippingCost = freeShipping ? 0 : Number(shippingPrice);
+  const finalTotal = cartTotal + shippingCost;
 
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethodDB[]>([]);
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethodDB | null>(null);
@@ -112,6 +121,8 @@ const PaymentPage = () => {
       formData.append('buyerId', user?.id.toString() || '');
       formData.append('paymentMethod', selectedMethod?.name || 'Desconocido');
       formData.append('referenceNumber', referenceNumber);
+      formData.append('shippingCost', shippingCost.toString());
+      formData.append('freeShipping', freeShipping.toString());
       if (receiptImage) {
         formData.append('receiptImage', receiptImage);
       }
@@ -309,9 +320,19 @@ const PaymentPage = () => {
             </div>
 
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <div className="flex justify-between items-center mb-6">
-                <span className="text-gray-600 font-medium">Total a pagar:</span>
-                <FormattedPrice price={getCartTotal()} className="text-2xl font-bold text-red-600" />
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal:</span>
+                  <FormattedPrice price={cartTotal} />
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Envío:</span>
+                  <FormattedPrice price={shippingCost} />
+                </div>
+                <div className="border-t pt-3 flex justify-between items-center font-bold">
+                  <span className="text-gray-800">Total a pagar:</span>
+                  <FormattedPrice price={finalTotal} className="text-2xl text-red-600" />
+                </div>
               </div>
 
               <button

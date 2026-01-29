@@ -6,46 +6,51 @@ class SaleService {
 
   async getAllSales(filters = {}) {
     try {
-      const where = {};
+      console.log('=== INICIANDO CONSULTA DE VENTAS ===');
+      console.log('Filtros recibidos:', filters);
+      
       const { startDate, endDate, status, paymentMethod } = filters;
-
+      
+      // Usar la misma lógica que la consulta manual
+      const where = {};
+      
+      // Filtro por fecha
       if (startDate && endDate) {
-        where.createdAt = {
-          [Op.between]: [new Date(startDate), new Date(endDate)]
-        };
+        console.log('Aplicando filtro de fecha:', startDate, 'a', endDate);
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        start.setHours(0, 0, 0, 0);
+        end.setDate(end.getDate() + 1);
+        end.setHours(0, 0, 0, 0);
+        where.saleDate = { [Op.between]: [start, end] };
       }
-
-      if (status) {
-        where.status = status;
-      }
-
+      
+      // Filtro por método de pago
       if (paymentMethod) {
+        console.log('Aplicando filtro de método de pago:', paymentMethod);
         where.paymentMethod = paymentMethod;
       }
-
+      
+      // Consulta simple para probar
       const sales = await Sale.findAll({
         where,
-        order: [['createdAt', 'DESC']],
         include: [
-          {
-            model: models.Product,
-            as: 'product',
-            attributes: ['id', 'name', 'price', 'partNumber'],
-            include: [{
-              model: models.ProductImage,
-              as: 'images',
-              attributes: ['image']
-            }]
-          },
-          {
-            model: models.User,
-            as: 'buyer',
-            attributes: ['id', 'name', 'email']
-          }
-        ]
+          { model: models.Product, as: 'product' },
+          { model: models.User, as: 'buyer' },
+          { model: models.Order, as: 'order' }
+        ],
+        order: [['saleDate', 'DESC']]
       });
+      
+      console.log('Resultado de la consulta:', sales.length, 'ventas encontradas');
+      if (sales.length > 0) {
+        console.log('Primera venta encontrada:', JSON.stringify(sales[0], null, 2));
+      }
+      
+      console.log('=== FIN CONSULTA DE VENTAS ===');
       return sales;
     } catch (error) {
+      console.error('Error en getAllSales:', error);
       throw new Error(`Error al obtener ventas: ${error.message}`);
     }
   }
@@ -53,11 +58,18 @@ class SaleService {
   async getSaleById(id) {
     try {
       const sale = await Sale.findByPk(id, {
-        include: [{
-          model: models.Product,
-          as: 'product',
-          attributes: ['id', 'name', 'price', 'partNumber']
-        }]
+        include: [
+          {
+            model: models.Product,
+            as: 'product',
+            attributes: ['id', 'name', 'price', 'partNumber', 'images']
+          },
+          {
+            model: models.Order,
+            as: 'order',
+            attributes: ['id', 'status', 'shippingCost', 'total', 'createdAt', 'updatedAt']
+          }
+        ]
       });
       if (!sale) {
         throw new Error('Venta no encontrada');
@@ -102,6 +114,11 @@ class SaleService {
             as: 'images',
             attributes: ['image']
           }]
+        },
+        {
+          model: models.Order,
+          as: 'order',
+          attributes: ['id', 'status', 'shippingCost', 'total', 'createdAt', 'updatedAt']
         }]
       });
       return sales;
@@ -114,18 +131,30 @@ class SaleService {
     try {
       const where = {};
       if (startDate && endDate) {
-        where.createdAt = {
-          [Op.between]: [new Date(startDate), new Date(endDate)]
+        // Convertir fechas a objetos Date sin offset (usar UTC)
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        // Ajustar fecha de inicio a medianoche UTC
+        start.setHours(0, 0, 0, 0);
+        
+        // Ajustar fecha de fin a medianoche UTC del día siguiente
+        end.setDate(end.getDate() + 1);
+        end.setHours(0, 0, 0, 0);
+        
+        // Filtrar por saleDate (fecha de venta) en lugar de createdAt
+        where.saleDate = {
+          [Op.between]: [start, end]
         };
       }
 
       const sales = await Sale.findAll({
         where,
-        attributes: ['id', 'quantity', 'dailyRate', 'createdAt'],
+        attributes: ['id', 'quantity', 'unitPrice', 'originalPrice', 'discount', 'saleDate', 'createdAt'],
         include: [{
           model: models.Product,
           as: 'product',
-          attributes: ['price']
+          attributes: ['name']
         }]
       });
 

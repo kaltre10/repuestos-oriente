@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaEdit, FaTrash, FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus, FaTimes } from 'react-icons/fa';
 import request from '../../utils/request';
 import { apiUrl } from '../../utils/utils';
 import useNotify from '../../hooks/useNotify';
