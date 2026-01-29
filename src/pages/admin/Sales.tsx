@@ -54,7 +54,7 @@ const Sales = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [paymentMethodFilter, setPaymentMethodFilter] = useState('');
   const [dateRange, setDateRange] = useState({ 
-    start: '2020-01-01', 
+    start: new Date().toISOString().split('T')[0], 
     end: new Date().toISOString().split('T')[0] 
   });
   const [showFilters, setShowFilters] = useState(false);
@@ -74,47 +74,28 @@ const Sales = () => {
       setLoading(true);
       const params = new URLSearchParams();
       
-      // Agregar logging de los parámetros que se van a enviar
-      console.log('Filtros a enviar:', {
-        statusFilter,
-        paymentMethodFilter,
-        dateRange
-      });
-      
       // Asegurar que se envían todos los filtros correctamente
       if (statusFilter && statusFilter !== '') params.append('status', statusFilter);
       if (paymentMethodFilter && paymentMethodFilter !== '') params.append('paymentMethod', paymentMethodFilter);
-      
-      // Logging específico para las fechas
-      console.log('Fecha start original:', dateRange.start);
-      console.log('Fecha end original:', dateRange.end);
+
       
       // Asegurar que las fechas se envían en formato YYYY-MM-DD
       if (dateRange.start) {
         const startDate = new Date(dateRange.start);
         const formattedStart = startDate.toISOString().split('T')[0];
         params.append('startDate', formattedStart);
-        console.log('Fecha start formateada:', formattedStart);
       }
       
       if (dateRange.end) {
         const endDate = new Date(dateRange.end);
         const formattedEnd = endDate.toISOString().split('T')[0];
         params.append('endDate', formattedEnd);
-        console.log('Fecha end formateada:', formattedEnd);
       }
       
       // Construir URL completa para logging
       const fullUrl = `${apiUrl}/sales?${params.toString()}`;
-      console.log('URL de solicitud:', fullUrl);
 
       const response = await request.get(fullUrl);
-      
-      // Logging detallado de la respuesta
-      console.log('Respuesta completa de la API:', response);
-      console.log('Status de la respuesta:', response.status);
-      console.log('Headers de la respuesta:', response.headers);
-      console.log('Datos de la respuesta:', response.data);
       
       // Verificar si la respuesta tiene un campo success
       if (response.data && typeof response.data === 'object') {
@@ -124,47 +105,25 @@ const Sales = () => {
           setSales([]);
           return;
         }
-      }
-      
-      // Manejar estructura de respuesta más simple
-      // Logging detallado del tipo de response.data
-      console.log('Tipo de response.data:', typeof response.data);
-      console.log('Es array response.data:', Array.isArray(response.data));
-      console.log('Contenido response.data:', response.data);
-      
-      // Verificar la estructura completa de la respuesta
-      console.log('Estructura completa de la respuesta:', JSON.stringify(response.data, null, 2));
-      
-      // Verificar si hay body y sales
-      console.log('¿Tiene body?:', !!response.data.body);
-      console.log('¿Tiene sales dentro de body?:', !!response.data.body?.sales);
-      console.log('Tipo de sales:', typeof response.data.body?.sales);
-      
+      }  
+ 
       // Usar la misma estructura que Purchases.tsx
       if (response.data && response.data.body && Array.isArray(response.data.body.sales)) {
-        console.log(`Se recibieron ${response.data.body.sales.length} ventas`);
         setSales(response.data.body.sales);
       } else if (response.data && response.data.body && response.data.body.sales) {
         // Si sales existe pero no es un array, intentar convertirlo
         try {
           const salesArray = Array.isArray(response.data.body.sales) ? response.data.body.sales : [response.data.body.sales];
-          console.log(`Se recibieron ${salesArray.length} ventas después de conversion`);
           setSales(salesArray);
         } catch (e) {
-          console.error('Error al convertir sales a array:', e);
           setSales([]);
           notify.info('No se encontraron registros de ventas con los filtros actuales');
         }
       } else {
-        console.log('Estructura de respuesta inesperada:', response.data);
         setSales([]);
         notify.info('No se encontraron registros de ventas con los filtros actuales');
       }
     } catch (error: any) {
-      console.error('Error completo al obtener ventas:', error);
-      console.error('Mensaje de error:', error.message);
-      console.error('Respuesta de error:', error.response?.data);
-      console.error('Status de error:', error.response?.status);
       
       // Mostrar mensaje de error más específico
       let errorMessage = 'Error al cargar el registro de ventas';
@@ -241,7 +200,7 @@ const Sales = () => {
     const today = new Date().toISOString().split('T')[0];
     setStatusFilter('');
     setPaymentMethodFilter('');
-    setDateRange({ start: '2020-01-01', end: today });
+    setDateRange({ start: today, end: today });
     setSearchTerm('');
   };
 

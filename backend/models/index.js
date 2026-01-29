@@ -34,6 +34,10 @@ const sequelize = new Sequelize(
       acquire: 30000,
       idle: 10000,
     },
+    timezone: '-04:30', // Zona horaria de Venezuela (UTC-4:30)
+    dialectOptions: {
+      timezone: '-04:30', // Configuración adicional para MySQL
+    },
   }
 );
 

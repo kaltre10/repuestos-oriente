@@ -7,7 +7,6 @@ const asyncHandler = (fn) => (req, res, next) => {
 
 const getSliders = asyncHandler(async (req, res) => {
   const sliders = await sliderService.getAllSliders();
-  console.log(sliders)
   return responser.success({
     res,
     body: { sliders },

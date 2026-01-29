@@ -9,7 +9,6 @@ const asyncHandler = (fn) => (req, res, next) => {
 const getProducts = asyncHandler(async (req, res) => {
   const { year, onSale } = req.query;
   const products = await productService.getAllProducts({ year, onSale });
-  console.log('Fetching products', year ? `for year ${year}` : '', onSale === 'true' ? 'on sale' : 'all');
   responser.success({
     res,
     body: { products },
