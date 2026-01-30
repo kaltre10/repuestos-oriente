@@ -355,7 +355,7 @@ const Purchases = () => {
                         </div>
                       )}
                     </div>
-                    <span className='text-red-400'>{mainPurchase.rating === null && "No as calificado esta compra"} </span>
+                    <span className='text-red-400'>{mainPurchase.rating === null && "No has calificado esta compra"} </span>
                
                     <div className='flex text-amber-500'>
                       {[...Array(5)].map((_, i) => (

@@ -145,7 +145,12 @@ const ProductsPage = () => {
                     <div className="flex items-center mb-3">
                         <div className="flex text-yellow-400 mr-2">
                             {[...Array(5)].map((_, i) => (
-                                <Star key={i} size={14} sm:size={16} fill={i < product.rating ? 'currentColor' : 'none'} />
+                               <div key={i} className="size-3.5 sm:size-4 text-yellow-400">
+                                    <Star 
+                                        fill={i < product.rating ? 'currentColor' : 'none'} 
+                                        className="size-full"
+                                    />
+                                </div>                  
                             ))}
                         </div>
                         <span className="text-gray-500 text-xs sm:text-sm">{product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'}</span>
@@ -180,24 +185,28 @@ const ProductsPage = () => {
                                         className="p-1 hover:bg-white rounded-md transition-colors text-gray-600 disabled:opacity-50"
                                         disabled={cartItem.quantity <= 1}
                                     >
-                                        <Minus size={16} sm:size={18} />
+                                        <div className="inline-block size-4 sm:size-[18px]">
+                                            <Minus className="size-full" />
+                                        </div>
                                     </button>
                                     <span className="px-2 sm:px-3 font-bold text-xs sm:text-sm">
                                         {cartItem.quantity}
                                     </span>
-                                    <button
+                                   <button
                                         onClick={() => incrementQuantity(product.id)}
                                         className="p-1 hover:bg-white rounded-md transition-colors text-gray-600"
                                     >
-                                        <Plus size={16} sm:size={18} />
+                                        <Plus className="size-4 sm:size-[18px]" />
                                     </button>
                                 </div>
                                 <button
-                                    onClick={() => removeFromCart(product.id)}
-                                    className="p-1.5 sm:p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
-                                    title="Eliminar del carrito"
+                                onClick={() => removeFromCart(product.id)}
+                                className="p-1.5 sm:p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                                title="Eliminar del carrito"
                                 >
-                                    <Trash2 size={16} sm:size={18} />
+                                    <div className="size-4 sm:size-[18px]">
+                                        <Trash2 className="size-full" />
+                                    </div>
                                 </button>
                             </div>
                         ) : (

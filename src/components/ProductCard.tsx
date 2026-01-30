@@ -29,7 +29,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const displayImage = product.images && product.images.length > 0
     ? `${imagesUrl}${product.images[0].image}`
-    : (product.image?.startsWith('http') ? product.image : '/placeholder-product.png');
+    : (product.image?.startsWith('http') ? product.image : '/placeholder-product.svg');
 
   const basePrice = Number(product.price);
   const discountPercent = product.discount ? Number(product.discount) : 0;
