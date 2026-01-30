@@ -30,6 +30,23 @@ export default (sequelize) => {
       allowNull: true,
       defaultValue: 0,
     },
+    paymentMethodId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'payment_methods',
+        key: 'id'
+      }
+    },
+    shippingMethod: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'standard',
+    },
+    shippingAddress: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

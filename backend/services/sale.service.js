@@ -35,10 +35,18 @@ class SaleService {
         include: [
           { model: models.Product, as: 'product' },
           { model: models.User, as: 'buyer' },
-          { 
-            model: models.Order, 
+          {
+            model: models.Order,
             as: 'order',
-            where: status ? { status } : {} // Aplicar filtro de status a la orden
+            where: status ? { status } : {}, // Aplicar filtro de status a la orden
+            attributes: ['id', 'status', 'shippingCost', 'total', 'paymentMethodId', 'shippingMethod', 'shippingAddress', 'createdAt', 'updatedAt'],
+            include: [
+              {
+                model: models.PaymentMethod,
+                as: 'paymentMethod',
+                attributes: ['id', 'name']
+              }
+            ]
           }
         ],
         order: [['saleDate', 'DESC']]
@@ -67,7 +75,12 @@ class SaleService {
           {
             model: models.Order,
             as: 'order',
-            attributes: ['id', 'status', 'shippingCost', 'total', 'createdAt', 'updatedAt']
+            attributes: ['id', 'status', 'shippingCost', 'total', 'paymentMethodId', 'shippingMethod', 'shippingAddress', 'createdAt', 'updatedAt'],
+            include: [{
+              model: models.PaymentMethod,
+              as: 'paymentMethod',
+              attributes: ['id', 'name']
+            }]
           }
         ]
       });
@@ -118,7 +131,12 @@ class SaleService {
         {
           model: models.Order,
           as: 'order',
-          attributes: ['id', 'status', 'shippingCost', 'total', 'createdAt', 'updatedAt']
+          attributes: ['id', 'status', 'shippingCost', 'total', 'paymentMethodId', 'shippingMethod', 'shippingAddress', 'createdAt', 'updatedAt'],
+          include: [{
+            model: models.PaymentMethod,
+            as: 'paymentMethod',
+            attributes: ['id', 'name']
+          }]
         }]
       });
       return sales;

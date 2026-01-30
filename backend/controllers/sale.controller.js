@@ -166,7 +166,9 @@ const createCheckout = asyncHandler(async (req, res) => {
     paymentMethod,
     referenceNumber,
     shippingCost,
-    freeShipping
+    freeShipping,
+    shippingMethod,
+    shippingAddress
   } = req.body;
 
   // If items is sent as a string (common with FormData), parse it
@@ -208,6 +210,17 @@ const createCheckout = asyncHandler(async (req, res) => {
   // Convert shippingCost to number and handle empty/undefined values
   const calculatedShippingCost = parseFloat(shippingCost) || 0;
 
+  // Get paymentMethodId from paymentMethod name first
+  let paymentMethodId = null;
+  if (paymentMethod) {
+    const paymentMethodObj = await models.PaymentMethod.findOne({
+      where: { name: paymentMethod }
+    });
+    if (paymentMethodObj) {
+      paymentMethodId = paymentMethodObj.id;
+    }
+  }
+  
   // Get all product IDs from items
   const productIds = items.map(item => item.productId);
   
@@ -248,6 +261,7 @@ const createCheckout = asyncHandler(async (req, res) => {
       orderId: null, // Will be set after order creation
       buyerId,
       paymentMethod,
+      paymentMethodId,
       referenceNumber,
       receiptImage,
       productId: item.productId,
@@ -266,7 +280,11 @@ const createCheckout = asyncHandler(async (req, res) => {
     status: 'pending',
     buyerId,
     shippingCost: calculatedShippingCost,
-    total: total // Total including shipping
+    total: total, // Total including shipping
+    paymentMethodId,
+    paymentMethod,
+    shippingMethod: shippingMethod || 'standard', // Guardar el nombre del método de pago en el campo shippingMethod
+    shippingAddress: shippingAddress || '' // Use received shipping address
   });
   
   // Set the orderId for all sales

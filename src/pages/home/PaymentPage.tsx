@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { CreditCard, Smartphone, Hash, Image as ImageIcon, CheckCircle, AlertCircle, ChevronLeft, Mail, Phone } from 'lucide-react';
 import useStore from '../../states/global';
 import { apiUrl, bancos } from '../../utils/utils';
@@ -22,11 +22,13 @@ interface PaymentMethodDB {
 
 const PaymentPage = () => {
   const { notify } = useNotify()
-  // const location = useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
   const { cart, clearCart, user, getCartTotal } = useStore();
   const { freeShippingThreshold, shippingPrice } = useDollarRate();
-  // const accountData = location.state?.accountData; 
+  // const accountData = location.state?.accountData;
+  const shippingOption = location.state?.shippingOption;
+  const selectedAddress = location.state?.selectedAddress;
   
   // Calcular si el envío es gratis
   const cartTotal = getCartTotal();
@@ -123,6 +125,8 @@ const PaymentPage = () => {
       formData.append('referenceNumber', referenceNumber);
       formData.append('shippingCost', shippingCost.toString());
       formData.append('freeShipping', freeShipping.toString());
+      formData.append('shippingMethod', selectedMethod?.name || 'standard');
+      formData.append('shippingAddress', selectedAddress?.address || '');
       if (receiptImage) {
         formData.append('receiptImage', receiptImage);
       }

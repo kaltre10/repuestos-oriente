@@ -85,6 +85,18 @@ models.Order.belongsTo(models.User, {
   as: 'buyer'
 });
 
+// Order belongs to PaymentMethod
+models.Order.belongsTo(models.PaymentMethod, {
+  foreignKey: 'paymentMethodId',
+  as: 'paymentMethod'
+});
+
+// PaymentMethod has many Orders
+models.PaymentMethod.hasMany(models.Order, {
+  foreignKey: 'paymentMethodId',
+  as: 'orders'
+});
+
 // User has many Orders
 models.User.hasMany(models.Order, {
   foreignKey: 'buyerId',

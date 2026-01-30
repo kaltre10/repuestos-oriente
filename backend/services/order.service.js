@@ -46,6 +46,11 @@ class OrderService {
             model: models.User,
             as: 'buyer',
             attributes: ['id', 'name', 'email']
+          },
+          {
+            model: models.PaymentMethod,
+            as: 'paymentMethod',
+            attributes: ['id', 'name']
           }
         ]
       });
@@ -65,6 +70,11 @@ class OrderService {
             model: models.User,
             as: 'buyer',
             attributes: ['id', 'name', 'email']
+          },
+          {
+            model: models.PaymentMethod,
+            as: 'paymentMethod',
+            attributes: ['id', 'name']
           }
         ]
       });
@@ -90,6 +100,11 @@ class OrderService {
             model: models.User,
             as: 'buyer',
             attributes: ['id', 'name', 'email']
+          },
+          {
+            model: models.PaymentMethod,
+            as: 'paymentMethod',
+            attributes: ['id', 'name']
           }
         ]
       });

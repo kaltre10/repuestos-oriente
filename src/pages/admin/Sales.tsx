@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Loader2, ShoppingBag, User, Calendar, Filter, Trash2, ChevronRight, X, CreditCard, Hash, Image as ImageIcon, Mail } from 'lucide-react';
+import { Search, Loader2, ShoppingBag, User, Calendar, Filter, Trash2, ChevronRight, X, CreditCard, Hash, Image as ImageIcon, Mail, Package } from 'lucide-react';
 import { apiUrl, imagesUrl } from '../../utils/utils';
 import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
@@ -41,6 +41,12 @@ interface Sale {
     id: number;
     shippingCost: number;
     total: number;
+    shippingMethod: string;
+    shippingAddress: string;
+    paymentMethod?: {
+      id: number;
+      name: string;
+    };
   };
   // The order status will be inherited from the Order table via buyerId and saleDate
 }
@@ -50,12 +56,21 @@ const Sales = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Helper function to get current date in YYYY-MM-DD format using local time
+  const getCurrentLocalDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   // New Filter States
   const [statusFilter, setStatusFilter] = useState('');
   const [paymentMethodFilter, setPaymentMethodFilter] = useState('');
   const [dateRange, setDateRange] = useState({ 
-    start: new Date().toISOString().split('T')[0], 
-    end: new Date().toISOString().split('T')[0] 
+    start: getCurrentLocalDate(), 
+    end: getCurrentLocalDate() 
   });
   const [showFilters, setShowFilters] = useState(false);
   
@@ -197,7 +212,7 @@ const Sales = () => {
   }, [sales, searchTerm, groupedSales, filteredSales]);
 
   const clearFilters = () => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getCurrentLocalDate();
     setStatusFilter('');
     setPaymentMethodFilter('');
     setDateRange({ start: today, end: today });
@@ -428,7 +443,7 @@ const Sales = () => {
                         </div>
                         <div className="flex items-center text-gray-500 bg-gray-50 px-2 md:px-3 py-1 md:py-1.5 rounded-lg">
                           <CreditCard className="w-3.5 h-3.5 mr-1.5 md:mr-2 text-red-500" />
-                          <span className="font-semibold uppercase">{mainSale.paymentMethod}</span>
+                          <span className="font-semibold uppercase">{mainSale.order?.paymentMethod?.name || mainSale.paymentMethod}</span>
                         </div>
                         {mainSale.referenceNumber && (
                           <div className="flex items-center text-gray-500 bg-gray-50 px-2 md:px-3 py-1 md:py-1.5 rounded-lg">
@@ -610,7 +625,7 @@ const Sales = () => {
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Método de Pago</span>
-                        <span className="font-medium text-gray-900 uppercase">{selectedPurchase.paymentMethod}</span>
+                        <span className="font-medium text-gray-900 uppercase">{selectedPurchase.order?.paymentMethod?.name || selectedPurchase.paymentMethod}</span>
                       </div>
                       {selectedPurchase.referenceNumber && (
                         <div className="flex justify-between text-sm">
@@ -645,6 +660,30 @@ const Sales = () => {
                       </a>
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Shipping Information */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5">
+                  <Package className="w-4 h-4 text-red-500" />
+                  Información de Envío
+                </h3>
+                <div className="bg-white rounded-xl p-4 border border-gray-100">
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Dirección de Envío</span>
+                      <span className="font-medium text-gray-900 max-w-[60%] text-right">{selectedPurchase.order?.shippingAddress || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Método de Envío</span>
+                      <span className="font-medium text-gray-900 uppercase">{selectedPurchase.order?.shippingMethod || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Costo de Envío</span>
+                      <FormattedPrice price={selectedPurchase.order?.shippingCost || 0} />
+                    </div>
+                  </div>
                 </div>
               </div>
               
@@ -694,7 +733,7 @@ const Sales = () => {
                           </div>
                           <div>
                             <p className="text-xs text-gray-500">Método de Pago</p>
-                            <p className="text-sm font-semibold text-gray-900 uppercase">{currentGroup[0].paymentMethod}</p>
+                            <p className="text-sm font-semibold text-gray-900 uppercase">{currentGroup[0].order?.paymentMethod?.name || currentGroup[0].paymentMethod}</p>
                           </div>
                         </div>
                       </div>

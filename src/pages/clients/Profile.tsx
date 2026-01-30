@@ -15,6 +15,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 're
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import useConfirmStore from '../../states/useConfirmStore';
+import type { Map as LeafletMap } from 'leaflet';
 
 const Profile = () => {
   const { user, setUser } = useStore();
@@ -24,6 +25,8 @@ const Profile = () => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+const mapRef = useRef<LeafletMap | null>(null);
 
   // Interfaz para direcciones
   interface Address {
@@ -293,11 +296,13 @@ const Profile = () => {
     };
   }, []);
 
-  // Efecto para depurar los estados
   useEffect(() => {
-    console.log('showResults:', showResults);
-    console.log('searchResults length:', searchResults.length);
-  }, [showResults, searchResults]);
+    if (editingAddress && mapRef.current) {
+    setTimeout(() => {
+      mapRef.current?.invalidateSize();
+    }, 300);
+  }
+  }, [editingAddress]);
 
   // Componente para manejar eventos del mapa
   const MapEvents = () => {
@@ -681,6 +686,7 @@ const Profile = () => {
                         center={location}
                         zoom={13}
                         style={{ height: '100%', width: '100%' }}
+                        ref={mapRef}
                       >
                         <TileLayer
                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

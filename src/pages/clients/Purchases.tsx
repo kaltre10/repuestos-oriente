@@ -36,6 +36,12 @@ interface Sale {
     id: number;
     shippingCost: number;
     total: number;
+    shippingMethod: string;
+    shippingAddress: string;
+    paymentMethod?: {
+      id: number;
+      name: string;
+    };
   };
   // The order status will be inherited from the Order table via buyerId and saleDate
 }
@@ -333,7 +339,7 @@ const Purchases = () => {
                       </div>
                       <div className="flex items-center text-gray-500 bg-gray-50 px-2 md:px-3 py-1 md:py-1.5 rounded-lg">
                         <CreditCard className="w-3.5 h-3.5 mr-1.5 md:mr-2 text-red-500" />
-                        <span className="font-semibold uppercase">{mainPurchase.paymentMethod}</span>
+                        <span className="font-semibold uppercase">{mainPurchase.order?.paymentMethod?.name || mainPurchase.paymentMethod}</span>
                       </div>
                     </div>
 
@@ -473,7 +479,7 @@ const Purchases = () => {
                 })()}
               </div>
 
-              {/* Payment Info & Receipt Grid */}
+              {/* Payment Info, Shipping & Receipt Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <h3 className="text-base md:text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -483,7 +489,7 @@ const Purchases = () => {
                   <div className="bg-gray-50 rounded-xl md:rounded-2xl p-4 space-y-3">
                     <div className="flex justify-between items-center text-xs md:text-sm">
                       <span className="text-gray-500 font-medium">Método:</span>
-                      <span className="font-bold text-gray-900 uppercase">{selectedPurchase.paymentMethod}</span>
+                      <span className="font-bold text-gray-900 uppercase">{selectedPurchase.order?.paymentMethod?.name || selectedPurchase.paymentMethod}</span>
                     </div>
                     {selectedPurchase.referenceNumber && (
                       <div className="flex justify-between items-center text-xs md:text-sm">
@@ -499,6 +505,27 @@ const Purchases = () => {
                       <span className={`px-2 py-0.5 rounded-full text-[9px] md:text-2xs font-black uppercase border ${getStatusColor(selectedPurchase?.status || "")}`}>
                         {translateStatus(selectedPurchase?.status || "")}
                       </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-base md:text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <Package className="w-4 h-4 md:w-5 md:h-5 text-red-500" />
+                    Información de Envío
+                  </h3>
+                  <div className="bg-gray-50 rounded-xl md:rounded-2xl p-4 space-y-3">
+                    <div className="flex justify-between items-start text-xs md:text-sm">
+                      <span className="text-gray-500 font-medium">Dirección:</span>
+                      <span className="font-bold text-gray-900 max-w-[60%] text-right">{selectedPurchase.order?.shippingAddress || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs md:text-sm">
+                      <span className="text-gray-500 font-medium">Método:</span>
+                      <span className="font-bold text-gray-900 uppercase">{selectedPurchase.order?.shippingMethod || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs md:text-sm">
+                      <span className="text-gray-500 font-medium">Costo:</span>
+                      <FormattedPrice price={selectedPurchase.order?.shippingCost || 0} />
                     </div>
                   </div>
                 </div>
