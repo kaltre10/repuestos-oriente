@@ -183,18 +183,21 @@ const BestSellers = () => {
   }
 
   return (
-    <div className="bg-gray-100 py-16">
+    <div className="bg-white py-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-gray-800 text-center mb-8">MÁS VENDIDOS</h2>
+        <div className="flex flex-col items-center justify-center mb-12">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-3">MÁS VENDIDOS</h2>
+          <div className="w-20 h-1 bg-red-500 rounded-full"></div>
+        </div>
 
         {/* Sorting and Grid Controls */}
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-10 p-4 bg-gray-50 rounded-xl shadow-sm">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-700">Ordenar por:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'popular' | 'price-low' | 'price-high')}
-              className="px-3 cursor-pointer py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all bg-white shadow-sm"
             >
               <option value="popular">Más popular</option>
               <option value="price-low">Precio menor</option>
@@ -204,33 +207,33 @@ const BestSellers = () => {
 
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-700">Vista:</span>
-            <div className="flex gap-1">
+            <div className="flex gap-2 bg-white p-1 rounded-lg shadow-sm">
               <button
                 onClick={() => handleGridLayoutChange('1')}
-                className={`cursor-pointer px-3 py-1 border rounded-md text-sm transition-colors ${gridLayout === '1'
-                    ? 'bg-red-500 text-white border-red-500'
-                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                className={`cursor-pointer px-3 py-2 rounded-md text-sm transition-all duration-200 ${gridLayout === '1'
+                    ? 'bg-red-500 text-white shadow-md'
+                    : 'text-gray-700 hover:bg-gray-100'
                   }`}
               >
-                <List size={16} />
+                <List size={18} />
               </button>
               <button
                 onClick={() => handleGridLayoutChange('3')}
-                className={`cursor-pointer px-3 py-1 border rounded-md text-sm transition-colors ${gridLayout === '3'
-                    ? 'bg-red-500 text-white border-red-500'
-                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                className={`cursor-pointer px-3 py-2 rounded-md text-sm transition-all duration-200 ${gridLayout === '3'
+                    ? 'bg-red-500 text-white shadow-md'
+                    : 'text-gray-700 hover:bg-gray-100'
                   }`}
               >
-                <Grid2X2 size={16} />
+                <Grid2X2 size={18} />
               </button>
               <button
                 onClick={() => handleGridLayoutChange('4')}
-                className={`cursor-pointer px-3 py-1 border rounded-md text-sm transition-colors ${gridLayout === '4'
-                    ? 'bg-red-500 text-white border-red-500'
-                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                className={`cursor-pointer px-3 py-2 rounded-md text-sm transition-all duration-200 ${gridLayout === '4'
+                    ? 'bg-red-500 text-white shadow-md'
+                    : 'text-gray-700 hover:bg-gray-100'
                   }`}
               >
-                <Grid3X3 size={16} />
+                <Grid3X3 size={18} />
               </button>
             </div>
           </div>
@@ -241,7 +244,7 @@ const BestSellers = () => {
             {filteredProducts.map(product => renderListItem(product))}
           </div>
         ) : (
-          <div className={`grid ${getGridClasses()} gap-8`}>
+          <div className={`grid ${getGridClasses()} gap-6`}>
             {filteredProducts.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}

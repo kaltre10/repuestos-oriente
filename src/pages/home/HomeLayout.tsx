@@ -1,5 +1,6 @@
 import Footer from "../../components/Footer";
-import Header from "../../components/Header";
+
+import HeaderNew from "../../components/HeaderNew";
 import { Outlet } from "react-router-dom";
 import MobileBottomNav from '../../components/MobileBottomNav';
 
@@ -7,7 +8,7 @@ const HomeLayout = () => {
   return (
     <div className="">
       <MobileBottomNav />
-      <Header />
+      <HeaderNew />
       <Outlet />
       <Footer />
     </div>

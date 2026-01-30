@@ -20,7 +20,7 @@ const HomeButtonInfo = () => {
                         </div>
                         <div>
                             <h3 className="font-bold text-red-500 text-sm md:text-base">PAGO SEGURO</h3>
-                            <p className="text-xs md:text-sm">Pago Movil, Transferenia, Binance y Visa</p>
+                            <p className="text-xs md:text-sm">Transferencia, Pago Movil, Binance y Zelle</p>
                         </div>
                     </div>
                     <div className="flex items-center space-x-4">

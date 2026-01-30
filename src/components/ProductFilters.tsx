@@ -64,7 +64,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   };
 
   return (
-    <div className="w-80 bg-white p-6 rounded-lg shadow-md h-fit">
+    <div className="w-80 md:w-60 bg-white p-6 rounded-lg shadow-md h-fit">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-800">Filtros</h3>
         <button

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+// import HeaderNew from '../../components/HeaderNew';
 import Hero from '../../components/Hero';
 import BestSellers from '../../components/BestSellers';
 import CartModal from '../../components/CartModal';

@@ -130,8 +130,8 @@ const ProductsPage = () => {
         const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
 
         return (
-            <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md flex">
-                <div onClick={() => navigate(`/producto/${product.id}`)} className="cursor-pointer relative w-48 h-48 flex-shrink-0">
+            <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md flex flex-col sm:flex-row">
+                <div onClick={() => navigate(`/producto/${product.id}`)} className="cursor-pointer relative w-full sm:w-40 h-40 sm:h-48 flex-shrink-0">
                     <img
                         src={product.image}
                         alt={product.name}
@@ -139,71 +139,71 @@ const ProductsPage = () => {
                     />
                     <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
                 </div>
-                <div className="flex-1 p-6 relative">
-                    <p className="text-gray-500 text-sm mb-1">{product.category}</p>
-                    <h3 onClick={() => navigate(`/producto/${product.id}`)} className="cursor-pointer hover:underline font-semibold text-lg mb-2 text-gray-800">{product.name}</h3>
+                <div className="flex-1 p-4 sm:p-6 relative">
+                    <p className="text-gray-500 text-xs sm:text-sm mb-1">{product.category}</p>
+                    <h3 onClick={() => navigate(`/producto/${product.id}`)} className="cursor-pointer hover:underline font-semibold text-base sm:text-lg mb-2 text-gray-800 line-clamp-2">{product.name}</h3>
                     <div className="flex items-center mb-3">
                         <div className="flex text-yellow-400 mr-2">
                             {[...Array(5)].map((_, i) => (
-                                <Star key={i} size={16} fill={i < product.rating ? 'currentColor' : 'none'} />
+                                <Star key={i} size={14} sm:size={16} fill={i < product.rating ? 'currentColor' : 'none'} />
                             ))}
                         </div>
-                        <span className="text-gray-500 text-sm">{product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'}</span>
+                        <span className="text-gray-500 text-xs sm:text-sm">{product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'}</span>
                     </div>
 
-                    {/* Price in top-right corner */}
-                    <div className="absolute top-6 right-6 flex flex-col items-end">
+                    {/* Price */}
+                    <div className="mb-4 sm:mb-0">
                         {discountPercent > 0 ? (
                             <>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm text-gray-400 line-through">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-xs sm:text-sm text-gray-400 line-through">
                                         <FormattedPrice price={basePrice} />
                                     </span>
                                     <span className="text-red-600 text-xs font-bold bg-red-50 px-1.5 py-0.5 rounded">
                                         {discountPercent}% OFF
                                     </span>
                                 </div>
-                                <FormattedPrice price={discountedPrice} className="text-red-500 font-bold text-2xl" />
+                                <FormattedPrice price={discountedPrice} className="text-red-500 font-bold text-xl sm:text-2xl" />
                             </>
                         ) : (
-                            <FormattedPrice price={basePrice} className="text-red-500 font-bold text-xl" />
+                            <FormattedPrice price={basePrice} className="text-red-500 font-bold text-lg sm:text-xl" />
                         )}
                     </div>
 
-                    {/* Actions in bottom-right corner */}
-                    <div className="absolute bottom-6 right-6">
+                    {/* Actions */}
+                    <div className="mt-4 sm:mt-0 sm:absolute sm:bottom-4 sm:right-4">
                         {isInCart ? (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1 sm:gap-2">
                                 <div className="flex items-center bg-gray-100 rounded-lg p-1">
                                     <button
                                         onClick={() => decrementQuantity(product.id)}
                                         className="p-1 hover:bg-white rounded-md transition-colors text-gray-600 disabled:opacity-50"
                                         disabled={cartItem.quantity <= 1}
                                     >
-                                        <Minus size={18} />
+                                        <Minus size={16} sm:size={18} />
                                     </button>
-                                    <span className="px-3 font-bold text-sm">
+                                    <span className="px-2 sm:px-3 font-bold text-xs sm:text-sm">
                                         {cartItem.quantity}
                                     </span>
                                     <button
                                         onClick={() => incrementQuantity(product.id)}
                                         className="p-1 hover:bg-white rounded-md transition-colors text-gray-600"
                                     >
-                                        <Plus size={18} />
+                                        <Plus size={16} sm:size={18} />
                                     </button>
                                 </div>
                                 <button
                                     onClick={() => removeFromCart(product.id)}
-                                    className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                                    className="p-1.5 sm:p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
                                     title="Eliminar del carrito"
                                 >
-                                    <Trash2 size={18} />
+                                    <Trash2 size={16} sm:size={18} />
                                 </button>
                             </div>
                         ) : (
                             <button
                                 onClick={() => handleAddToCart(product)}
-                                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded transition-colors cursor-pointer"
+                                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded transition-colors cursor-pointer text-sm"
                             >
                                 Agregar al carrito
                             </button>
@@ -217,13 +217,13 @@ const ProductsPage = () => {
     const getGridClasses = () => {
         switch (gridLayout) {
             case '1':
-                return 'grid-cols-1';
+                return 'grid-cols-1 gap-1';
             case '3':
-                return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+                return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-1';
             case '4':
-                return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
+                return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2';
             default:
-                return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
+                return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2';
         }
     };
 
@@ -240,11 +240,11 @@ const ProductsPage = () => {
         <>
             <CartModal />
             <div className="min-h-screen bg-gray-50">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="container mx-auto px-4 sm:px-1 lg:px-8 py-8">
                     <h1 className="text-4xl font-bold text-gray-800 text-center mb-8">NUESTROS PRODUCTOS</h1>
 
                     {/* Filters Toggle Button - Only visible on mobile */}
-                    <div className="mb-6 lg:hidden">
+                    <div className="mb-6 md:hidden">
                         <button
                             onClick={() => setFiltersExpanded(!filtersExpanded)}
                             className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-shadow"
@@ -258,10 +258,12 @@ const ProductsPage = () => {
 
 
                     {/* Main content */}
-                    <div className="grid grid-cols-12 gap-4">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-12 md:flex">
 
-                        <div className={'block md:hidden'}>
-                            <div className={`${filtersExpanded ? 'block' : 'hidden'} lg:block w-full mb-8`}>
+                        {/* Filters Section */}
+                        {/* Mobile filters - toggleable */}
+                        <div className="md:hidden">
+                            <div className={`${filtersExpanded ? 'block' : 'hidden'} w-full`}>
                                 <ProductFilters
                                     selectedYear={selectedYear}
                                     selectedBrand={selectedBrand}
@@ -275,32 +277,29 @@ const ProductsPage = () => {
                                     onSubcategoryChange={setSelectedSubcategory}
                                     onClearFilters={clearFilters}
                                 />
-
                             </div>
                         </div>
 
-                        <div className={'hidden md:block col-span-4'}>
-                            <div className={`${filtersExpanded ? 'block' : 'hidden'} lg:block w-full mb-8`}>
-                                <ProductFilters
-                                    selectedYear={selectedYear}
-                                    selectedBrand={selectedBrand}
-                                    selectedModel={selectedModel}
-                                    selectedCategory={selectedCategory}
-                                    selectedSubcategory={selectedSubcategory}
-                                    onYearChange={setSelectedYear}
-                                    onBrandChange={setSelectedBrand}
-                                    onModelChange={setSelectedModel}
-                                    onCategoryChange={setSelectedCategory}
-                                    onSubcategoryChange={setSelectedSubcategory}
-                                    onClearFilters={clearFilters}
-                                />
-
-                            </div>
+                        {/* Desktop filters - always visible */}
+                        <div className="hidden md:block md:col-span-3 lg:col-span-3">
+                            <ProductFilters
+                                selectedYear={selectedYear}
+                                selectedBrand={selectedBrand}
+                                selectedModel={selectedModel}
+                                selectedCategory={selectedCategory}
+                                selectedSubcategory={selectedSubcategory}
+                                onYearChange={setSelectedYear}
+                                onBrandChange={setSelectedBrand}
+                                onModelChange={setSelectedModel}
+                                onCategoryChange={setSelectedCategory}
+                                onSubcategoryChange={setSelectedSubcategory}
+                                onClearFilters={clearFilters}
+                            />
                         </div>
 
                         {/* Sorting and Grid Controls */}
-                        <div className="col-span-12 md:col-span-8">
-                            <div className='flex items-center justify-between mb-6 p-4'>
+                        <div className="col-span-12 md:col-span-9 lg:col-span-9 md:w-full">
+                            <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 p-4 bg-white rounded-lg shadow-sm gap-4'>
 
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm font-medium text-gray-700">Ordenar por:</span>
@@ -370,7 +369,7 @@ const ProductsPage = () => {
                                     {filteredProducts.map(product => renderListItem(product))}
                                 </div>
                             ) : (
-                                <div className={`grid ${getGridClasses()} gap-8`}>
+                                <div className={`grid ${getGridClasses()}`}>
                                     {filteredProducts.map(product => (
                                         <ProductCard key={product.id} product={product} />
                                     ))}
