@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { ShoppingBag, Package, Calendar, Clock, ChevronRight, AlertCircle, ExternalLink, X, CreditCard, Hash, Image as ImageIcon, Upload, CheckCircle2, UserIcon } from 'lucide-react';
+import { ShoppingBag, Package, Calendar, Clock, ChevronRight, AlertCircle, ExternalLink, X, CreditCard, Hash, Image as ImageIcon, Upload, CheckCircle2, Star, UserIcon } from 'lucide-react';
 import useStore from '../../states/global';
 import { apiUrl, imagesUrl } from '../../utils/utils';
 import request from '../../utils/request';
@@ -206,7 +206,7 @@ const Purchases = () => {
 
   if (error) {
     return (
-      <div className="p-6 bg-white rounded-2xl shadow-sm p-12 border border-gray-100 text-center">
+      <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 text-center">
         <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
           <AlertCircle className="w-10 h-10 text-red-600" />
         </div>
@@ -224,7 +224,7 @@ const Purchases = () => {
 
   if (purchases.length === 0) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-12 border border-gray-100 text-center p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 text-center p-6">
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
           <ShoppingBag className="w-10 h-10 text-gray-300" />
         </div>
@@ -252,8 +252,8 @@ const Purchases = () => {
             <button
               onClick={() => setCurrency('USD')}
               className={`px-3 py-1 rounded-full text-xs font-bold transition-all duration-200 ${currency === 'USD'
-                  ? 'bg-red-500 text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-red-500 text-white shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
                 }`}
             >
               USD
@@ -261,8 +261,8 @@ const Purchases = () => {
             <button
               onClick={() => setCurrency('BS')}
               className={`px-3 py-1 rounded-full text-xs font-bold transition-all duration-200 ${currency === 'BS'
-                  ? 'bg-red-500 text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-red-500 text-white shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
                 }`}
             >
               BS
@@ -321,14 +321,17 @@ const Purchases = () => {
                             ? `Pedido de ${group.length} productos`
                             : mainPurchase.product.name}
                         </h3>
+                        <div className='bg-amber-200 p-4'>
+
+                        </div>
                         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest truncate">
                           {group.length > 1
                             ? `${group.reduce((sum, item) => sum + item.quantity, 0)} artículos en total`
                             : `Ref: ${mainPurchase.product.partNumber || 'N/A'}`}
                         </p>
                       </div>
-                      <div className={`self-start sm:self-center px-3 py-1 rounded-full text-2xs md:text-xs font-black border uppercase tracking-wider ${getStatusColor(mainPurchase?.status || "")}`}>
-                        {translateStatus(mainPurchase?.status || "")}
+                      <div className={`self-start sm:self-center px-3 py-1 rounded-full md:text-xs font-black border uppercase tracking-wider ${getStatusColor(mainPurchase.status || 'Desconocido')}`}>
+                        {translateStatus(mainPurchase.status || 'Desconocido')}
                       </div>
                     </div>
 
@@ -351,6 +354,13 @@ const Purchases = () => {
                           <span className="font-semibold">{mainPurchase.order.orderNumber}</span>
                         </div>
                       )}
+                    </div>
+                    <span className='text-red-400'>{mainPurchase.rating === null && "No as calificado esta compra"} </span>
+               
+                    <div className='flex text-amber-500'>
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} size={16} fill={mainPurchase.rating !== null && i > mainPurchase.rating ? 'currentColor' : 'none'} />
+                      ))}
                     </div>
 
                     <div className="pt-2 flex items-center justify-between border-t border-gray-50">
@@ -483,6 +493,7 @@ const Purchases = () => {
                             />
                           </div>
                         </div>
+
                       </div>
                     </>
                   );
@@ -537,8 +548,8 @@ const Purchases = () => {
                     )}
                     <div className="flex justify-between items-center text-xs md:text-sm">
                       <span className="text-gray-500 font-medium">Estado:</span>
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] md:text-2xs font-black uppercase border ${getStatusColor(selectedPurchase?.status || "")}`}>
-                        {translateStatus(selectedPurchase?.status || "")}
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase border ${getStatusColor(selectedPurchase.status || 'Desconocido')}`}>
+                        {translateStatus(selectedPurchase.status || 'Desconocido')}
                       </span>
                     </div>
                   </div>

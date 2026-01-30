@@ -34,6 +34,7 @@ const CheckoutPage = () => {
   
   // Inicializar desde localStorage si existe, otherwise usar datos del usuario
   const [accountData, setAccountData] = useState(() => {
+    
     const savedData = localStorage.getItem('checkoutAccountData');
     if (savedData) {
       return JSON.parse(savedData);
