@@ -8,6 +8,12 @@
   }
 }
 
+@layer utilities {
+    .text-2xs {
+        font-size: 10px;
+    }
+}
+
 :root {
     --gray: rgb(153,153,153);
     --red: rgb(206,42,40);

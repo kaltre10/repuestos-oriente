@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { Search, Loader2, ShoppingBag, User, Calendar, ExternalLink, CheckCircle, Clock, XCircle, Filter, Trash2, ChevronRight, AlertCircle, X, CreditCard, Hash, Image as ImageIcon, Upload, CheckCircle2, Mail } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Search, Loader2, ShoppingBag, User, Calendar, Filter, Trash2, ChevronRight, X, CreditCard, Hash, Image as ImageIcon, Mail } from 'lucide-react';
 import { apiUrl, imagesUrl } from '../../utils/utils';
 import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
@@ -67,7 +67,7 @@ const Sales = () => {
 
   useEffect(() => {
     fetchSales();
-  }, [statusFilter, paymentMethodFilter, dateRange]);
+  }, [statusFilter, paymentMethodFilter, dateRange]); // eslint-disable-line
 
   const fetchSales = async () => {
     try {
@@ -214,18 +214,18 @@ const Sales = () => {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><CheckCircle size={14} /> Completada</span>;
-      case 'pending':
-        return <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><Clock size={14} /> Pendiente</span>;
-      case 'cancelled':
-        return <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><XCircle size={14} /> Cancelada</span>;
-      default:
-        return <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold">{status}</span>;
-    }
-  };
+  // const getStatusBadge = (status: string) => { 
+  //   switch (status.toLowerCase()) {
+  //     case 'completed':
+  //       return <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><CheckCircle size={14} /> Completada</span>;
+  //     case 'pending':
+  //       return <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><Clock size={14} /> Pendiente</span>;
+  //     case 'cancelled':
+  //       return <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><XCircle size={14} /> Cancelada</span>;
+  //     default:
+  //       return <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold">{status}</span>;
+  //   }
+  // };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -411,8 +411,8 @@ const Sales = () => {
                             <span>{totalItems} artículos en total</span>
                           </div>
                         </div>
-                        <div className={`self-start sm:self-center px-3 py-1 rounded-full text-[10px] md:text-xs font-black border uppercase tracking-wider ${getStatusColor(mainSale.status)}`}>
-                          {translateStatus(mainSale.status)}
+                        <div className={`self-start sm:self-center px-3 py-1 rounded-full text-2xs md:text-xs font-black border uppercase tracking-wider ${getStatusColor(mainSale?.status || "")}`}>
+                          {translateStatus(mainSale?.status || "")} 
                         </div>
                       </div>
                       
@@ -480,7 +480,7 @@ const Sales = () => {
       
       {/* Detail Modal */}
       {isModalOpen && selectedPurchase && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div
             className="bg-white w-full max-w-2xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[95vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
@@ -517,12 +517,11 @@ const Sales = () => {
                 const handleUpdateOrderStatus = async (newStatus: string) => {
                   try {
                     // Create order data based on the group
-                    const orderData = {
-                      buyerId: currentGroup[0].buyerId,
-                      status: newStatus,
-                      // The backend should calculate shipping cost and total amount
-                      // We're only sending the status update here
-                    };
+                    // const orderData = { 
+                    //   buyerId: currentGroup[0].buyerId,
+                    //   status: newStatus,
+                    
+                    // };
                     
                     // In the future, when Order table is implemented, use this endpoint instead:
                     // await request.put(`${apiUrl}/orders/${orderId}`, { status: newStatus });
@@ -548,7 +547,7 @@ const Sales = () => {
                         <h3 className="text-sm font-semibold text-gray-700">Estado del Pedido</h3>
                         <p className="text-xs text-gray-500 mt-0.5">
                           {(() => {
-                            switch (orderStatus.toLowerCase()) {
+                            switch (orderStatus?.toLowerCase()) { 
                               case 'completed': return 'El pedido ha sido completado';
                               case 'pending': return 'El pedido está pendiente de procesamiento';
                               case 'cancelled': return 'El pedido ha sido cancelado';

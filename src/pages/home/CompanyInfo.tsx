@@ -1,6 +1,6 @@
 // import React from 'react';
 
-import { Building2, Target, Users, MapPin, Newspaper } from 'lucide-react';
+import { Building2, Target, Users, MapPin } from 'lucide-react';
 import { socials } from '../../utils/utils';
 const CompanyInfo = () => {
   const locations = [

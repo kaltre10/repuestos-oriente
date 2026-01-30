@@ -7,7 +7,7 @@ import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
 import { useDollarRate } from '../../hooks/useDollarRate';
-import { useLocation } from 'react-router-dom';
+// import { useLocation } from 'react-router-dom';
 
 interface PaymentMethodDB {
   id: number;
@@ -22,11 +22,11 @@ interface PaymentMethodDB {
 
 const PaymentPage = () => {
   const { notify } = useNotify()
-  const location = useLocation();
+  // const location = useLocation();
   const navigate = useNavigate();
   const { cart, clearCart, user, getCartTotal } = useStore();
   const { freeShippingThreshold, shippingPrice } = useDollarRate();
-  const accountData = location.state?.accountData;
+  // const accountData = location.state?.accountData; 
   
   // Calcular si el envío es gratis
   const cartTotal = getCartTotal();

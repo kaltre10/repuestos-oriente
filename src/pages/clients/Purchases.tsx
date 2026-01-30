@@ -271,7 +271,7 @@ const Purchases = () => {
           // Use the pre-calculated total from the Order table
           const totalAmount = mainPurchase.order?.total || group.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
           // Get shipping cost from the order if available, otherwise assume 0
-          const shippingCost = mainPurchase.order?.shippingCost || 0;
+          // const shippingCost = mainPurchase.order?.shippingCost || 0;
 
           return (
             <div
@@ -317,8 +317,8 @@ const Purchases = () => {
                             : `Ref: ${mainPurchase.product.partNumber || 'N/A'}`}
                         </p>
                       </div>
-                      <div className={`self-start sm:self-center px-3 py-1 rounded-full text-[10px] md:text-xs font-black border uppercase tracking-wider ${getStatusColor(mainPurchase.status)}`}>
-                        {translateStatus(mainPurchase.status)}
+                      <div className={`self-start sm:self-center px-3 py-1 rounded-full text-2xs md:text-xs font-black border uppercase tracking-wider ${getStatusColor(mainPurchase?.status || "")}`}>
+                        {translateStatus(mainPurchase?.status || "")}
                       </div>
                     </div>
 
@@ -404,9 +404,9 @@ const Purchases = () => {
                       <div className="space-y-3">
                         {currentGroup.map((item) => {
                           // Calculate item discount details
-                          const itemOriginalSubtotal = item.originalPrice * item.quantity;
-                          const itemDiscountAmount = (item.originalPrice * item.discount / 100) * item.quantity;
-                          const itemFinalSubtotal = item.unitPrice * item.quantity;
+                          // const itemOriginalSubtotal = item.originalPrice * item.quantity;
+                          // const itemDiscountAmount = (item.originalPrice * item.discount / 100) * item.quantity;
+                          // const itemFinalSubtotal = item.unitPrice * item.quantity;
                           
                           return (
                             <div key={item.id} className="flex items-center gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl border border-gray-100 bg-white">
@@ -496,8 +496,8 @@ const Purchases = () => {
                     )}
                     <div className="flex justify-between items-center text-xs md:text-sm">
                       <span className="text-gray-500 font-medium">Estado:</span>
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-black uppercase border ${getStatusColor(selectedPurchase.status)}`}>
-                        {translateStatus(selectedPurchase.status)}
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] md:text-2xs font-black uppercase border ${getStatusColor(selectedPurchase?.status || "")}`}>
+                        {translateStatus(selectedPurchase?.status || "")}
                       </span>
                     </div>
                   </div>
