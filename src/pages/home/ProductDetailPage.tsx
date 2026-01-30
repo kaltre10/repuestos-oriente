@@ -10,6 +10,7 @@ import useStore from '../../states/global';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
 import { useDollarRate } from '../../hooks/useDollarRate';
+import Rating from '../../components/Rating';
 
 const ProductDetailPage = () => {
   const { notify } = useNotify()
@@ -43,7 +44,7 @@ const ProductDetailPage = () => {
     category: (productFromDB as any).categories,
     discount: (productFromDB as any).discount || 0,
     originalPrice: Number(productFromDB.price),
-    price: (productFromDB as any).discount > 0 
+    price: (productFromDB as any).discount > 0
       ? Number(productFromDB.price) * (1 - (Number(productFromDB.discount) / 100))
       : Number(productFromDB.price)
   } : null;
@@ -125,6 +126,7 @@ const ProductDetailPage = () => {
     for (let i = 0; i < quantity; i++) {
       addToCart(product as any);
     }
+    notify.success(`${product.name} agregado al carrito`);
   };
 
   const isInCart = cart.some(item => item.id === product.id);
@@ -207,33 +209,29 @@ const ProductDetailPage = () => {
                     </p>
                   </div>
                 )}
+                
                 {/* Rating */}
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={20} fill={i < product.rating ? 'currentColor' : 'none'} />
-                    ))}
-                  </div>
-
-                  <span className="text-gray-600">({product.reviews} reseñas)</span>
+                <div className="mb-3">
+                  <Rating hover={false} action={() => { }} stars={5} />
+                  <span className="text-gray-400">({product.reviews} reseñas)</span>
                 </div>
 
                 {/* Price */}
                 <div className="mb-2">
-                    {product.discount > 0 && (
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-base text-gray-400 line-through">
-                          <FormattedPrice price={product.originalPrice} />
-                        </span>
-                        <span className="text-xl font-bold text-red-600">
-                          {product.discount}% OFF
-                        </span>
-                      </div>
-                    )}
-                    <div className="text-5xl font-extrabold text-red-600">
-                      <FormattedPrice price={product.price} />
+                  {product.discount > 0 && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-base text-gray-400 line-through">
+                        <FormattedPrice price={product.originalPrice} />
+                      </span>
+                      <span className="text-xl font-bold text-red-600">
+                        {product.discount}% OFF
+                      </span>
                     </div>
+                  )}
+                  <div className="text-5xl font-extrabold text-red-600">
+                    <FormattedPrice price={product.price} />
                   </div>
+                </div>
               </div>
               {/* Description */}
               {product?.description &&

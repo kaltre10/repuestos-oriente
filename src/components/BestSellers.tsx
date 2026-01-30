@@ -7,8 +7,10 @@ import { imagesUrl } from '../utils/utils';
 import ProductCard from './ProductCard';
 import useStore from '../states/global';
 import FormattedPrice from './FormattedPrice';
+import useNotify from '../hooks/useNotify';
 
 const BestSellers = () => {
+  const { notify } = useNotify();
   const navigate = useNavigate();
   const { products, loading } = useProducts();
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
@@ -76,6 +78,7 @@ const BestSellers = () => {
       const basePrice = Number(product.price);
       const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
       addToCart({ ...product, price: discountedPrice });
+      notify.success(`${product.name} agregado al carrito`);
     }
   };
 

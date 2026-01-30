@@ -1,5 +1,7 @@
 import { Op } from 'sequelize';
 import models from '../models/index.js';
+import imageService from './image.service.js';
+
 const { Sale } = models;
 
 class SaleService {
@@ -33,7 +35,11 @@ class SaleService {
       const sales = await Sale.findAll({
         where,
         include: [
-          { model: models.Product, as: 'product' },
+          {
+            model: models.Product,
+            as: 'product',
+            include: [{ model: models.ProductImage, as: 'images', attributes: ['image'] }]
+          },
           { model: models.User, as: 'buyer' },
           { 
             model: models.Order, 
@@ -43,8 +49,7 @@ class SaleService {
         ],
         order: [['saleDate', 'DESC']]
       });
-      
-     
+
       if (sales.length > 0) {
         console.log('Primera venta encontrada:', JSON.stringify(sales[0], null, 2));
       }
@@ -62,7 +67,8 @@ class SaleService {
           {
             model: models.Product,
             as: 'product',
-            attributes: ['id', 'name', 'price', 'partNumber', 'images']
+            attributes: ['id', 'name', 'price', 'partNumber'],
+            include: [{ model: models.ProductImage, as: 'images', attributes: ['image'] }]
           },
           {
             model: models.Order,

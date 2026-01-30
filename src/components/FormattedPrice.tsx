@@ -11,7 +11,7 @@ const FormattedPrice: React.FC<FormattedPriceProps> = ({ price, className = "" }
   const { currency } = useStore();
   const { dollarRate } = useDollarRate();
 
-  console.log("FormattedPrice - currency:", currency, "dollarRate:", dollarRate);
+  /* console.log("FormattedPrice - currency:", currency, "dollarRate:", dollarRate); */
   const formattedPrice = React.useMemo(() => {
     const numericPrice = Number(price);
     const numericRate = Number(dollarRate);

@@ -5,6 +5,7 @@ import { apiUrl, imagesUrl } from '../../utils/utils';
 import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
+import Rating from '../../components/Rating';
 
 // Sale interface updated for the new Order table structure
 // The status field is now in the Order table, not in the Sale table
@@ -53,6 +54,7 @@ const Purchases = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+
   // Group purchases by buyerId and saleDate to match orders from the new Order table
   // Each group represents an order with multiple products
   const groupedPurchases = useMemo(() => {
@@ -94,6 +96,19 @@ const Purchases = () => {
       setError('Error de conexión al cargar las compras');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const sendRating = async ({ item, i }: { item: Sale, i: number }) => {
+    try {
+      await request.put(`${apiUrl}/sales/${item.id}`, {
+        rating: i,
+      });
+      notify.success('Reseña enviada con éxito');
+      await fetchPurchases(); // Refresh list
+    } catch (err) {
+      console.error('Error sending rating:', err);
+      notify.error('Error al enviar la reseña');
     }
   };
 
@@ -267,11 +282,11 @@ const Purchases = () => {
       <div className="grid gap-4 md:gap-6">
         {groupedPurchases.map((group, index) => {
           const mainPurchase = group[0];
-         
+
           // Use the pre-calculated total from the Order table
           const totalAmount = mainPurchase.order?.total || group.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
           // Get shipping cost from the order if available, otherwise assume 0
-          const shippingCost = mainPurchase.order?.shippingCost || 0;
+          /* const shippingCost = mainPurchase.order?.shippingCost || 0; */
 
           return (
             <div
@@ -311,9 +326,6 @@ const Purchases = () => {
                             ? `Pedido de ${group.length} productos`
                             : mainPurchase.product.name}
                         </h3>
-                        <div className='bg-amber-200 p-4'>
-
-                        </div>
                         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest truncate">
                           {group.length > 1
                             ? `${group.reduce((sum, item) => sum + item.quantity, 0)} artículos en total`
@@ -339,13 +351,13 @@ const Purchases = () => {
                         <span className="font-semibold uppercase">{mainPurchase.paymentMethod}</span>
                       </div>
                     </div>
-                    <span className='text-red-400'>{mainPurchase.rating === null && "No as calificado esta compra"} </span>
-               
+                    {/* <span className='text-red-400'>{mainPurchase.rating === null && "No as calificado esta compra"} </span>
+
                     <div className='flex text-amber-500'>
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} size={16} fill={mainPurchase.rating !== null && i > mainPurchase.rating ? 'currentColor' : 'none'} />
                       ))}
-                    </div>
+                    </div> */}
 
                     <div className="pt-2 flex items-center justify-between border-t border-gray-50">
                       <div className="flex items-baseline gap-1.5">
@@ -390,8 +402,8 @@ const Purchases = () => {
                 <X className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </div>
-
             <div className="overflow-y-auto flex-1 p-4 md:p-6 space-y-6 md:space-y-8">
+
               {/* Products List */}
               <div className="space-y-4">
                 <h3 className="text-base md:text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -403,7 +415,7 @@ const Purchases = () => {
                     g[0].buyerId === selectedPurchase.buyerId &&
                     new Date(g[0].saleDate).getTime() === new Date(selectedPurchase.saleDate).getTime()
                   ) || [];
-                  
+
                   // Use pre-calculated totals from the Order table if available
                   const shippingCost = selectedPurchase.order?.shippingCost || 0;
                   const subtotal = currentGroup.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
@@ -414,10 +426,10 @@ const Purchases = () => {
                       <div className="space-y-3">
                         {currentGroup.map((item) => {
                           // Calculate item discount details
-                          const itemOriginalSubtotal = item.originalPrice * item.quantity;
-                          const itemDiscountAmount = (item.originalPrice * item.discount / 100) * item.quantity;
-                          const itemFinalSubtotal = item.unitPrice * item.quantity;
-                          
+                          /*  const itemOriginalSubtotal = item.originalPrice * item.quantity;
+                           const itemDiscountAmount = (item.originalPrice * item.discount / 100) * item.quantity;
+                           const itemFinalSubtotal = item.unitPrice * item.quantity; */
+
                           return (
                             <div key={item.id} className="flex items-center gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl border border-gray-100 bg-white">
                               <img
@@ -428,22 +440,28 @@ const Purchases = () => {
                                 className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg md:rounded-xl"
                               />
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-bold text-gray-900 text-xs md:text-sm truncate">{item.product.name}</h4>
+                                <div className='flex justify-between'>
+                                  <h4 className="font-bold text-gray-900 text-xs md:text-sm truncate">{item.product.name}</h4>
+                                  <Rating hover={true} action={(i: number) => {
+                                    sendRating({ item, i })
+                                  }} stars={item.rating || null} />
+                                </div>
+
                                 <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-wider truncate">Ref: {item.product.partNumber || 'N/A'}</p>
                                 <div className="flex items-center justify-between mt-0.5 md:mt-1">
                                   <span className="text-[10px] md:text-xs font-bold text-gray-500">Cant: {item.quantity}</span>
                                   <div className="text-right">
                                     {item.discount > 0 && (
                                       <div className="flex items-center justify-end gap-1.5">
-                                        <FormattedPrice 
-                                          price={item.originalPrice} 
+                                        <FormattedPrice
+                                          price={item.originalPrice}
                                           className="line-through text-gray-400 text-[10px] md:text-xs"
                                         />
                                         <span className="bg-red-100 text-red-600 text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded">-{item.discount}%</span>
                                       </div>
                                     )}
-                                    <FormattedPrice 
-                                      price={item.unitPrice * item.quantity} 
+                                    <FormattedPrice
+                                      price={item.unitPrice * item.quantity}
                                       className="font-black text-sm md:text-base text-red-600"
                                     />
                                   </div>
@@ -453,7 +471,7 @@ const Purchases = () => {
                           );
                         })}
                       </div>
-                      
+
                       {/* Order Summary */}
                       <div className="bg-gray-50 rounded-xl md:rounded-2xl p-4 space-y-3">
                         <h3 className="text-base md:text-lg font-bold text-gray-900 flex items-center gap-2">

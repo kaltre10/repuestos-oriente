@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import useStore from '../states/global';
 import FormattedPrice from './FormattedPrice';
 import { imagesUrl } from '../utils/utils';
+import useNotify from '../hooks/useNotify';
 
 interface ProductCardProps {
   product: {
@@ -21,6 +22,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const { notify } = useNotify();
   const navigate = useNavigate();
   const { addToCart, cart, incrementQuantity, decrementQuantity, removeFromCart } = useStore();
 
@@ -38,6 +40,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const handleAddToCart = () => {
     if (!isInCart) {
       addToCart({ ...product, image: displayImage, price: discountedPrice });
+      notify.success(`${product.name} agregado al carrito`);
     }
   };
 

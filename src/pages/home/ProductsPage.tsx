@@ -9,9 +9,11 @@ import ProductFilters from '../../components/ProductFilters';
 import CartModal from '../../components/CartModal';
 import FormattedPrice from '../../components/FormattedPrice';
 import useStore from '../../states/global';
+import useNotify from '../../hooks/useNotify';
 import { Dropdown, DropdownItem } from 'flowbite-react';
 
 const ProductsPage = () => {
+    const { notify } = useNotify();
     const navigate = useNavigate();
     const { products, loading, getProducts } = useProducts();
     const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
@@ -115,6 +117,7 @@ const ProductsPage = () => {
             const basePrice = Number(product.price);
             const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
             addToCart({ ...product, price: discountedPrice });
+            notify.success(`${product.name} agregado al carrito`);
         }
     };
 
