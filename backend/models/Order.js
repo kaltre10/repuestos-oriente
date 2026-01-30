@@ -7,6 +7,11 @@ export default (sequelize) => {
       primaryKey: true,
       autoIncrement: true,
     },
+    orderNumber: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+    },
     buyerId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -14,6 +19,18 @@ export default (sequelize) => {
         model: 'users',
         key: 'id'
       }
+    },
+    clientName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    clientEmail: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    clientPhone: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     status: {
       type: DataTypes.STRING,

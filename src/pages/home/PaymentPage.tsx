@@ -26,7 +26,7 @@ const PaymentPage = () => {
   const navigate = useNavigate();
   const { cart, clearCart, user, getCartTotal } = useStore();
   const { freeShippingThreshold, shippingPrice } = useDollarRate();
-  // const accountData = location.state?.accountData;
+  const accountData = location.state?.accountData;
   const shippingOption = location.state?.shippingOption;
   const selectedAddress = location.state?.selectedAddress;
   
@@ -121,11 +121,16 @@ const PaymentPage = () => {
     try {
       const formData = new FormData();
       formData.append('buyerId', user?.id.toString() || '');
+      formData.append('clientName', accountData?.name || user?.name || '');
+      formData.append('clientEmail', accountData?.email || user?.email || '');
+      formData.append('clientPhone', accountData?.phone || user?.phone || '');
       formData.append('paymentMethod', selectedMethod?.name || 'Desconocido');
       formData.append('referenceNumber', referenceNumber);
       formData.append('shippingCost', shippingCost.toString());
       formData.append('freeShipping', freeShipping.toString());
-      formData.append('shippingMethod', selectedMethod?.name || 'standard');
+      // Convertir shippingOption a nombre legible: 'Empresa de Envíos' o 'A Domicilio'
+      const shippingMethodName = shippingOption === 'shipping_company' ? 'Empresa de Envíos' : shippingOption === 'home_delivery' ? 'A Domicilio' : 'standard';
+      formData.append('shippingMethod', shippingMethodName);
       formData.append('shippingAddress', selectedAddress?.address || '');
       if (receiptImage) {
         formData.append('receiptImage', receiptImage);

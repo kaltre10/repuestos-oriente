@@ -39,7 +39,7 @@ class SaleService {
             model: models.Order,
             as: 'order',
             where: status ? { status } : {}, // Aplicar filtro de status a la orden
-            attributes: ['id', 'status', 'shippingCost', 'total', 'paymentMethodId', 'shippingMethod', 'shippingAddress', 'createdAt', 'updatedAt'],
+            attributes: ['id', 'orderNumber', 'status', 'shippingCost', 'total', 'paymentMethodId', 'shippingMethod', 'shippingAddress', 'clientName', 'clientEmail', 'clientPhone', 'createdAt', 'updatedAt'],
             include: [
               {
                 model: models.PaymentMethod,
@@ -75,7 +75,7 @@ class SaleService {
           {
             model: models.Order,
             as: 'order',
-            attributes: ['id', 'status', 'shippingCost', 'total', 'paymentMethodId', 'shippingMethod', 'shippingAddress', 'createdAt', 'updatedAt'],
+            attributes: ['id', 'orderNumber', 'status', 'shippingCost', 'total', 'paymentMethodId', 'shippingMethod', 'shippingAddress', 'clientName', 'clientEmail', 'clientPhone', 'createdAt', 'updatedAt'],
             include: [{
               model: models.PaymentMethod,
               as: 'paymentMethod',
@@ -131,7 +131,7 @@ class SaleService {
         {
           model: models.Order,
           as: 'order',
-          attributes: ['id', 'status', 'shippingCost', 'total', 'paymentMethodId', 'shippingMethod', 'shippingAddress', 'createdAt', 'updatedAt'],
+          attributes: ['id', 'orderNumber', 'status', 'shippingCost', 'total', 'paymentMethodId', 'shippingMethod', 'shippingAddress', 'clientName', 'clientEmail', 'clientPhone', 'createdAt', 'updatedAt'],
           include: [{
             model: models.PaymentMethod,
             as: 'paymentMethod',

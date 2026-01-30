@@ -163,6 +163,9 @@ const createCheckout = asyncHandler(async (req, res) => {
   let {
     items, // Array of { productId, quantity }
     buyerId,
+    clientName,
+    clientEmail,
+    clientPhone,
     paymentMethod,
     referenceNumber,
     shippingCost,
@@ -275,10 +278,32 @@ const createCheckout = asyncHandler(async (req, res) => {
   // Calculate total including shipping cost
   const total = subtotal + calculatedShippingCost;
 
+  // Get user data to use as default if client info is not provided
+  let defaultClientInfo = {};
+  if (buyerId) {
+    try {
+      const user = await models.User.findByPk(buyerId, {
+        attributes: ['name', 'email', 'phone']
+      });
+      if (user) {
+        defaultClientInfo = {
+          clientName: user.name,
+          clientEmail: user.email,
+          clientPhone: user.phone
+        };
+      }
+    } catch (error) {
+      console.error('Error fetching user data for default client info:', error);
+    }
+  }
+
   // Step 1: Create an Order record for this checkout with total amount
   const order = await orderService.createOrder({
     status: 'pending',
     buyerId,
+    clientName: clientName || defaultClientInfo.clientName || '',
+    clientEmail: clientEmail || defaultClientInfo.clientEmail || '',
+    clientPhone: clientPhone || defaultClientInfo.clientPhone || '',
     shippingCost: calculatedShippingCost,
     total: total, // Total including shipping
     paymentMethodId,

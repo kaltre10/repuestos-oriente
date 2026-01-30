@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { ShoppingBag, Package, Calendar, Clock, ChevronRight, AlertCircle, ExternalLink, X, CreditCard, Hash, Image as ImageIcon, Upload, CheckCircle2 } from 'lucide-react';
+import { ShoppingBag, Package, Calendar, Clock, ChevronRight, AlertCircle, ExternalLink, X, CreditCard, Hash, Image as ImageIcon, Upload, CheckCircle2, UserIcon } from 'lucide-react';
 import useStore from '../../states/global';
 import { apiUrl, imagesUrl } from '../../utils/utils';
 import request from '../../utils/request';
@@ -34,10 +34,14 @@ interface Sale {
   };
   order?: {
     id: number;
+    orderNumber: string;
     shippingCost: number;
     total: number;
     shippingMethod: string;
     shippingAddress: string;
+    clientName: string;
+    clientEmail: string;
+    clientPhone: string;
     paymentMethod?: {
       id: number;
       name: string;
@@ -341,6 +345,12 @@ const Purchases = () => {
                         <CreditCard className="w-3.5 h-3.5 mr-1.5 md:mr-2 text-red-500" />
                         <span className="font-semibold uppercase">{mainPurchase.order?.paymentMethod?.name || mainPurchase.paymentMethod}</span>
                       </div>
+                      {mainPurchase.order?.orderNumber && (
+                        <div className="flex items-center text-gray-500 bg-gray-50 px-2 md:px-3 py-1 md:py-1.5 rounded-lg">
+                          <Hash className="w-3.5 h-3.5 mr-1.5 md:mr-2 text-red-500" />
+                          <span className="font-semibold">{mainPurchase.order.orderNumber}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="pt-2 flex items-center justify-between border-t border-gray-50">
@@ -479,8 +489,33 @@ const Purchases = () => {
                 })()}
               </div>
 
-              {/* Payment Info, Shipping & Receipt Grid */}
+              {/* Client Info, Payment Info, Shipping & Receipt Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h3 className="text-base md:text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <UserIcon className="w-4 h-4 md:w-5 md:h-5 text-red-500" />
+                    Información del Cliente
+                  </h3>
+                  <div className="bg-gray-50 rounded-xl md:rounded-2xl p-4 space-y-3">
+                    <div className="flex justify-between items-center text-xs md:text-sm">
+                      <span className="text-gray-500 font-medium">Nombre:</span>
+                      <span className="font-bold text-gray-900">{selectedPurchase.order?.clientName || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs md:text-sm">
+                      <span className="text-gray-500 font-medium">Correo:</span>
+                      <span className="font-bold text-gray-900">{selectedPurchase.order?.clientEmail || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs md:text-sm">
+                      <span className="text-gray-500 font-medium">Teléfono:</span>
+                      <span className="font-bold text-gray-900">{selectedPurchase.order?.clientPhone || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs md:text-sm">
+                      <span className="text-gray-500 font-medium">Usuario Original:</span>
+                      <span className="font-bold text-gray-900">{user?.name || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+                
                 <div className="space-y-4">
                   <h3 className="text-base md:text-lg font-bold text-gray-900 flex items-center gap-2">
                     <CreditCard className="w-4 h-4 md:w-5 md:h-5 text-red-500" />
@@ -520,8 +555,15 @@ const Purchases = () => {
                       <span className="font-bold text-gray-900 max-w-[60%] text-right">{selectedPurchase.order?.shippingAddress || 'N/A'}</span>
                     </div>
                     <div className="flex justify-between items-center text-xs md:text-sm">
-                      <span className="text-gray-500 font-medium">Método:</span>
+                      <span className="text-gray-500 font-medium">Forma de Envío:</span>
                       <span className="font-bold text-gray-900 uppercase">{selectedPurchase.order?.shippingMethod || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs md:text-sm">
+                      <span className="text-gray-500 font-medium">Número de Pedido:</span>
+                      <span className="font-bold text-gray-900 flex items-center gap-1">
+                        <Hash className="w-3 h-3 md:w-3.5 md:h-3.5 text-red-500" />
+                        {selectedPurchase.order?.orderNumber || 'N/A'}
+                      </span>
                     </div>
                     <div className="flex justify-between items-center text-xs md:text-sm">
                       <span className="text-gray-500 font-medium">Costo:</span>

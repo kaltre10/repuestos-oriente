@@ -36,13 +36,18 @@ interface Sale {
     id: number;
     name: string;
     email: string;
+    phone: string;
   };
   order?: {
     id: number;
+    orderNumber: string;
     shippingCost: number;
     total: number;
     shippingMethod: string;
     shippingAddress: string;
+    clientName: string;
+    clientEmail: string;
+    clientPhone: string;
     paymentMethod?: {
       id: number;
       name: string;
@@ -445,6 +450,12 @@ const Sales = () => {
                           <CreditCard className="w-3.5 h-3.5 mr-1.5 md:mr-2 text-red-500" />
                           <span className="font-semibold uppercase">{mainSale.order?.paymentMethod?.name || mainSale.paymentMethod}</span>
                         </div>
+                        {mainSale.order?.orderNumber && (
+                          <div className="flex items-center text-gray-500 bg-gray-50 px-2 md:px-3 py-1 md:py-1.5 rounded-lg">
+                            <Hash className="w-3.5 h-3.5 mr-1.5 md:mr-2 text-red-500" />
+                            <span className="font-semibold">{mainSale.order.orderNumber}</span>
+                          </div>
+                        )}
                         {mainSale.referenceNumber && (
                           <div className="flex items-center text-gray-500 bg-gray-50 px-2 md:px-3 py-1 md:py-1.5 rounded-lg">
                             <Hash className="w-3.5 h-3.5 mr-1.5 md:mr-2 text-red-500" />
@@ -589,10 +600,10 @@ const Sales = () => {
               <div>
                 <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5">
                   <User className="w-4 h-4 text-red-500" />
-                  Información del Cliente
+                  Información del la cuenta
                 </h3>
                 <div className="bg-white rounded-xl p-4 border border-gray-100">
-                  <div className="space-y-3">
+                  <div className="space-y-3 grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="flex items-start gap-2">
                       <div className="text-gray-500 mt-0.5">
                         <User className="w-4 h-4" />
@@ -609,6 +620,34 @@ const Sales = () => {
                       <div>
                         <p className="text-sm font-medium text-gray-900">{selectedPurchase.buyer.email}</p>
                       </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500">Teléfono</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedPurchase.buyer?.phone || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Client Information */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5">
+                  <User className="w-4 h-4 text-red-500" />
+                  Información del Cliente
+                </h3>
+                <div className="bg-white rounded-xl p-4 border border-gray-100">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500">Nombre</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedPurchase.order?.clientName || 'N/A'}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500">Correo Electrónico</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedPurchase.order?.clientEmail || 'N/A'}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500">Teléfono</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedPurchase.order?.clientPhone || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -662,7 +701,6 @@ const Sales = () => {
                   )}
                 </div>
               </div>
-
               {/* Shipping Information */}
               <div>
                 <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5">
@@ -676,7 +714,7 @@ const Sales = () => {
                       <span className="font-medium text-gray-900 max-w-[60%] text-right">{selectedPurchase.order?.shippingAddress || 'N/A'}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Método de Envío</span>
+                      <span className="text-gray-500">Forma de Envío</span>
                       <span className="font-medium text-gray-900 uppercase">{selectedPurchase.order?.shippingMethod || 'N/A'}</span>
                     </div>
                     <div className="flex justify-between text-sm">
@@ -719,7 +757,7 @@ const Sales = () => {
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <p className="text-xs text-gray-500">Número de Pedido</p>
-                            <p className="text-sm font-semibold text-gray-900">{currentGroup[0].buyerId}-{new Date(currentGroup[0].saleDate).getTime()}</p>
+                            <p className="text-sm font-semibold text-gray-900">{currentGroup[0].order?.orderNumber || `${currentGroup[0].buyerId}-${new Date(currentGroup[0].saleDate).getTime()}`}</p>
                           </div>
                           <div>
                             <p className="text-xs text-gray-500">Fecha y Hora</p>

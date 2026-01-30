@@ -118,7 +118,18 @@ class OrderService {
 
   async createOrder(orderData) {
     try {
-      const order = await Order.create(orderData);
+      // Generate short order number: ORD + YYMMDD + 4 random chars
+      const now = new Date();
+      const year = now.getFullYear().toString().slice(-2);
+      const month = now.getMonth().toString().padStart(2, '0');
+      const day = now.getDate().toString().padStart(2, '0');
+      const randomChars = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const shortOrderNumber = `ORD${year}${month}${day}${randomChars}`;
+      
+      const order = await Order.create({
+        ...orderData,
+        orderNumber: shortOrderNumber
+      });
       return order;
     } catch (error) {
       console.error('Error creating order:', error);

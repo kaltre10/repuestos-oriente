@@ -14,7 +14,7 @@ export const startServer = async (app) => {
     try {
         await connectDB();
 
-        await sequelize.sync({ alter: true });
+        await sequelize.sync(); // Usa force: false por defecto para evitar modificaciones peligrosas
 
         // Seed brands, categories and models after sync
         await seedBrands();
