@@ -446,7 +446,7 @@ const CheckoutPage = () => {
                   <div>
                     <h3 className="font-bold text-red-900 mb-2">Instrucciones de Pago</h3>
                     <p className="text-sm text-red-800 leading-relaxed">
-                      Una vez completado el pedido, nuestro equipo se pondrá en contacto contigo a través de los datos proporcionados para coordinar el pago y la entrega de tus productos.
+                      Una vez completado el pedido, nuestro equipo se pondrá en contacto contigo a través de los datos proporcionados para coordinar la entrega de tus productos.
                     </p>
                   </div>
                 </div>

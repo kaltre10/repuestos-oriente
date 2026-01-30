@@ -190,24 +190,50 @@ const PaymentPage = () => {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
                 </div>
               ) : paymentMethods.length > 0 ? (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-4">
                   {paymentMethods.map((method) => (
-                    <button
+                    <div
                       key={method.id}
                       onClick={() => setSelectedMethod(method)}
-                      className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-2 ${
+                      className={`p-5 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-md ${
                         selectedMethod?.id === method.id
-                          ? 'border-red-600 bg-red-50 text-red-600'
-                          : 'border-gray-100 hover:border-gray-200 text-gray-500'
+                          ? 'border-red-500 bg-red-50'
+                          : 'border-gray-200 bg-white hover:border-red-300'
                       }`}
                     >
-                      {method.type === 'Pago Movil' ? (
-                        <Smartphone className="w-5 h-5" />
-                      ) : (
-                        <CreditCard className="w-5 h-5" />
-                      )}
-                      <span className="font-semibold text-xs text-center">{method.name}</span>
-                    </button>
+                      <div className="flex items-start space-x-4">
+                        <div className={`p-3 rounded-full ${
+                          selectedMethod?.id === method.id ? 'bg-red-100' : 'bg-gray-100'
+                        }`}>
+                          {method.type === 'Pago Movil' ? (
+                            <Smartphone className={`w-6 h-6 ${
+                              selectedMethod?.id === method.id ? 'text-red-600' : 'text-gray-500'
+                            }`} />
+                          ) : (
+                            <CreditCard className={`w-6 h-6 ${
+                              selectedMethod?.id === method.id ? 'text-red-600' : 'text-gray-500'
+                            }`} />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className={`font-bold text-gray-800 mb-1 ${
+                            selectedMethod?.id === method.id ? 'text-red-600' : ''
+                          }`}>{method.name}</h3>
+                          <p className="text-sm text-gray-500">{method.type}</p>
+                        </div>
+                        <div className="flex items-center">
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                            selectedMethod?.id === method.id ? 'border-red-500 bg-red-500' : 'border-gray-300 bg-white'
+                          }`}>
+                            {selectedMethod?.id === method.id && (
+                              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               ) : (
