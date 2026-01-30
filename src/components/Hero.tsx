@@ -114,7 +114,7 @@ const Hero = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent"></div>
               
               <div className="relative z-10 container mx-auto h-full flex flex-col items-start justify-end pb-12 px-6 md:px-12 lg:px-24">
-                <div className="max-w-2xl animate-in fade-in slide-in-from-left-10 duration-700">
+                <div className="max-w-2xl animate-in fade-in slide-in-from-left-10 duration-700 p-6 sm:p-0">
                   <p className="text-xs sm:text-sm md:text-base font-light text-white/90 tracking-wider mb-2">
                     {slide.description1}
                   </p>
