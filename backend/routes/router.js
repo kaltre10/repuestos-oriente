@@ -16,6 +16,7 @@ import paymentTypeRoutes from './paymenttype.routes.js';
 import sliderRoutes from './slider.routes.js';
 import advertisingRoutes from './advertising.routes.js';
 import contactRoutes from './contact.routes.js';
+/* import ratingsRoutes from './ratings.routes.js'; */
 
 const router = express.Router();
 
@@ -43,6 +44,7 @@ router.use(`${apiVersion}/payment-types`, paymentTypeRoutes);
 router.use(`${apiVersion}/sliders`, sliderRoutes);
 router.use(`${apiVersion}/advertising`, advertisingRoutes);
 router.use(`${apiVersion}/contact`, contactRoutes);
+/* router.use(`${apiVersion}/ratings`, ratingsRoutes); */
 
 
 export default router;

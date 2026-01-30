@@ -52,6 +52,7 @@ interface ConfigState {
   errorCategories: string | null;
   errorSubCategories: string | null;
   errorDollar: string | null;
+  isConfigsFetched: boolean;
 
   // Brands Actions
   fetchBrands: () => Promise<void>;
@@ -110,6 +111,7 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
   errorCategories: null,
   errorSubCategories: null,
   errorDollar: null,
+  isConfigsFetched: false,
 
   // Brands Actions
   // ... (no changes in fetchBrands, addBrand)
@@ -417,6 +419,9 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
 
   // Config Actions
   fetchDollarRate: async () => {
+    const { isConfigsFetched } = get();
+    if (isConfigsFetched) return;
+    
     set({ loadingDollar: true, errorDollar: null });
     try {
       const response = await request.get(`${apiUrl}/configs`);
@@ -426,7 +431,8 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
           dollarRate: configs[0].dolarRate.toString(),
           freeShippingThreshold: configs[0].freeShippingThreshold.toString(),
           shippingPrice: configs[0].shippingPrice.toString(),
-          configId: configs[0].id 
+          configId: configs[0].id,
+          isConfigsFetched: true 
         });
       }
     } catch (err) {

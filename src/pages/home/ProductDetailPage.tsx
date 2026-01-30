@@ -10,43 +10,76 @@ import useStore from '../../states/global';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
 import { useDollarRate } from '../../hooks/useDollarRate';
+import Rating from '../../components/Rating';
 
 const ProductDetailPage = () => {
   const { notify } = useNotify()
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { products } = useProducts();
   const { addToCart, cart, user, incrementQuantity, decrementQuantity, removeFromCart } = useStore();
-  const { products, loading } = useProducts();
   const { freeShippingThreshold } = useDollarRate();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
   // Question states
-  const [, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<any[]>([]);
   const [newQuestion, setNewQuestion] = useState('');
   const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
-  const [, setLoadingQuestions] = useState(true);
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
 
-  const productFromDB = products.find(p => p.id === parseInt(id || '0'));
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!id) return;
+      try {
+        setLoading(true);
+        const response = await request.get(`${apiUrl}/products/${id}`);
+        const productData = response.data.body.product;
 
-  const product = productFromDB ? {
-    ...productFromDB,
-    rating: (productFromDB as any).rating || 5,
-    reviews: (productFromDB as any).reviews || 0,
-    image: (productFromDB as any).images && (productFromDB as any).images.length > 0
-      ? `${imagesUrl}${(productFromDB as any).images[0].image}`
-      : '/placeholder-product.png',
-    images: (productFromDB as any).images && (productFromDB as any).images.length > 0
-      ? (productFromDB as any).images.map((img: any) => `${imagesUrl}${img.image}`)
-      : ['/placeholder-product.png'],
-    category: (productFromDB as any).categories,
-    discount: (productFromDB as any).discount || 0,
-    originalPrice: Number(productFromDB.price),
-    price: (productFromDB as any).discount > 0 
-      ? Number(productFromDB.price) * (1 - (Number(productFromDB.discount) / 100))
-      : Number(productFromDB.price)
-  } : null;
+        
+        
+        if (productData) {
+          const processedProduct = {
+            ...productData,
+            rating: productData.rating || 0,
+            reviews: productData.reviews || 0,
+            image: productData.images && productData.images.length > 0
+              ? `${imagesUrl}${productData.images[0].image}`
+              : '/placeholder-product.png',
+            images: productData.images && productData.images.length > 0
+              ? productData.images.map((img: any) => `${imagesUrl}${img.image}`)
+              : ['/placeholder-product.png'],
+            category: productData.categories,
+            categories: productData.categories,
+            subcategories: productData.subcategories,
+            brand: productData.brand,
+            model: productData.model,
+            garantia: productData.garantia,
+            discount: productData.discount || 0,
+            originalPrice: Number(productData.price),
+            price: productData.discount > 0
+              ? Number(productData.price) * (1 - (Number(productData.discount) / 100))
+              : Number(productData.price)
+          };
+          setProduct(processedProduct);
+          setNotFound(false);
+        } else {
+          setNotFound(true);
+        } 
+      } catch (error) {
+        console.error('Error fetching product:', error);
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id, navigate]);
 
   useEffect(() => {
     if (product?.name) {
@@ -88,6 +121,7 @@ const ProductDetailPage = () => {
         questionText: newQuestion
       });
       setNewQuestion('');
+      notify.info('Tu pregunta ha sido enviada. Podrás ver la respuesta en la sección de preguntas dentro de tu perfil.');
       fetchQuestions();
     } catch (error) {
       console.error('Error submitting question:', error);
@@ -96,12 +130,6 @@ const ProductDetailPage = () => {
       setIsSubmittingQuestion(false);
     }
   };
-
-  useEffect(() => {
-    if (!loading && !product && products.length > 0) {
-      navigate('/productos');
-    }
-  }, [product, loading, products, navigate]);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -117,14 +145,34 @@ const ProductDetailPage = () => {
     );
   }
 
-  if (!product) {
-    return null;
+  if (notFound || !product) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
+          <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Search className="w-10 h-10 text-red-500" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Producto no encontrado</h1>
+          <p className="text-gray-600 mb-8">
+            Lo sentimos, el producto que estás buscando no existe o no está disponible en este momento.
+          </p>
+          <button
+            onClick={() => navigate('/')}
+            className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-red-200 flex items-center justify-center gap-2"
+          >
+            <ArrowLeft size={20} />
+            Volver a la página principal
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
       addToCart(product as any);
     }
+    notify.success(`${product.name} agregado al carrito`);
   };
 
   const isInCart = cart.some(item => item.id === product.id);
@@ -207,33 +255,31 @@ const ProductDetailPage = () => {
                     </p>
                   </div>
                 )}
+                
                 {/* Rating */}
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={20} fill={i < product.rating ? 'currentColor' : 'none'} />
-                    ))}
-                  </div>
-
-                  <span className="text-gray-600">({product.reviews} reseñas)</span>
+                <div className="flex items-center gap-3 mb-3">
+                  <Rating hover={false} action={() => { }} stars={Math.round(product.rating)} />
+                  <span className="text-sm text-gray-500 font-medium">
+                    {product.rating > 0 ? product.rating.toFixed(1) : 'Sin calificaciones'} ({product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'})
+                  </span>
                 </div>
 
                 {/* Price */}
                 <div className="mb-2">
-                    {product.discount > 0 && (
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-base text-gray-400 line-through">
-                          <FormattedPrice price={product.originalPrice} />
-                        </span>
-                        <span className="text-xl font-bold text-red-600">
-                          {product.discount}% OFF
-                        </span>
-                      </div>
-                    )}
-                    <div className="text-5xl font-extrabold text-red-600">
-                      <FormattedPrice price={product.price} />
+                  {product.discount > 0 && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-base text-gray-400 line-through">
+                        <FormattedPrice price={product.originalPrice} />
+                      </span>
+                      <span className="text-xl font-bold text-red-600">
+                        {product.discount}% OFF
+                      </span>
                     </div>
+                  )}
+                  <div className="text-5xl font-extrabold text-red-600">
+                    <FormattedPrice price={product.price} />
                   </div>
+                </div>
               </div>
               {/* Description */}
               {product?.description &&
@@ -259,7 +305,7 @@ const ProductDetailPage = () => {
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Calificación:</span>
-                    <p className="text-gray-600">{product.rating}/5 estrellas</p>
+                    <p className="text-gray-600">{product.rating > 0 ? `${product.rating.toFixed(1)}/5` : 'N/A'}</p>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Disponibilidad:</span>
@@ -406,75 +452,35 @@ const ProductDetailPage = () => {
                 </p>
               )}
             </form>
-
-            {/* Questions List */}
-            {/* <div className="space-y-8">
-              {loadingQuestions ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="w-8 h-8 text-red-600 animate-spin" />
-                </div>
-              ) : questions.length > 0 ? (
-                questions.map((q) => (
-                  <div key={q.id} className="border-b border-gray-100 pb-8 last:border-0">
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className="bg-gray-100 p-2 rounded-lg">
-                        <MessageSquare size={20} className="text-gray-600" />
-                      </div>
-                      <div>
-                        <p className="text-gray-800 font-medium mb-1">{q.questionText}</p>
-                        <div className="flex items-center gap-2 text-xs text-gray-400">
-                          <span>{q.client?.name || 'Cliente'}</span>
-                          <span>•</span>
-                          <span>{new Date(q.createdAt).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {q.status === 1 ? (
-                      <div className="ml-12 bg-gray-50 p-4 rounded-xl border-l-4 border-red-500">
-                        <div className="flex items-start gap-3">
-                          <div className="text-red-600 mt-1">
-                            <Send size={16} className="rotate-180" />
-                          </div>
-                          <div>
-                            <p className="text-gray-700 text-sm leading-relaxed">{q.answerText}</p>
-                            <p className="text-xs text-gray-400 mt-2 font-medium">Respuesta del vendedor</p>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="ml-12 text-sm text-gray-400 italic">Pendiente de respuesta...</p>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                  <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 font-medium">Aún no hay preguntas. ¡Sé el primero en preguntar!</p>
-                </div>
-              )}
-            </div> */}
           </div>
 
           {/* Related Products Section */}
           <div className="mt-16">
-            {[...products]
-              .filter(p => p.categories === productFromDB?.categories && p.id !== product.id)
+            {products
+              .filter(p => p.categories === product?.categories && p.id !== product?.id)
               .length > 0 &&
               <h2 className="text-2xl font-bold text-gray-800 mb-8">Productos relacionados</h2>
             }
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-              {[...products]
-                .filter(p => p.categories === productFromDB?.categories && p.id !== product.id)
+              {products
+                .filter(p => p.categories === product?.categories && p.id !== product?.id)
                 .sort((a, b) => b.id - a.id)
                 .slice(0, 6)
                 .map(relatedProductRaw => {
+                  const raw = relatedProductRaw as any;
+                  const discount = raw.discount || 0;
+                  const price = discount > 0
+                    ? Number(raw.price) * (1 - (Number(discount) / 100))
+                    : Number(raw.price);
+
                   const relatedProduct = {
-                    ...relatedProductRaw,
-                    image: (relatedProductRaw as any).images && (relatedProductRaw as any).images.length > 0
-                      ? `${imagesUrl}${(relatedProductRaw as any).images[0].image}`
+                    ...raw,
+                    image: raw.images && raw.images.length > 0
+                      ? `${imagesUrl}${raw.images[0].image}`
                       : '/placeholder-product.png',
-                    category: (relatedProductRaw as any).categories
+                    category: raw.categories,
+                    discountedPrice: price,
+                    originalPrice: Number(raw.price)
                   };
 
                   return (
@@ -492,13 +498,25 @@ const ProductDetailPage = () => {
                           alt={relatedProduct.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
+                        {discount > 0 && (
+                          <div className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-full">
+                            {discount}% OFF
+                          </div>
+                        )}
                       </div>
                       <div className="p-3">
                         <p className="text-[10px] text-gray-400 uppercase font-bold mb-1 truncate">{relatedProduct.category}</p>
                         <h3 className="text-sm font-semibold text-gray-700 mb-2 line-clamp-2 h-10 leading-tight">{relatedProduct.name}</h3>
-                        <p className="text-red-600 font-bold text-base">
-                          <FormattedPrice price={relatedProduct.price} />
-                        </p>
+                        <div className="flex flex-col">
+                          {discount > 0 && (
+                            <span className="text-[10px] text-gray-400 line-through">
+                              <FormattedPrice price={relatedProduct.originalPrice} />
+                            </span>
+                          )}
+                          <p className="text-red-600 font-bold text-base">
+                            <FormattedPrice price={relatedProduct.discountedPrice} />
+                          </p>
+                        </div>
                       </div>
                     </div>
                   );

@@ -1,8 +1,10 @@
 import { Star, Plus, Minus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Rating from './Rating';
 import useStore from '../states/global';
 import FormattedPrice from './FormattedPrice';
 import { imagesUrl } from '../utils/utils';
+import useNotify from '../hooks/useNotify';
 
 interface ProductCardProps {
   product: {
@@ -21,6 +23,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const { notify } = useNotify();
   const navigate = useNavigate();
   const { addToCart, cart, incrementQuantity, decrementQuantity, removeFromCart } = useStore();
 
@@ -38,6 +41,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const handleAddToCart = () => {
     if (!isInCart) {
       addToCart({ ...product, image: displayImage, price: discountedPrice });
+      notify.success(`${product.name} agregado al carrito`);
     }
   };
 
@@ -61,13 +65,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <p className="text-gray-500 text-sm">{product.category}</p>
           <p className='text-gray-500 text-sm'>{product.years} </p>
         </div>
-        <div className="flex items-center mt-2">
-          <div className="flex text-yellow-400">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={16} fill={i < product.rating ? 'currentColor' : 'none'} />
-            ))}
-          </div>
-          <span className="text-gray-500 text-sm ml-2">{product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'}</span>
+        <div className="flex items-center gap-2 mt-2">
+          <Rating hover={false} action={() => { }} stars={Math.round(product.rating)} />
+          <span className="text-gray-500 text-sm">{product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'}</span>
         </div>
         <div className="mt-2 mb-4 flex flex-col">
           {discountPercent > 0 ? (

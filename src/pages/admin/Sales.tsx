@@ -4,6 +4,7 @@ import { apiUrl, imagesUrl } from '../../utils/utils';
 import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
+import Rating from '../../components/Rating';
 
 // Sale interface updated for the new Order table structure
 // The status field is now in the Order table, not in the Sale table
@@ -73,12 +74,12 @@ const Sales = () => {
   // New Filter States
   const [statusFilter, setStatusFilter] = useState('');
   const [paymentMethodFilter, setPaymentMethodFilter] = useState('');
-  const [dateRange, setDateRange] = useState({ 
-    start: getCurrentLocalDate(), 
-    end: getCurrentLocalDate() 
+  const [dateRange, setDateRange] = useState({
+    start: new Date().toISOString().split('T')[0],
+    end: new Date().toISOString().split('T')[0]
   });
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // Modal states
   const [selectedPurchase, setSelectedPurchase] = useState<Sale | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -93,30 +94,31 @@ const Sales = () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      
+
       // Asegurar que se envían todos los filtros correctamente
       if (statusFilter && statusFilter !== '') params.append('status', statusFilter);
       if (paymentMethodFilter && paymentMethodFilter !== '') params.append('paymentMethod', paymentMethodFilter);
 
-      
+
       // Asegurar que las fechas se envían en formato YYYY-MM-DD
       if (dateRange.start) {
         const startDate = new Date(dateRange.start);
         const formattedStart = startDate.toISOString().split('T')[0];
         params.append('startDate', formattedStart);
       }
-      
+
       if (dateRange.end) {
         const endDate = new Date(dateRange.end);
         const formattedEnd = endDate.toISOString().split('T')[0];
         params.append('endDate', formattedEnd);
       }
-      
+
       // Construir URL completa para logging
       const fullUrl = `${apiUrl}/sales?${params.toString()}`;
 
       const response = await request.get(fullUrl);
-      
+      console.log("fetchin de sales con parametros", response.data)
+
       // Verificar si la respuesta tiene un campo success
       if (response.data && typeof response.data === 'object') {
         if (response.data.success === false) {
@@ -125,8 +127,8 @@ const Sales = () => {
           setSales([]);
           return;
         }
-      }  
- 
+      }
+
       // Usar la misma estructura que Purchases.tsx
       if (response.data && response.data.body && Array.isArray(response.data.body.sales)) {
         setSales(response.data.body.sales);
@@ -144,13 +146,13 @@ const Sales = () => {
         notify.info('No se encontraron registros de ventas con los filtros actuales');
       }
     } catch (error: any) {
-      
+
       // Mostrar mensaje de error más específico
       let errorMessage = 'Error al cargar el registro de ventas';
-      
+
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
-        
+
         // Manejo especial para error de token inválido
         if (errorMessage.includes('token')) {
           errorMessage = 'Sesión expirada. Por favor, inicie sesión nuevamente.';
@@ -158,7 +160,7 @@ const Sales = () => {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       notify.error(errorMessage);
       setSales([]);
     } finally {
@@ -199,7 +201,7 @@ const Sales = () => {
     console.log('--- VERIFICACIÓN DE VENTAS ---');
     console.log('Ventas recibidas del backend:', sales);
     console.log('Cantidad de ventas:', sales.length);
-    
+
     // Verificar la estructura de algunas ventas
     if (sales.length > 0) {
       console.log('Estructura de la primera venta:', sales[0]);
@@ -207,7 +209,7 @@ const Sales = () => {
       console.log('¿Tiene buyer?:', !!sales[0].buyer);
       console.log('¿Tiene product?:', !!sales[0].product);
     }
-    
+
     console.log('Ventas agrupadas:', groupedSales);
     console.log('Cantidad de ventas agrupadas:', groupedSales.length);
     console.log('Resultado filteredSales:', filteredSales);
@@ -234,18 +236,18 @@ const Sales = () => {
     }
   };
 
-  // const getStatusBadge = (status: string) => { 
-  //   switch (status.toLowerCase()) {
-  //     case 'completed':
-  //       return <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><CheckCircle size={14} /> Completada</span>;
-  //     case 'pending':
-  //       return <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><Clock size={14} /> Pendiente</span>;
-  //     case 'cancelled':
-  //       return <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><XCircle size={14} /> Cancelada</span>;
-  //     default:
-  //       return <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold">{status}</span>;
-  //   }
-  // };
+  /* const getStatusBadge = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><CheckCircle size={14} /> Completada</span>;
+      case 'pending':
+        return <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><Clock size={14} /> Pendiente</span>;
+      case 'cancelled':
+        return <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><XCircle size={14} /> Cancelada</span>;
+      default:
+        return <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold">{status}</span>;
+    }
+  }; */
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -258,11 +260,10 @@ const Sales = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${
-              showFilters || statusFilter || paymentMethodFilter || dateRange.start
-                ? 'bg-red-50 border-red-200 text-red-600'
-                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${showFilters || statusFilter || paymentMethodFilter || dateRange.start
+              ? 'bg-red-50 border-red-200 text-red-600'
+              : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+              }`}
           >
             <Filter size={18} />
             <span className="font-medium">Filtros</span>
@@ -359,10 +360,11 @@ const Sales = () => {
         <div className="grid gap-4 md:gap-6">
           {filteredSales.map((group, index) => {
             const mainSale = group[0];
+            console.log("group", group);
             // Use pre-calculated total from Order table if available, otherwise calculate it
             const totalAmount = mainSale.order?.total || group.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
             const totalItems = group.reduce((sum, item) => sum + item.quantity, 0);
-            
+
             // Define status color classes similar to Purchases.tsx
             const getStatusColor = (status: string) => {
               switch (status.toLowerCase()) {
@@ -372,7 +374,7 @@ const Sales = () => {
                 default: return 'bg-gray-100 text-gray-700 border-gray-200';
               }
             };
-            
+
             const translateStatus = (status: string) => {
               switch (status.toLowerCase()) {
                 case 'completed': return 'Completada';
@@ -381,12 +383,12 @@ const Sales = () => {
                 default: return status;
               }
             };
-            
+
             const openModal = () => {
               setSelectedPurchase(mainSale);
               setIsModalOpen(true);
             };
-            
+
             return (
               <div
                 key={index}
@@ -396,10 +398,11 @@ const Sales = () => {
                 <div className="p-4 md:p-6">
                   <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
                     {/* Product Image Stack */}
-                    <div className="w-full md:w-32 h-24 md:h-32 flex-shrink-0 relative">
+                    <div className="w-full md:w-32 h-24 md:h-32 shrink-0 relative">
                       <div className="absolute inset-0 flex items-center justify-center">
-                        {group.slice(0, 3).map((item, i) => (
-                          <img
+                        {group.slice(0, 3).map((item, i) => {
+                          console.log("images product: ", item);
+                          return <img
                             key={item.id}
                             src={item.product.images && item.product.images.length > 0
                               ? `${imagesUrl}${item.product.images[0].image}`
@@ -412,10 +415,10 @@ const Sales = () => {
                               opacity: 1 - (i * 0.2)
                             }}
                           />
-                        ))}
+                        })}
                       </div>
                     </div>
-                    
+
                     {/* Details */}
                     <div className="flex-1 space-y-3">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -431,11 +434,11 @@ const Sales = () => {
                             <span>{totalItems} artículos en total</span>
                           </div>
                         </div>
-                        <div className={`self-start sm:self-center px-3 py-1 rounded-full text-2xs md:text-xs font-black border uppercase tracking-wider ${getStatusColor(mainSale?.status || "")}`}>
-                          {translateStatus(mainSale?.status || "")} 
+                        <div className={`self-start sm:self-center px-3 py-1 rounded-full md:text-xs font-black border uppercase tracking-wider ${getStatusColor(mainSale.status ? mainSale.status : "")}`}>
+                          {translateStatus(mainSale.status || '')}
                         </div>
                       </div>
-                      
+
                       <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm">
                         <div className="flex items-center text-gray-500 bg-gray-50 px-2 md:px-3 py-1 md:py-1.5 rounded-lg">
                           <Calendar className="w-3.5 h-3.5 mr-1.5 md:mr-2 text-red-500" />
@@ -463,7 +466,7 @@ const Sales = () => {
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="pt-2 flex items-center justify-between border-t border-gray-50">
                         <div className="flex items-baseline gap-1.5">
                           <span className="text-gray-400 text-xs md:text-sm font-medium">Total:</span>
@@ -503,7 +506,7 @@ const Sales = () => {
           )}
         </div>
       )}
-      
+
       {/* Detail Modal */}
       {isModalOpen && selectedPurchase && (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
@@ -526,7 +529,7 @@ const Sales = () => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
               {/* Order Status */}
@@ -535,23 +538,24 @@ const Sales = () => {
                   g[0].buyerId === selectedPurchase.buyerId &&
                   new Date(g[0].saleDate).getTime() === new Date(selectedPurchase.saleDate).getTime()
                 );
-                
+
                 if (!currentGroup) return null;
-                
+
                 // In the new structure, we update the order status in the Order table
                 // This will automatically affect all sales in the order via buyerId relationship
                 const handleUpdateOrderStatus = async (newStatus: string) => {
                   try {
                     // Create order data based on the group
-                    // const orderData = { 
-                    //   buyerId: currentGroup[0].buyerId,
-                    //   status: newStatus,
-                    
-                    // };
-                    
+                    /* const orderData = {
+                      buyerId: currentGroup[0].buyerId,
+                      status: newStatus,
+                    }; */
+                    // The backend should calculate shipping cost and total amount
+                    // We're only sending the status update here
+
                     // In the future, when Order table is implemented, use this endpoint instead:
                     // await request.put(`${apiUrl}/orders/${orderId}`, { status: newStatus });
-                    
+
                     // For now, we'll use the existing endpoint to update all sales in the group
                     // This will be replaced with a single order update when backend is ready
                     await Promise.all(
@@ -562,10 +566,10 @@ const Sales = () => {
                     notify.error('Error al actualizar el estado del pedido');
                   }
                 };
-                
+
                 // Get the order status from the first sale (temporary until Order table is implemented)
                 const orderStatus = currentGroup[0].status;
-                
+
                 return (
                   <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                     <div className="flex items-center justify-between">
@@ -573,7 +577,7 @@ const Sales = () => {
                         <h3 className="text-sm font-semibold text-gray-700">Estado del Pedido</h3>
                         <p className="text-xs text-gray-500 mt-0.5">
                           {(() => {
-                            switch (orderStatus?.toLowerCase()) { 
+                            switch (orderStatus && orderStatus.toLowerCase()) {
                               case 'completed': return 'El pedido ha sido completado';
                               case 'pending': return 'El pedido está pendiente de procesamiento';
                               case 'cancelled': return 'El pedido ha sido cancelado';
@@ -595,7 +599,7 @@ const Sales = () => {
                   </div>
                 );
               })()}
-              
+
               {/* Customer Information */}
               <div>
                 <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5">
@@ -652,7 +656,7 @@ const Sales = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Payment Information */}
               <div>
                 <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5">
@@ -684,7 +688,7 @@ const Sales = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   {selectedPurchase.receiptImage && (
                     <div className="mt-4 pt-4 border-t border-gray-100">
                       <h4 className="text-sm font-medium text-gray-700 mb-2">Comprobante de Pago</h4>
@@ -731,16 +735,16 @@ const Sales = () => {
                   <ShoppingBag className="w-4 h-4 text-red-500" />
                   Productos del Pedido
                 </h3>
-                
+
                 {/* Find all sales in the same group (order) as selectedPurchase */}
                 {(() => {
                   const currentGroup = groupedSales.find(g =>
                     g[0].buyerId === selectedPurchase.buyerId &&
                     new Date(g[0].saleDate).getTime() === new Date(selectedPurchase.saleDate).getTime()
                   );
-                  
+
                   if (!currentGroup) return null;
-                  
+
                   // Calculate order totals with discounts
                   const totalItems = currentGroup.reduce((sum, item) => sum + item.quantity, 0);
                   // Calculate subtotal using unitPrice (with discount already applied)
@@ -749,7 +753,7 @@ const Sales = () => {
                   const shippingCost = selectedPurchase.order?.shippingCost || 0;
                   // Use pre-calculated total from Order table if available, otherwise calculate it
                   const totalAmount = selectedPurchase.order?.total || subtotal + shippingCost;
-                  
+
                   return (
                     <div className="space-y-3">
                       {/* Order Summary */}
@@ -775,7 +779,7 @@ const Sales = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Products List */}
                       <div className="space-y-2">
                         {currentGroup.map((sale) => {
@@ -783,7 +787,7 @@ const Sales = () => {
                           const itemOriginalPrice = sale.originalPrice;
                           const itemFinalPrice = sale.unitPrice;
                           const itemDiscountPercent = sale.discount;
-                          
+
                           return (
                             <div key={sale.id} className="bg-white rounded-xl p-4 border border-gray-100 flex flex-col md:flex-row gap-4">
                               <div className="w-16 h-16 flex-shrink-0">
@@ -795,13 +799,31 @@ const Sales = () => {
                                   className="w-full h-full object-cover rounded-lg"
                                 />
                               </div>
-                              
+
                               <div className="flex-1 space-y-2">
-                                <div>
-                                  <h4 className="text-sm font-medium text-gray-900">{sale.product.name}</h4>
-                                  <p className="text-xs text-gray-500">{sale.product.partNumber}</p>
-                                </div>
-                                
+                                  <div className='flex justify-between items-start'>
+                                    <div>
+                                      <h4 className="text-sm font-medium text-gray-900">{sale.product.name}</h4>
+                                      <p className="text-xs text-gray-500">{sale.product.partNumber}</p>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-1">
+                                      {sale.rating !== null ? (
+                                        <div className="flex flex-col items-end">
+                                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight mb-0.5">Calificación</span>
+                                          <Rating
+                                            hover={false}
+                                            action={() => { }}
+                                            stars={sale.rating}
+                                          />
+                                        </div>
+                                      ) : (
+                                        <span className="bg-yellow-200 text-gray-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-gray-200">
+                                          No se ha calificado aún
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+
                                 <div className="flex items-center justify-between">
                                   <div className="space-y-1">
                                     <div className="flex items-center gap-4 text-sm">
@@ -809,7 +831,7 @@ const Sales = () => {
                                       <div className="text-right">
                                         {itemDiscountPercent > 0 && (
                                           <div className="flex items-center gap-1.5">
-                                            <FormattedPrice 
+                                            <FormattedPrice
                                               price={itemOriginalPrice}
                                               className="line-through text-gray-400 text-xs"
                                             />
@@ -823,7 +845,7 @@ const Sales = () => {
                                       </div>
                                     </div>
                                   </div>
-                                 
+
                                   <div className="flex items-center">
                                     <div className="text-right">
                                       <FormattedPrice
@@ -838,7 +860,7 @@ const Sales = () => {
                           );
                         })}
                       </div>
-                      
+
                       {/* Order Total with shipping */}
                       <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-2">
                         <div className="flex justify-between text-sm">
@@ -862,7 +884,7 @@ const Sales = () => {
                 })()}
               </div>
             </div>
-            
+
             {/* Modal Footer */}
             <div className="p-4 md:p-6 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3">
               <button

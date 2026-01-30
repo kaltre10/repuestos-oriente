@@ -41,10 +41,14 @@ export const useProducts = () => {
       if (queryString) url += `?${queryString}`;
 
       const response = await request.get(url)
+
+      console.log("Productos desde fetch: ",response.data.body)
       const fetchedProducts = response.data.body.products.map((p: any) => ({
         ...p,
         price: Number(p.price),
-        discount: p.discount ? Number(p.discount) : 0
+        discount: p.discount ? Number(p.discount) : 0,
+        rating: p.rating || 0,
+        reviews: p.reviews || 0
       }))
       setProducts(fetchedProducts)
       console.log("obteniendo productos: ,", fetchedProducts)
