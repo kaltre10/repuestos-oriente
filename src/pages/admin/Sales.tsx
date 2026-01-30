@@ -724,17 +724,28 @@ const Sales = () => {
                               </div>
 
                               <div className="flex-1 space-y-2">
-                                <div>
-                                  <div className='flex justify-between'>
-                                    <h4 className="text-sm font-medium text-gray-900">{sale.product.name}</h4>
-                                    <Rating
-                                      hover={false}
-                                      action={() => { }}
-                                      stars={sale.rating}
-                                    />
+                                  <div className='flex justify-between items-start'>
+                                    <div>
+                                      <h4 className="text-sm font-medium text-gray-900">{sale.product.name}</h4>
+                                      <p className="text-xs text-gray-500">{sale.product.partNumber}</p>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-1">
+                                      {sale.rating !== null ? (
+                                        <div className="flex flex-col items-end">
+                                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight mb-0.5">Calificación</span>
+                                          <Rating
+                                            hover={false}
+                                            action={() => { }}
+                                            stars={sale.rating}
+                                          />
+                                        </div>
+                                      ) : (
+                                        <span className="bg-yellow-200 text-gray-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-gray-200">
+                                          No se ha calificado aún
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
-                                  <p className="text-xs text-gray-500">{sale.product.partNumber}</p>
-                                </div>
 
                                 <div className="flex items-center justify-between">
                                   <div className="space-y-1">

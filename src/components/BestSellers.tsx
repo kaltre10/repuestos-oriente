@@ -5,6 +5,7 @@ import { List, Grid2X2, Grid3X3, Star, Loader2, Plus, Minus, Trash2 } from 'luci
 import { useProducts } from '../hooks/useProducts';
 import { imagesUrl } from '../utils/utils';
 import ProductCard from './ProductCard';
+import Rating from './Rating';
 import useStore from '../states/global';
 import FormattedPrice from './FormattedPrice';
 import useNotify from '../hooks/useNotify';
@@ -33,7 +34,7 @@ const BestSellers = () => {
   const filteredProducts = useMemo(() => {
     let filtered = products.map((p: any) => ({
       ...p,
-      rating: p.rating || 5,
+      rating: p.rating || 0,
       reviews: p.reviews || 0,
       image: p.images && p.images.length > 0 
         ? `${imagesUrl}${p.images[0].image}` 
@@ -106,13 +107,9 @@ const BestSellers = () => {
         <div className="flex-1 p-6 relative">
           <p className="text-gray-500 text-sm mb-1">{product.category}</p>
           <h3 onClick={() => navigate(`/producto/${product.id}`)} className="hover:underline cursor-pointer font-semibold text-lg mb-2 text-gray-800">{product.name}</h3>
-          <div className="flex items-center mb-3">
-            <div className="flex text-yellow-400">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} size={16} fill={i < product.rating ? 'currentColor' : 'none'} />
-              ))}
-            </div>
-            <span className="text-gray-500 text-sm ml-2">({product.reviews} reseñas)</span>
+          <div className="flex items-center gap-2 mb-3">
+            <Rating hover={false} action={() => { }} stars={Math.round(product.rating)} />
+            <span className="text-gray-500 text-sm">({product.reviews} reseñas)</span>
           </div>
           <div className="flex flex-col mb-4">
             {discountPercent > 0 ? (
