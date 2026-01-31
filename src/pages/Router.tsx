@@ -12,7 +12,7 @@ import AuthPage from "./AuthPage"
 import ResetPasswordPage from "./ResetPasswordPage"
 import ClientsPage from "./clients/ClientsPage"
 import AdminLayout from './admin/AdminLayout';
-// import HomeLayout from './home/HomeLayout';
+import HomeLayout from './home/HomeLayout';
 import ClientLayout from "./clients/ClientLayout"
 import Profile from "./clients/Profile"
 import Purchases from "./clients/Purchases"
@@ -34,7 +34,7 @@ import Test from './test'
 const Router = () => {
     return (
         <Routes>
-            {/* <Route element={<HomeLayout />}> */}
+            <Route element={<HomeLayout />}>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/productos" element={<ProductsPage />} />
                 <Route path="/producto/:id" element={<ProductDetailPage />} />
@@ -44,7 +44,7 @@ const Router = () => {
                 <Route path="/ayuda-soporte" element={<HelpSupport />} />
                 <Route path="/informacion-empresa" element={<CompanyInfo />} />
                 <Route path="/atencion-cliente" element={<CustomerService />} />
-            {/* </Route> */}
+            </Route>
 
             <Route element={<ClientLayout />}>
                 <Route path="/clients" element={<ClientsPage />} />

@@ -5,9 +5,7 @@ import { GlobalConfirmModal } from './components/modals/GlobalConfirmModal';
 // import ScrollToTop from './components/ScrollToTop';
 import AdvertisingModal from './components/AdvertisingModal';
 import WhatsAppButton from './components/WhatsAppButton';
-import HeaderNew from "./components/HeaderNew";
-import MobileBottomNav from './components/MobileBottomNav';
-import Footer from "./components/Footer";
+
 const App: React.FC = () => {
 
   const { ToastContainer } = useNotify()
@@ -17,10 +15,7 @@ const App: React.FC = () => {
     <WhatsAppButton />
     <GlobalConfirmModal />
     <ToastContainer theme="dark" />
-    <MobileBottomNav />
-    <HeaderNew />
     <Router />
-    <Footer />
   </>
 };
 
