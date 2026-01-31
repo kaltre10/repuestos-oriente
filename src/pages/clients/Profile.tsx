@@ -9,19 +9,21 @@ import { useState, useEffect, useRef } from 'react';
 import useStore from '../../states/global';
 import request from '../../utils/request';
 import { apiUrl } from '../../utils/utils';
-import { FaUser, FaPhone, FaMapMarkerAlt, FaLock, FaSave, FaSearch, FaPlus, FaEdit, FaTrash, FaStar } from 'react-icons/fa';
-import { Eye, EyeOff, X, MapPin } from 'lucide-react';
+import { FaUser, FaPhone, FaMapMarkerAlt, FaLock, FaSave, FaSearch, FaPlus, FaEdit, FaTrash, FaStar, FaShieldAlt } from 'react-icons/fa';
+import { Eye, EyeOff, X, MapPin, User, Phone, MapPin as MapPinLucide, ShieldCheck, AlertCircle } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import useConfirmStore from '../../states/useConfirmStore';
 import type { Map as LeafletMap } from 'leaflet';
+import useNotify from '../../hooks/useNotify';
 
 const Profile = () => {
   const { user, setUser } = useStore();
+  const { notify } = useNotify();
   const [loading, setLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -145,6 +147,10 @@ const mapRef = useRef<LeafletMap | null>(null);
         : [...prev.addresses, updatedAddress]
     }));
 
+    if (!hasUnsavedChanges) {
+      notify.info('Recuerda guardar los cambios al finalizar');
+    }
+    setHasUnsavedChanges(true);
     setEditingAddress(null);
   };
 
@@ -159,6 +165,11 @@ const mapRef = useRef<LeafletMap | null>(null);
       ...prev,
       addresses: prev.addresses.filter(addr => addr.id !== addressId)
     }));
+
+    if (!hasUnsavedChanges) {
+      notify.info('Recuerda guardar los cambios al finalizar');
+    }
+    setHasUnsavedChanges(true);
 
     // Si se está editando la dirección que se está eliminando, limpiar el estado
     if (editingAddress?.id === addressId) {
@@ -178,6 +189,10 @@ const mapRef = useRef<LeafletMap | null>(null);
         primary: addr.id === addressId
       }))
     }));
+    if (!hasUnsavedChanges) {
+      notify.info('Recuerda guardar los cambios al finalizar');
+    }
+    setHasUnsavedChanges(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,6 +200,10 @@ const mapRef = useRef<LeafletMap | null>(null);
       ...formData,
       [e.target.name]: e.target.value,
     });
+    if (!hasUnsavedChanges) {
+      notify.info('Recuerda guardar los cambios al finalizar');
+    }
+    setHasUnsavedChanges(true);
   };
 
   // Función para buscar direcciones (geocoding) con múltiples resultados
@@ -360,12 +379,11 @@ const mapRef = useRef<LeafletMap | null>(null);
     });
   };
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleUpdateProfile = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!user) return;
 
     setLoading(true);
-    setMessage({ type: '', text: '' });
 
     try {
       // Preparar los datos para enviar al servidor
@@ -385,12 +403,10 @@ const mapRef = useRef<LeafletMap | null>(null);
       // Update global store
       setUser(newUserState);
 
-      setMessage({ type: 'success', text: 'Perfil actualizado exitosamente' });
+      setHasUnsavedChanges(false);
+      notify.success('Perfil actualizado exitosamente');
     } catch (error: any) {
-      setMessage({
-        type: 'error',
-        text: error.response?.data?.message || 'Error al actualizar el perfil'
-      });
+      notify.error(error.response?.data?.message || 'Error al actualizar el perfil');
     } finally {
       setLoading(false);
     }
@@ -401,12 +417,11 @@ const mapRef = useRef<LeafletMap | null>(null);
     if (!user) return;
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setMessage({ type: 'error', text: 'Las contraseñas nuevas no coinciden' });
+      notify.error('Las contraseñas nuevas no coinciden');
       return;
     }
 
     setPasswordLoading(true);
-    setMessage({ type: '', text: '' });
 
     try {
       await request.put(`${apiUrl}/users/${user.id}/password`, {
@@ -414,462 +429,474 @@ const mapRef = useRef<LeafletMap | null>(null);
         newPassword: passwordData.newPassword,
       });
 
-      setMessage({ type: 'success', text: 'Contraseña actualizada exitosamente' });
+      notify.success('Contraseña actualizada exitosamente');
       setPasswordData({
         oldPassword: '',
         newPassword: '',
         confirmPassword: '',
       });
     } catch (error: any) {
-      setMessage({
-        type: 'error',
-        text: error.response?.data?.message || 'Error al actualizar la contraseña'
-      });
+      notify.error(error.response?.data?.message || 'Error al actualizar la contraseña');
     } finally {
       setPasswordLoading(false);
     }
   };
 
   return (
-    <div className="p-6">
-      <div className="pb-8">
-        <div className="border-b border-gray-300 pb-3 mb-3">
-          <h2 className="text-xl font-bold text-gray-600 flex items-center gap-2">
-            <FaUser /> Mi Perfil
-          </h2>
+    <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500">
+      {/* Header de la Página */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-6">
+        <div>
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+            <div className="p-2 bg-red-50 rounded-xl">
+              <User className="w-8 h-8 text-red-600" />
+            </div>
+            Mi Perfil
+          </h1>
+          <p className="text-gray-500 mt-1 font-medium">Gestiona tu información personal y de seguridad</p>
         </div>
+      </div>
 
-        <div className="">
-          {message.text && (
-            <div className={`mb-6 p-4 rounded-md text-sm ${message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
-              }`}>
-              {message.text}
-            </div>
-          )}
-
-          <form onSubmit={handleUpdateProfile} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <FaUser className="text-gray-400" /> Nombre Completo
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
-                />
+      {/* Notificación de Cambios Pendientes (Arriba) */}
+      {hasUnsavedChanges && (
+        <div className="animate-in slide-in-from-top-4 duration-500">
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl px-6 py-4 flex items-center justify-between gap-4 shadow-sm ring-4 ring-amber-50/50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-100 rounded-xl">
+                <AlertCircle className="w-5 h-5 text-amber-600" />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <FaPhone className="text-gray-400" /> Teléfono
-                </label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  placeholder="Ej: +58 412 1234567"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
-                />
+                <p className="text-sm font-black text-amber-900 uppercase tracking-wider">Cambios sin guardar</p>
+                <p className="text-xs font-bold text-amber-700">
+                  Has realizado modificaciones. No olvides pulsar el botón de guardado al final de la página.
+                </p>
               </div>
             </div>
-           
+            {/* <button 
+              onClick={() => {
+                const element = document.getElementById('save-button-container');
+                element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }}
+              className="hidden md:block px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-black rounded-xl transition-all active:scale-95 uppercase tracking-widest shadow-md shadow-amber-200"
+            >
+              Ir a Guardar
+            </button> */}
+          </div>
+        </div>
+      )}
 
-            <div className="col-span-1 md:col-span-2">
-              <div className='flex justify-between w-full rounded-lg mb-6'>
-                <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <FaMapMarkerAlt className="text-gray-400" /> Direcciones de Envío
-                </label>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Columna Izquierda: Información Personal y Direcciones */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Card: Datos Personales */}
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-1.5 h-6 bg-red-600 rounded-full" />
+                <h2 className="text-xl font-black text-gray-900">Datos Personales</h2>
+              </div>
 
-                {/* Botón de agregar dirección debajo del título */}
-                <div className="mb-4">
-                  <button
-                    type="button"
-                    onClick={addAddress}
-                    className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md"
-                  >
-                    <FaPlus className="h-4 w-4" />
-                    Agregar Dirección
-                  </button>
+              <form onSubmit={handleUpdateProfile} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-700 ml-1 flex items-center gap-2">
+                      <User className="w-4 h-4 text-gray-400" /> Nombre Completo
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="Tu nombre completo"
+                      className="w-full px-5 py-3.5 bg-gray-50 border-transparent rounded-2xl focus:bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-medium text-gray-900"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-700 ml-1 flex items-center gap-2">
+                      <Phone className="w-4 h-4 text-gray-400" /> Teléfono
+                    </label>
+                    <input
+                      type="text"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      placeholder="Ej: +58 412 1234567"
+                      className="w-full px-5 py-3.5 bg-gray-50 border-transparent rounded-2xl focus:bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-medium text-gray-900"
+                    />
+                  </div>
                 </div>
+              </form>
+            </div>
+          </div>
+
+          {/* Card: Direcciones */}
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 md:p-8">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-1.5 h-6 bg-red-600 rounded-full" />
+                  <h2 className="text-xl font-black text-gray-900">Direcciones de Envío</h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={addAddress}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all group active:scale-95 font-bold text-sm"
+                >
+                  <FaPlus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
+                  <span className="hidden sm:inline">Nueva Dirección</span>
+                </button>
               </div>
 
-              {/* Lista de direcciones */}
-              <div className="mb-6 space-y-3">
+              <div className="space-y-4">
                 {formData.addresses.filter(address => address.address.trim() !== '').length === 0 ? (
-                  <div className="bg-gray-50 border border-dashed border-gray-300 rounded-xl p-8 text-center">
-                    <div className="bg-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
-                      <FaMapMarkerAlt className="text-gray-400 w-6 h-6" />
+                  <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-[2rem] md:rounded-3xl p-6 md:p-10 text-center">
+                    <div className="bg-white w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-sm ring-4 ring-gray-50">
+                      <MapPinLucide className="text-gray-300 w-8 h-8 md:w-10 md:h-10" />
                     </div>
-                    <h3 className="text-gray-900 font-bold text-lg mb-1">No hay direcciones guardadas</h3>
-                    <p className="text-gray-500 text-sm max-w-xs mx-auto">
-                      Aún no has agregado ninguna dirección de envío. Agrega una para facilitar tus compras.
+                    <h3 className="text-gray-900 font-black text-lg md:text-xl">Sin direcciones</h3>
+                    <p className="text-gray-500 text-xs md:text-sm mt-2 md:mt-3 font-medium max-w-xs mx-auto leading-relaxed">
+                      Agrega tu primera dirección para que tus entregas sean más rápidas y precisas.
                     </p>
                   </div>
                 ) : (
-                  formData.addresses
-                    .filter(address => address.address.trim() !== '')
-                    .map((address) => (
-                      <div key={address.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 bg-white">
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start gap-2">
-                              <p className="text-sm text-gray-600 line-clamp-3">{address.address}</p>
-                              {address.primary && (
-                                <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full flex items-center gap-1 mt-0.5 whitespace-nowrap">
-                                  <FaStar className="h-3 w-3" /> Principal
-                                </span>
-                              )}
+                  <div className="grid grid-cols-1 gap-4">
+                    {formData.addresses
+                      .filter(address => address.address.trim() !== '')
+                      .map((address) => (
+                        <div 
+                          key={address.id} 
+                          className={`group relative border-2 rounded-[1.5rem] p-4 transition-all duration-300 ${
+                            address.primary 
+                              ? 'bg-red-50/20 border-red-100' 
+                              : 'bg-white border-gray-50 hover:border-gray-200 hover:shadow-xl hover:shadow-gray-100/50'
+                          }`}
+                        >
+                          <div className="flex flex-col justify-between items-start gap-4">
+                            <div className="flex-1 min-w-0 w-full">
+                              <div className="flex items-center justify-between gap-3 mb-3">
+                                <div className="flex items-center gap-3">
+                                  <div className={`p-2 rounded-xl ${address.primary ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-400'}`}>
+                                    <MapPinLucide className="w-5 h-5" />
+                                  </div>
+                                  {address.primary && (
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-red-600 bg-red-100/50 px-3 py-1 rounded-full border border-red-100">
+                                      Principal
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Botones de acción siempre visibles en la esquina superior derecha */}
+                                <div className="flex items-center gap-1">
+                                  {!address.primary && (
+                                    <button
+                                      type="button"
+                                      onClick={() => setAsPrimary(address.id)}
+                                      className="p-2 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-xl transition-all active:scale-90"
+                                      title="Marcar como principal"
+                                    >
+                                      <FaStar className="w-4 h-4" />
+                                    </button>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => editAddress(address)}
+                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all active:scale-90"
+                                    title="Editar"
+                                  >
+                                    <FaEdit className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => deleteAddress(address.id)}
+                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all active:scale-90"
+                                    title="Eliminar"
+                                  >
+                                    <FaTrash className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                              <p className="text-sm font-bold text-gray-900 leading-relaxed break-words">
+                                {address.address}
+                              </p>
                             </div>
                           </div>
-
-                          {/* Botones de acción con iconos */}
-                          <div className="flex gap-2">
-                            {/* Botón Principal */}
-                            <button
-                              type="button"
-                              onClick={() => setAsPrimary(address.id)}
-                              title={address.primary ? "Ya es principal" : "Establecer como principal"}
-                              className={`p-2 rounded-full transition-all duration-200 ${address.primary ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100' : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-50'}`}
-                              disabled={address.primary}
-                            >
-                              <FaStar className="h-5 w-5" />
-                            </button>
-
-                            {/* Botón Editar */}
-                            <button
-                              type="button"
-                              onClick={() => editAddress(address)}
-                              title="Editar dirección"
-                              className="p-2 rounded-full text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all duration-200"
-                            >
-                              <FaEdit className="h-5 w-5" />
-                            </button>
-
-                            {/* Botón Eliminar */}
-                            <button
-                              type="button"
-                              onClick={() => deleteAddress(address.id)}
-                              title="Eliminar dirección"
-                              className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-200"
-                            >
-                              <FaTrash className="h-5 w-5" />
-                            </button>
-                          </div>
                         </div>
-                      </div>
-                    ))
+                      ))}
+                  </div>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
 
-              {/* Formulario para agregar/editar dirección */}
-              {editingAddress && (
-                <div className="fixed inset-0 z-[5000] flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setEditingAddress(null)}>
-                  <div
-                    className="bg-white w-full max-w-3xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[95vh] flex flex-col"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {/* Header */}
-                    <div className="p-4 md:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                      <div className="min-w-0">
-                        <h2 className="text-xl md:text-2xl font-black text-gray-900 truncate flex items-center gap-2">
-                          <MapPin className="w-5 h-5 md:w-6 md:h-6 text-red-500" />
-                          {formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Editar Dirección' : 'Crear Dirección'}
-                        </h2>
-                        <p className="text-gray-500 text-xs md:text-sm font-medium mt-1">
-                          {formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Modifica los detalles de tu ubicación' : 'Añade una nueva ubicación de envío'}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setEditingAddress(null)}
-                        className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500 flex-shrink-0"
-                      >
-                        <X className="w-5 h-5 md:w-6 md:h-6" />
-                      </button>
-                    </div>
+        {/* Columna Derecha: Seguridad */}
+        <div className="space-y-8">
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden lg:sticky lg:top-8">
+            <div className="p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-1.5 h-6 bg-red-600 rounded-full" />
+                <h2 className="text-xl font-black text-gray-900">Seguridad</h2>
+              </div>
 
-                    {/* Body */}
-                    <div className="overflow-y-auto flex-1 p-4 md:p-6 space-y-6">
-                      <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Buscar dirección
-                      </label>
-                      {/* Contenedor principal con z-index muy alto */}
-                      <div className="relative z-[10000]">
-                        {/* Input de búsqueda de dirección con dropdown */}
-                        <div className="relative">
-                          <input
-                            ref={searchInputRef}
-                            type="text"
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                            placeholder="Buscar dirección..."
-                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm hover:shadow-md"
-                          />
-                          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <form onSubmit={handleUpdatePassword} className="space-y-5">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 ml-1 flex items-center gap-2">
+                    <FaLock className="w-3.5 h-3.5 text-gray-400" /> Contraseña Actual
+                  </label>
+                  <div className="relative group">
+                    <input
+                      type={showOldPassword ? 'text' : 'password'}
+                      name="oldPassword"
+                      value={passwordData.oldPassword}
+                      onChange={handlePasswordChange}
+                      required
+                      placeholder="••••••••"
+                      className="w-full pl-5 pr-12 py-3.5 bg-gray-50 border-transparent rounded-2xl focus:bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-medium"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                      onClick={() => setShowOldPassword(!showOldPassword)}
+                    >
+                      {showOldPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
 
-                          {/* Dropdown de resultados - Asegurado por encima del mapa */}
-                          {isSearching ? (
-                            <div
-                              className="absolute z-[99999] mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl"
-                              style={{
-                                zIndex: 99999,
-                                position: 'absolute',
-                                top: '100%',
-                                left: 0,
-                                right: 0,
-                                borderRadius: '0.5rem',
-                                border: '1px solid #e5e7eb',
-                                margin: '0.25rem 0 0 0',
-                                width: '100%',
-                                boxSizing: 'border-box',
-                                pointerEvents: 'auto',
-                                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-                              }}
-                            >
-                              <div className="px-4 py-3 flex items-center justify-center text-sm text-gray-500">
-                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Buscando direcciones...
-                              </div>
-                            </div>
-                          ) : showResults && searchResults.length > 0 && (
-                            <div
-                              ref={resultsContainerRef}
-                              className="absolute z-[99999] mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto"
-                              style={{
-                                zIndex: 99999,
-                                position: 'absolute',
-                                top: '100%',
-                                left: 0,
-                                right: 0,
-                                borderRadius: '0.5rem',
-                                border: '1px solid #e5e7eb',
-                                maxHeight: '15rem',
-                                overflowY: 'auto',
-                                margin: '0.25rem 0 0 0',
-                                width: '100%',
-                                boxSizing: 'border-box',
-                                pointerEvents: 'auto',
-                                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-                              }}
-                            >
-                              {searchResults.map((result, index) => (
-                                <div
-                                  key={index}
-                                  onClick={() => handleSelectAddress(result)}
-                                  className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors text-sm border-b border-gray-100 last:border-b-0"
-                                >
-                                  {result.display_name}
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 ml-1 flex items-center gap-2">
+                    <FaShieldAlt className="w-3.5 h-3.5 text-gray-400" /> Nueva Contraseña
+                  </label>
+                  <div className="relative group">
+                    <input
+                      type={showNewPassword ? 'text' : 'password'}
+                      name="newPassword"
+                      value={passwordData.newPassword}
+                      onChange={handlePasswordChange}
+                      required
+                      placeholder="Mínimo 8 caracteres"
+                      className="w-full pl-5 pr-12 py-3.5 bg-gray-50 border-transparent rounded-2xl focus:bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-medium"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                    >
+                      {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 ml-1 flex items-center gap-2">
+                    <ShieldCheck className="w-3.5 h-3.5 text-gray-400" /> Confirmar Nueva
+                  </label>
+                  <div className="relative group">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      name="confirmPassword"
+                      value={passwordData.confirmPassword}
+                      onChange={handlePasswordChange}
+                      required
+                      placeholder="Repite tu nueva contraseña"
+                      className="w-full pl-5 pr-12 py-3.5 bg-gray-50 border-transparent rounded-2xl focus:bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-medium"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={passwordLoading}
+                  className="w-full mt-4 bg-gray-900 hover:bg-black text-white py-4 rounded-2xl font-bold shadow-lg shadow-gray-200 transition-all flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95"
+                >
+                  {passwordLoading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <FaLock className="w-4 h-4" />
+                  )}
+                  {passwordLoading ? 'Actualizando...' : 'Cambiar Contraseña'}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Botón General de Actualización */}
+      <div id="save-button-container" className="flex justify-center md:justify-end pt-8 border-t border-gray-100">
+        <button
+          type="button"
+          onClick={() => handleUpdateProfile()}
+          disabled={loading}
+          className="w-full md:w-auto bg-gray-900 hover:bg-black text-white px-16 py-5 rounded-[2rem] font-black shadow-2xl shadow-gray-200 transition-all flex items-center justify-center gap-4 disabled:opacity-50 active:scale-95 text-xl"
+        >
+          {loading ? (
+            <div className="w-7 h-7 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            <FaSave className="w-7 h-7" />
+          )}
+          {loading ? 'Guardando cambios...' : 'Guardar Información'}
+        </button>
+      </div>
+
+      {/* Reutilización del Modal Existente */}
+      {editingAddress && (
+        <div className="fixed inset-0 z-[5000] flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setEditingAddress(null)}>
+          <div
+            className="bg-white w-full max-w-3xl rounded-[2.5rem] md:rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[95vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header del Modal */}
+            <div className="p-6 md:p-8 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+              <div className="min-w-0">
+                <h2 className="text-2xl md:text-3xl font-black text-gray-900 truncate flex items-center gap-3">
+                  <div className="p-2 bg-red-100 rounded-xl">
+                    <MapPinLucide className="w-6 h-6 md:w-8 md:h-8 text-red-600" />
+                  </div>
+                  {formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Editar Ubicación' : 'Nueva Ubicación'}
+                </h2>
+                <p className="text-gray-500 text-sm font-medium mt-1 ml-1">
+                  {formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Modifica los detalles de tu entrega' : 'Añade un nuevo punto de envío'}
+                </p>
+              </div>
+              <button
+                onClick={() => setEditingAddress(null)}
+                className="p-3 hover:bg-gray-200 rounded-2xl transition-colors text-gray-500 flex-shrink-0 active:scale-90"
+              >
+                <X className="w-6 h-6 md:w-7 md:h-7" />
+              </button>
+            </div>
+
+            {/* Body del Modal */}
+            <div className="overflow-y-auto flex-1 p-6 md:p-8 space-y-8">
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <label className="text-sm font-black text-gray-900 ml-1 flex items-center gap-2">
+                    <FaSearch className="w-3.5 h-3.5 text-red-600" /> Buscar Dirección
+                  </label>
+                  <div className="relative z-[10000]">
+                    <div className="relative">
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        placeholder="Escribe tu calle, sector o punto de referencia..."
+                        className="w-full pl-14 pr-6 py-4.5 bg-gray-50 border-transparent rounded-[1.5rem] focus:bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-bold text-gray-900 shadow-sm"
+                      />
+                      <FaSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+
+                      {/* Dropdown de resultados */}
+                      {isSearching ? (
+                        <div className="absolute z-[99999] mt-3 w-full bg-white border border-gray-100 rounded-2xl shadow-2xl p-6 text-center animate-in fade-in slide-in-from-top-2">
+                          <div className="flex items-center justify-center gap-3 text-gray-500 font-bold">
+                            <div className="w-5 h-5 border-3 border-red-600/30 border-t-red-600 rounded-full animate-spin" />
+                            Buscando...
+                          </div>
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Resultado de la dirección */}
-                    {addressResult && (
-                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                        <p className="text-sm text-blue-700 flex items-start gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span>
-                            <strong>Dirección seleccionada:</strong> {addressResult}
-                          </span>
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Mapa */}
-                    <div className="border border-gray-200 rounded-lg overflow-hidden h-80 shadow-sm">
-                      <MapContainer
-                        center={location}
-                        zoom={13}
-                        style={{ height: '100%', width: '100%' }}
-                        ref={mapRef}
-                      >
-                        <TileLayer
-                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        />
-                        <MapEvents />
-                        <MapCenterer />
-                        <Marker
-                          position={location}
-                          draggable={true}
-                          eventHandlers={{ dragend: handleMarkerDrag }}
-                          icon={L.icon({
-                            iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                            iconSize: [25, 41],
-                            iconAnchor: [12, 41],
-                            popupAnchor: [1, -34],
-                          })}
+                      ) : showResults && searchResults.length > 0 && (
+                        <div
+                          ref={resultsContainerRef}
+                          className="absolute z-[99999] mt-3 w-full bg-white border border-gray-100 rounded-2xl shadow-2xl max-h-72 overflow-y-auto animate-in fade-in slide-in-from-top-2"
                         >
-                          <Popup>
-                            <div>
-                              <h3 className="font-semibold text-sm">Tu ubicación</h3>
-                              <p className="text-xs">{addressResult || 'Selecciona una ubicación'}</p>
+                          {searchResults.map((result, index) => (
+                            <div
+                              key={index}
+                              onClick={() => handleSelectAddress(result)}
+                              className="px-6 py-4 cursor-pointer hover:bg-red-50 transition-colors text-sm font-bold text-gray-700 border-b border-gray-50 last:border-b-0 flex items-start gap-3"
+                            >
+                              <MapPinLucide className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                              {result.display_name}
                             </div>
-                          </Popup>
-                        </Marker>
-                      </MapContainer>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
+                </div>
 
+                {/* Resultado Seleccionado */}
+                {addressResult && (
+                  <div className="p-5 bg-green-50/50 border border-green-100 rounded-2xl flex items-start gap-4 animate-in zoom-in-95">
+                    <div className="p-2 bg-green-100 rounded-xl">
+                      <ShieldCheck className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-black text-green-700 uppercase tracking-wider mb-1">Ubicación Confirmada</p>
+                      <p className="text-sm font-bold text-green-900 leading-snug">{addressResult}</p>
+                    </div>
                   </div>
-                  {/* Footer */}
-                  <div className="p-4 md:p-6 bg-gray-50/50 border-t border-gray-100 flex gap-3 justify-end">
-                    <button
-                      type="button"
-                      onClick={() => setEditingAddress(null)}
-                      className="px-6 py-3.5 rounded-xl font-bold text-gray-700 hover:bg-gray-200 transition-colors"
+                )}
+
+                {/* Mapa */}
+                <div className="relative border-4 border-gray-50 rounded-[2rem] overflow-hidden h-80 shadow-inner group">
+                  <MapContainer
+                    center={location}
+                    zoom={13}
+                    style={{ height: '100%', width: '100%' }}
+                    ref={mapRef}
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    />
+                    <MapEvents />
+                    <MapCenterer />
+                    <Marker
+                      position={location}
+                      draggable={true}
+                      eventHandlers={{ dragend: handleMarkerDrag }}
+                      icon={L.icon({
+                        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                      })}
                     >
-                      Cancelar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={saveCurrentAddress}
-                      disabled={!addressResult.trim()}
-                      className="bg-gray-900 hover:bg-black text-white px-8 py-3.5 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-900"
-                    >
-                      <FaSave className="h-4 w-4" />
-                      {formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Guardar Cambios' : 'Agregar Dirección'}
-                    </button>
-                  </div>
+                      <Popup className="custom-popup">
+                        <div className="p-1 font-bold">Tu entrega llegará aquí</div>
+                      </Popup>
+                    </Marker>
+                  </MapContainer>
+                  <div className="absolute bottom-4 left-4 z-[1000] bg-white/90 backdrop-blur px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 shadow-sm border border-gray-100">
+                    Puedes mover el marcador
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
-             <div className="flex justify-end">
+            {/* Footer del Modal */}
+            <div className="p-6 md:p-8 bg-gray-50/50 border-t border-gray-100 flex flex-col md:flex-row gap-4">
               <button
-                type="submit"
-                disabled={loading}
-                className="bg-red-600 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                type="button"
+                onClick={() => setEditingAddress(null)}
+                className="flex-1 px-8 py-4.5 rounded-2xl font-black text-gray-500 hover:bg-gray-200 transition-all active:scale-95"
               >
-                {loading ? 'Guardando...' : <><FaSave /> Guardar Cambios</>}
+                Cancelar
               </button>
-            </div> <hr className='border-gray-300 my-6' />
-
-          </form>
-        </div>
-      </div>
-
-      <div className="">
-        <div className="py-4 border-b border-gray-300 pb-3 mb-3">
-          <h2 className="text-xl font-bold text-gray-600 flex items-center gap-2">
-            <FaLock /> Cambiar Contraseña
-          </h2>
-        </div>
-
-        <div className="">
-          <form onSubmit={handleUpdatePassword} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contraseña Actual
-                </label>
-                <div className="relative">
-                  <input
-                    type={showOldPassword ? 'text' : 'password'}
-                    name="oldPassword"
-                    value={passwordData.oldPassword}
-                    onChange={handlePasswordChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all pr-10"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                    onClick={() => setShowOldPassword(!showOldPassword)}
-                  >
-                    {showOldPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nueva Contraseña
-                </label>
-                <div className="relative">
-                  <input
-                    type={showNewPassword ? 'text' : 'password'}
-                    name="newPassword"
-                    value={passwordData.newPassword}
-                    onChange={handlePasswordChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all pr-10"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                  >
-                    {showNewPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirmar Nueva Contraseña
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    name="confirmPassword"
-                    value={passwordData.confirmPassword}
-                    onChange={handlePasswordChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all pr-10"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end">
               <button
-                type="submit"
-                disabled={passwordLoading}
-                className="bg-red-600 text-white px-6 py-2 rounded-md font-semibold hover:bg-gray-900 transition-colors flex items-center gap-2 disabled:opacity-50"
+                type="button"
+                onClick={saveCurrentAddress}
+                disabled={!addressResult.trim()}
+                className="flex-[2] bg-gray-900 hover:bg-black text-white px-8 py-4.5 rounded-2xl font-black shadow-xl shadow-gray-200 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
               >
-                {passwordLoading ? 'Actualizando...' : <><FaLock /> Actualizar Contraseña</>}
+                <FaSave className="w-5 h-5" />
+                {formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Actualizar Dirección' : 'Confirmar Dirección'}
               </button>
             </div>
-          </form>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
