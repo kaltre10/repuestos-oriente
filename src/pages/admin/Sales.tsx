@@ -415,6 +415,9 @@ const Sales = () => {
                               transform: `translateX(${i * 12}px) translateY(${i * -4}px) rotate(${i * 2}deg)`,
                               opacity: 1 - (i * 0.2)
                             }}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                            }}
                           />
                         })}
                       </div>
@@ -794,6 +797,9 @@ const Sales = () => {
                                     : '/placeholder-product.svg'}
                                   alt={sale.product.name}
                                   className="w-full h-full object-cover rounded-lg"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                                  }}
                                 />
                               </div>
 

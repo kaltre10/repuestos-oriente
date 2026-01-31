@@ -466,9 +466,12 @@ const CheckoutPage = () => {
                   <div key={item.id} className="flex items-start space-x-4 pb-4 border-b border-gray-100 last:border-0">
                     <div className="relative group">
                       <img
-                        src={item.image}
+                        src={item.image || '/placeholder-product.svg'}
                         alt={item.name}
                         className="w-20 h-20 object-cover rounded-xl shadow-sm group-hover:scale-105 transition-transform"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                        }}
                       />
                     </div>
                     <div className="flex-1">

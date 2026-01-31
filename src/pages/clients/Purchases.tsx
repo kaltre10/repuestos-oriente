@@ -322,6 +322,9 @@ const Purchases = () => {
                             transform: `translateX(${i * 12}px) translateY(${i * -4}px) rotate(${i * 2}deg)`,
                             opacity: 1 - (i * 0.2)
                           }}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                          }}
                         />
                       ))}
                     </div>
@@ -454,6 +457,9 @@ const Purchases = () => {
                                   : '/placeholder-product.svg'}
                                 alt={item.product.name}
                                 className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg md:rounded-xl"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                                }}
                               />
                               <div className="flex-1 min-w-0">
                                 <div className='flex justify-between'>

@@ -41,9 +41,12 @@ const CartModal = () => {
               {cart.map((item) => (
                 <div key={item.id} className="flex items-center space-x-4 pb-4">
                   <img
-                    src={item.image}
+                    src={item.image || '/placeholder-product.svg'}
                     alt={item.name}
                     className="w-16 h-16 object-cover rounded"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                    }}
                   />
                   <div className="flex-1">
                     <h3 className="font-medium text-gray-800">{item.name}</h3>
