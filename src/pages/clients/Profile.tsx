@@ -10,7 +10,7 @@ import useStore from '../../states/global';
 import request from '../../utils/request';
 import { apiUrl } from '../../utils/utils';
 import { FaUser, FaPhone, FaMapMarkerAlt, FaLock, FaSave, FaSearch, FaPlus, FaEdit, FaTrash, FaStar } from 'react-icons/fa';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, X, MapPin } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -223,11 +223,6 @@ const mapRef = useRef<LeafletMap | null>(null);
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
-
-    // Mostrar el mapa automáticamente al empezar a escribir
-    if (value.trim() && !showMap) {
-      setShowMap(true);
-    }
 
     // Limpiar timeout anterior
     if (window.searchTimeout) {
@@ -482,15 +477,7 @@ const mapRef = useRef<LeafletMap | null>(null);
                 />
               </div>
             </div>
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={loading}
-                className="bg-red-600 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50"
-              >
-                {loading ? 'Guardando...' : <><FaSave /> Guardar Cambios</>}
-              </button>
-            </div> <hr className='border-gray-300 my-6' />
+           
 
             <div className="col-span-1 md:col-span-2">
               <div className='flex justify-between w-full rounded-lg mb-6'>
@@ -513,84 +500,101 @@ const mapRef = useRef<LeafletMap | null>(null);
 
               {/* Lista de direcciones */}
               <div className="mb-6 space-y-3">
-                {formData.addresses
-                  .filter(address => address.address.trim() !== '')
-                  .map((address) => (
-                    <div key={address.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 bg-white">
-                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start gap-2">
-                            <p className="text-sm text-gray-600 line-clamp-3">{address.address}</p>
-                            {address.primary && (
-                              <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full flex items-center gap-1 mt-0.5 whitespace-nowrap">
-                                <FaStar className="h-3 w-3" /> Principal
-                              </span>
-                            )}
+                {formData.addresses.filter(address => address.address.trim() !== '').length === 0 ? (
+                  <div className="bg-gray-50 border border-dashed border-gray-300 rounded-xl p-8 text-center">
+                    <div className="bg-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                      <FaMapMarkerAlt className="text-gray-400 w-6 h-6" />
+                    </div>
+                    <h3 className="text-gray-900 font-bold text-lg mb-1">No hay direcciones guardadas</h3>
+                    <p className="text-gray-500 text-sm max-w-xs mx-auto">
+                      Aún no has agregado ninguna dirección de envío. Agrega una para facilitar tus compras.
+                    </p>
+                  </div>
+                ) : (
+                  formData.addresses
+                    .filter(address => address.address.trim() !== '')
+                    .map((address) => (
+                      <div key={address.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 bg-white">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start gap-2">
+                              <p className="text-sm text-gray-600 line-clamp-3">{address.address}</p>
+                              {address.primary && (
+                                <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full flex items-center gap-1 mt-0.5 whitespace-nowrap">
+                                  <FaStar className="h-3 w-3" /> Principal
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Botones de acción con iconos */}
+                          <div className="flex gap-2">
+                            {/* Botón Principal */}
+                            <button
+                              type="button"
+                              onClick={() => setAsPrimary(address.id)}
+                              title={address.primary ? "Ya es principal" : "Establecer como principal"}
+                              className={`p-2 rounded-full transition-all duration-200 ${address.primary ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100' : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-50'}`}
+                              disabled={address.primary}
+                            >
+                              <FaStar className="h-5 w-5" />
+                            </button>
+
+                            {/* Botón Editar */}
+                            <button
+                              type="button"
+                              onClick={() => editAddress(address)}
+                              title="Editar dirección"
+                              className="p-2 rounded-full text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all duration-200"
+                            >
+                              <FaEdit className="h-5 w-5" />
+                            </button>
+
+                            {/* Botón Eliminar */}
+                            <button
+                              type="button"
+                              onClick={() => deleteAddress(address.id)}
+                              title="Eliminar dirección"
+                              className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-200"
+                            >
+                              <FaTrash className="h-5 w-5" />
+                            </button>
                           </div>
                         </div>
-
-                        {/* Botones de acción con iconos */}
-                        <div className="flex gap-2">
-                          {/* Botón Principal */}
-                          <button
-                            type="button"
-                            onClick={() => setAsPrimary(address.id)}
-                            title={address.primary ? "Ya es principal" : "Establecer como principal"}
-                            className={`p-2 rounded-full transition-all duration-200 ${address.primary ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100' : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-50'}`}
-                            disabled={address.primary}
-                          >
-                            <FaStar className="h-5 w-5" />
-                          </button>
-
-                          {/* Botón Editar */}
-                          <button
-                            type="button"
-                            onClick={() => editAddress(address)}
-                            title="Editar dirección"
-                            className="p-2 rounded-full text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all duration-200"
-                          >
-                            <FaEdit className="h-5 w-5" />
-                          </button>
-
-                          {/* Botón Eliminar */}
-                          <button
-                            type="button"
-                            onClick={() => deleteAddress(address.id)}
-                            title="Eliminar dirección"
-                            className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-200"
-                          >
-                            <FaTrash className="h-5 w-5" />
-                          </button>
-                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                )}
               </div>
 
               {/* Formulario para agregar/editar dirección */}
               {editingAddress && (
-                <div className="border border-gray-200 rounded-xl p-6 mb-6 bg-white shadow-sm">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                      {formData.addresses.some(addr => addr.id === editingAddress.id) ? (
-                        <>Editar Dirección</>
-                      ) : (
-                        <>Crear Dirección</>
-                      )}
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => setEditingAddress(null)}
-                      className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
-                      title="Cancelar edición"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
+                <div className="fixed inset-0 z-[5000] flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setEditingAddress(null)}>
+                  <div
+                    className="bg-white w-full max-w-3xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[95vh] flex flex-col"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Header */}
+                    <div className="p-4 md:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                      <div className="min-w-0">
+                        <h2 className="text-xl md:text-2xl font-black text-gray-900 truncate flex items-center gap-2">
+                          <MapPin className="w-5 h-5 md:w-6 md:h-6 text-red-500" />
+                          {formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Editar Dirección' : 'Crear Dirección'}
+                        </h2>
+                        <p className="text-gray-500 text-xs md:text-sm font-medium mt-1">
+                          {formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Modifica los detalles de tu ubicación' : 'Añade una nueva ubicación de envío'}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setEditingAddress(null)}
+                        className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500 flex-shrink-0"
+                      >
+                        <X className="w-5 h-5 md:w-6 md:h-6" />
+                      </button>
+                    </div>
 
-                  <div className="space-y-4">
+                    {/* Body */}
+                    <div className="overflow-y-auto flex-1 p-4 md:p-6 space-y-6">
+                      <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Buscar dirección
@@ -723,30 +727,40 @@ const mapRef = useRef<LeafletMap | null>(null);
                     </div>
                   </div>
 
-                  {/* Botones para guardar o cancelar */}
-                  <div className="flex gap-3 justify-end pt-4 border-t border-gray-100">
+                  </div>
+                  {/* Footer */}
+                  <div className="p-4 md:p-6 bg-gray-50/50 border-t border-gray-100 flex gap-3 justify-end">
                     <button
                       type="button"
                       onClick={() => setEditingAddress(null)}
-                      className="bg-gray-100 text-gray-700 px-4 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-all duration-200 shadow-sm"
+                      className="px-6 py-3.5 rounded-xl font-bold text-gray-700 hover:bg-gray-200 transition-colors"
                     >
                       Cancelar
                     </button>
                     <button
                       type="button"
                       onClick={saveCurrentAddress}
-                      className="bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2"
+                      disabled={!addressResult.trim()}
+                      className="bg-gray-900 hover:bg-black text-white px-8 py-3.5 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-900"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Guardar Dirección
+                      <FaSave className="h-4 w-4" />
+                      {formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Guardar Cambios' : 'Agregar Dirección'}
                     </button>
+                  </div>
                   </div>
                 </div>
               )}
             </div>
 
+             <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-red-600 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                {loading ? 'Guardando...' : <><FaSave /> Guardar Cambios</>}
+              </button>
+            </div> <hr className='border-gray-300 my-6' />
 
           </form>
         </div>
