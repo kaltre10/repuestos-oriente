@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, ArrowLeft, ShoppingCart, Loader2, MessageSquare, Send, Plus, Minus, Trash2, Search } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Loader2, MessageSquare, Send, Plus, Minus, Trash2, Search } from 'lucide-react';
 import { useProducts } from '../../hooks/useProducts';
 import { imagesUrl, apiUrl } from '../../utils/utils';
 import request from '../../utils/request';
@@ -27,10 +27,10 @@ const ProductDetailPage = () => {
   const [notFound, setNotFound] = useState(false);
 
   // Question states
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [, setQuestions] = useState<any[]>([]); 
   const [newQuestion, setNewQuestion] = useState('');
   const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
-  const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const [, setLoadingQuestions] = useState(true);
 
   useEffect(() => {
     const fetchProduct = async () => {

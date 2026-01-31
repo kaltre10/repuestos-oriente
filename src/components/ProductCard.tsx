@@ -1,4 +1,4 @@
-import { Star, Plus, Minus, Trash2 } from 'lucide-react';
+import { Plus, Minus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Rating from './Rating';
 import useStore from '../states/global';

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { ShoppingBag, Package, Calendar, Clock, ChevronRight, AlertCircle, ExternalLink, X, CreditCard, Hash, Image as ImageIcon, Upload, CheckCircle2, Star, UserIcon } from 'lucide-react';
+import { ShoppingBag, Package, Calendar, Clock, ChevronRight, AlertCircle, ExternalLink, X, CreditCard, Hash, Image as ImageIcon, Upload, CheckCircle2, UserIcon } from 'lucide-react';
 import useStore from '../../states/global';
 import { apiUrl, imagesUrl } from '../../utils/utils';
 import request from '../../utils/request';

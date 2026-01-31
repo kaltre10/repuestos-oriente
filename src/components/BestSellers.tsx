@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { List, Grid2X2, Grid3X3, Star, Loader2, Plus, Minus, Trash2 } from 'lucide-react';
+import { List, Grid2X2, Grid3X3, Loader2, Plus, Minus, Trash2 } from 'lucide-react';
 import { useProducts } from '../hooks/useProducts';
 import { imagesUrl } from '../utils/utils';
 import ProductCard from './ProductCard';
