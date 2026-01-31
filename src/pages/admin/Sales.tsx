@@ -193,7 +193,7 @@ const Sales = () => {
 
   // Filter sales after grouping
   const filteredSales = groupedSales.filter(group => {
-    const groupText = `${group[0].buyer?.name || ''} ${group[0].product?.name || ''} ${group[0].referenceNumber || ''}`;
+    const groupText = `${group[0].buyer?.name || ''} ${group[0].product?.name || ''} ${group[0].referenceNumber || ''} ${group[0].order?.orderNumber || ''}`;
     return groupText.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
@@ -277,7 +277,7 @@ const Sales = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Buscar venta..."
+              placeholder="Buscar por cliente, producto u orden..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-sm text-sm"
