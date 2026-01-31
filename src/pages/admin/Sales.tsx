@@ -49,6 +49,7 @@ interface Sale {
     clientName: string;
     clientEmail: string;
     clientPhone: string;
+    status: string;
     paymentMethod?: {
       id: number;
       name: string;
@@ -406,7 +407,7 @@ const Sales = () => {
                             key={item.id}
                             src={item.product.images && item.product.images.length > 0
                               ? `${imagesUrl}${item.product.images[0].image}`
-                              : 'https://via.placeholder.com/150'}
+                              : '/placeholder-product.svg'}
                             alt={item.product.name}
                             className="absolute w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl shadow-md border-2 border-white transition-all duration-300"
                             style={{
@@ -545,19 +546,15 @@ const Sales = () => {
                 // This will automatically affect all sales in the order via buyerId relationship
                 const handleUpdateOrderStatus = async (newStatus: string) => {
                   try {
-                    // Create order data based on the group
-                    /* const orderData = {
-                      buyerId: currentGroup[0].buyerId,
-                      status: newStatus,
-                    }; */
-                    // The backend should calculate shipping cost and total amount
-                    // We're only sending the status update here
-
-                    // In the future, when Order table is implemented, use this endpoint instead:
-                    // await request.put(`${apiUrl}/orders/${orderId}`, { status: newStatus });
-
-                    // For now, we'll use the existing endpoint to update all sales in the group
-                    // This will be replaced with a single order update when backend is ready
+                    // Get the order ID from the first sale in the group (all sales in the group belong to the same order)
+                    const orderId = currentGroup[0].order?.id;
+                    
+                    if (orderId) {
+                      // First, update the order status in the Order table
+                      await request.put(`${apiUrl}/orders/${orderId}`, { status: newStatus });
+                    }
+                    
+                    // Also update all sales in the group for backward compatibility
                     await Promise.all(
                       currentGroup.map(sale => handleUpdateStatus(sale.id, newStatus))
                     );
@@ -567,8 +564,8 @@ const Sales = () => {
                   }
                 };
 
-                // Get the order status from the first sale (temporary until Order table is implemented)
-                const orderStatus = currentGroup[0].status;
+                // Get the order status from the Order table
+                const orderStatus = currentGroup[0].order?.status || currentGroup[0].status;
 
                 return (
                   <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
@@ -794,7 +791,7 @@ const Sales = () => {
                                 <img
                                   src={sale.product.images && sale.product.images.length > 0
                                     ? `${imagesUrl}${sale.product.images[0].image}`
-                                    : 'https://via.placeholder.com/150'}
+                                    : '/placeholder-product.svg'}
                                   alt={sale.product.name}
                                   className="w-full h-full object-cover rounded-lg"
                                 />

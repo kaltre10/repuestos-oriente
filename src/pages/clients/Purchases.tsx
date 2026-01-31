@@ -314,7 +314,7 @@ const Purchases = () => {
                           key={item.id}
                           src={item.product.images && item.product.images.length > 0
                             ? `${imagesUrl}${item.product.images[0].image}`
-                            : 'https://via.placeholder.com/150'}
+                            : '/placeholder-product.svg'}
                           alt={item.product.name}
                           className="absolute w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl shadow-md border-2 border-white transition-all duration-300"
                           style={{
@@ -451,7 +451,7 @@ const Purchases = () => {
                               <img
                                 src={item.product.images && item.product.images.length > 0
                                   ? `${imagesUrl}${item.product.images[0].image}`
-                                  : 'https://via.placeholder.com/150'}
+                                  : '/placeholder-product.svg'}
                                 alt={item.product.name}
                                 className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg md:rounded-xl"
                               />
