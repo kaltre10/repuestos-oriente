@@ -97,18 +97,18 @@ class SaleService {
     }
   }
 
-  async createSale(saleData) {
+  async createSale(saleData, options = {}) {
     try {
-      const sale = await Sale.create(saleData);
+      const sale = await Sale.create(saleData, options);
       return sale;
     } catch (error) {
       throw new Error(`Error al crear venta: ${error.message}`);
     }
   }
 
-  async createMultipleSales(salesData) {
+  async createMultipleSales(salesData, options = {}) {
     try {
-      const sales = await Sale.bulkCreate(salesData);
+      const sales = await Sale.bulkCreate(salesData, options);
       return sales;
     } catch (error) {
       throw new Error(`Error al crear múltiples ventas: ${error.message}`);

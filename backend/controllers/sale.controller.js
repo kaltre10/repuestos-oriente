@@ -230,10 +230,10 @@ const createCheckout = asyncHandler(async (req, res) => {
   // Get all product IDs from items
   const productIds = items.map(item => item.productId);
   
-  // Get products with their details to calculate prices with discounts
+  // Get products with their details to calculate prices with discounts and check stock
   const products = await models.Product.findAll({
     where: { id: productIds },
-    attributes: ['id', 'price', 'discount']
+    attributes: ['id', 'price', 'discount', 'amount', 'name']
   });
   
   // Create a map for quick product lookup
@@ -241,96 +241,130 @@ const createCheckout = asyncHandler(async (req, res) => {
   products.forEach(product => {
     productMap.set(product.id, product);
   });
-  
-  // Calculate subtotal for the order
-  let subtotal = 0;
-  const salesData = items.map(item => {
-    const product = productMap.get(item.productId);
-    if (!product) {
-      throw new Error(`Product with id ${item.productId} not found`);
-    }
-    
-    // Calculate discount and unit price
-    const discountPercent = parseFloat(product.discount) || 0;
-    const originalPrice = parseFloat(product.price);
-    const discountAmount = (originalPrice * discountPercent) / 100;
-    const unitPriceWithDiscount = originalPrice - discountAmount;
-    
-    // Calculate subtotal for this item
-    const itemSubtotal = unitPriceWithDiscount * item.quantity;
-    subtotal += itemSubtotal;
-    
-    return {
-      dailyRate,
-      quantity: item.quantity,
-      status: 'pending', // For backward compatibility
-      orderId: null, // Will be set after order creation
-      buyerId,
-      paymentMethod,
-      paymentMethodId,
-      referenceNumber,
-      receiptImage,
-      productId: item.productId,
-      discount: discountPercent,
-      unitPrice: unitPriceWithDiscount,
-      originalPrice: originalPrice,
-      saleDate: new Date()
-    };
-  });
-  
-  // Calculate total including shipping cost
-  const total = subtotal + calculatedShippingCost;
 
-  // Get user data to use as default if client info is not provided
-  let defaultClientInfo = {};
-  if (buyerId) {
-    try {
-      const user = await models.User.findByPk(buyerId, {
-        attributes: ['name', 'email', 'phone']
-      });
-      if (user) {
-        defaultClientInfo = {
-          clientName: user.name,
-          clientEmail: user.email,
-          clientPhone: user.phone
-        };
+  // Start a transaction to ensure stock deduction and order creation are atomic
+  const transaction = await models.sequelize.transaction();
+
+  try {
+    // Calculate subtotal for the order and validate stock
+    let subtotal = 0;
+    const salesData = [];
+
+    for (const item of items) {
+      const product = productMap.get(item.productId);
+      if (!product) {
+        throw new Error(`Producto con ID ${item.productId} no encontrado`);
       }
-    } catch (error) {
-      console.error('Error fetching user data for default client info:', error);
+
+      // Stock validation
+      if (product.amount < item.quantity) {
+        const error = new Error(`Stock insuficiente para el producto: ${product.name}. Disponible: ${product.amount}, Solicitado: ${item.quantity}`);
+        error.status = 400;
+        throw error;
+      }
+
+      // Deduct stock
+      await product.update(
+        { amount: product.amount - item.quantity },
+        { transaction }
+      );
+      
+      // Calculate discount and unit price
+      const discountPercent = parseFloat(product.discount) || 0;
+      const originalPrice = parseFloat(product.price);
+      const discountAmount = (originalPrice * discountPercent) / 100;
+      const unitPriceWithDiscount = originalPrice - discountAmount;
+      
+      // Calculate subtotal for this item
+      const itemSubtotal = unitPriceWithDiscount * item.quantity;
+      subtotal += itemSubtotal;
+      
+      salesData.push({
+        dailyRate,
+        quantity: item.quantity,
+        status: 'pending', // For backward compatibility
+        orderId: null, // Will be set after order creation
+        buyerId,
+        paymentMethod,
+        paymentMethodId,
+        referenceNumber,
+        receiptImage,
+        productId: item.productId,
+        discount: discountPercent,
+        unitPrice: unitPriceWithDiscount,
+        originalPrice: originalPrice,
+        saleDate: new Date()
+      });
     }
+    
+    // Calculate total including shipping cost
+    const total = subtotal + calculatedShippingCost;
+
+    // Get user data to use as default if client info is not provided
+    let defaultClientInfo = {};
+    if (buyerId) {
+      try {
+        const user = await models.User.findByPk(buyerId, {
+          attributes: ['name', 'email', 'phone'],
+          transaction
+        });
+        if (user) {
+          defaultClientInfo = {
+            clientName: user.name,
+            clientEmail: user.email,
+            clientPhone: user.phone
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching user data for default client info:', error);
+      }
+    }
+
+    // Step 1: Create an Order record for this checkout with total amount
+    const order = await orderService.createOrder({
+      status: 'pending',
+      buyerId,
+      clientName: clientName || defaultClientInfo.clientName || '',
+      clientEmail: clientEmail || defaultClientInfo.clientEmail || '',
+      clientPhone: clientPhone || defaultClientInfo.clientPhone || '',
+      shippingCost: calculatedShippingCost,
+      total: total, // Total including shipping
+      paymentMethodId,
+      paymentMethod,
+      shippingMethod: shippingMethod || 'standard', // Guardar el nombre del método de pago en el campo shippingMethod
+      shippingAddress: shippingAddress || '' // Use received shipping address
+    }, { transaction });
+    
+    // Set the orderId for all sales
+    const salesWithOrderId = salesData.map(sale => ({
+      ...sale,
+      orderId: order.id
+    }));
+
+    // Step 2: Create the Sale records with the orderId set to the newly created Order's id
+    const newSales = await saleService.createMultipleSales(salesWithOrderId, { transaction });
+
+    // Commit the transaction
+    await transaction.commit();
+
+    responser.success({
+      res,
+      message: 'Checkout realizado con éxito',
+      body: { 
+        order: { ...order.dataValues, sales: newSales }, // Return the Order with its associated Sales
+        sales: newSales 
+      },
+    });
+  } catch (error) {
+    // Rollback the transaction in case of error
+    await transaction.rollback();
+    
+    return responser.error({
+      res,
+      message: error.message || 'Error al procesar el checkout',
+      status: error.status || 500,
+    });
   }
-
-  // Step 1: Create an Order record for this checkout with total amount
-  const order = await orderService.createOrder({
-    status: 'pending',
-    buyerId,
-    clientName: clientName || defaultClientInfo.clientName || '',
-    clientEmail: clientEmail || defaultClientInfo.clientEmail || '',
-    clientPhone: clientPhone || defaultClientInfo.clientPhone || '',
-    shippingCost: calculatedShippingCost,
-    total: total, // Total including shipping
-    paymentMethodId,
-    paymentMethod,
-    shippingMethod: shippingMethod || 'standard', // Guardar el nombre del método de pago en el campo shippingMethod
-    shippingAddress: shippingAddress || '' // Use received shipping address
-  });
-  
-  // Set the orderId for all sales
-  const salesWithOrderId = salesData.map(sale => ({
-    ...sale,
-    orderId: order.id
-  }));
-
-  // Step 2: Create the Sale records with the orderId set to the newly created Order's id
-  const newSales = await saleService.createMultipleSales(salesWithOrderId);
-  responser.success({
-    res,
-    message: 'Checkout realizado con éxito',
-    body: { 
-      order: { ...order.dataValues, sales: newSales }, // Return the Order with its associated Sales
-      sales: newSales 
-    },
-  });
 });
 
 const getStats = asyncHandler(async (req, res) => {

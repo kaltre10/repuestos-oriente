@@ -145,7 +145,7 @@ class OrderService {
     }
   }
 
-  async createOrder(orderData) {
+  async createOrder(orderData, options = {}) {
     try {
       // Generate short order number: ORD + YYMMDD + 4 random chars
       const now = new Date();
@@ -158,7 +158,7 @@ class OrderService {
       const order = await Order.create({
         ...orderData,
         orderNumber: shortOrderNumber
-      });
+      }, options);
       return order;
     } catch (error) {
       console.error('Error creating order:', error);
