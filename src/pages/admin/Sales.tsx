@@ -251,36 +251,36 @@ const Sales = () => {
   }; */
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div className="p-4 md:p-6 max-w-7xl mx-auto">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Registro de Ventas</h1>
-          <p className="text-gray-500 mt-1">Monitorea y gestiona las transacciones de la plataforma</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Registro de Ventas</h1>
+          <p className="text-sm md:text-base text-gray-500 mt-1">Monitorea y gestiona las transacciones de la plataforma</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${showFilters || statusFilter || paymentMethodFilter || dateRange.start
+            className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border transition-all ${showFilters || statusFilter || paymentMethodFilter || dateRange.start
               ? 'bg-red-50 border-red-200 text-red-600'
               : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
           >
             <Filter size={18} />
-            <span className="font-medium">Filtros</span>
+            <span className="font-semibold">Filtros</span>
             {(statusFilter || paymentMethodFilter || dateRange.start) && (
-              <span className="ml-1 px-1.5 py-0.5 bg-red-600 text-white text-[10px] rounded-full">!</span>
+              <span className="ml-1 px-1.5 py-0.5 bg-red-600 text-white text-[10px] rounded-full font-bold">!</span>
             )}
           </button>
 
-          <div className="relative w-full md:w-80">
+          <div className="relative w-full lg:w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Buscar por producto, cliente o referencia..."
+              placeholder="Buscar venta..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-sm"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-sm text-sm"
             />
           </div>
         </div>
@@ -288,14 +288,14 @@ const Sales = () => {
 
       {/* Filters Panel */}
       {showFilters && (
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white p-4 md:p-6 rounded-2xl border border-gray-100 shadow-sm mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Estado</label>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Estado</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
               >
                 <option value="">Todos los estados</option>
                 <option value="pending">Pendiente</option>
@@ -305,11 +305,11 @@ const Sales = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Método de Pago</label>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Método de Pago</label>
               <select
                 value={paymentMethodFilter}
                 onChange={(e) => setPaymentMethodFilter(e.target.value)}
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
               >
                 <option value="">Todos los métodos</option>
                 <option value="Pago Movil">Pago Móvil</option>
@@ -320,22 +320,22 @@ const Sales = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha Desde</label>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Fecha Desde</label>
               <input
                 type="date"
                 value={dateRange.start}
                 onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha Hasta</label>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Fecha Hasta</label>
               <input
                 type="date"
                 value={dateRange.end}
                 onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
               />
             </div>
           </div>
@@ -343,7 +343,7 @@ const Sales = () => {
           <div className="flex justify-end mt-6">
             <button
               onClick={clearFilters}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-red-600 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-400 hover:text-red-600 transition-colors uppercase tracking-wider"
             >
               <Trash2 size={16} />
               Limpiar filtros

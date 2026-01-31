@@ -62,21 +62,21 @@ const ClientQuestions = () => {
   );
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div className="p-4 md:p-6 max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Preguntas de Clientes</h1>
-          <p className="text-gray-500 mt-1">Gestiona y responde las dudas de tus compradores</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Preguntas de Clientes</h1>
+          <p className="text-gray-500 mt-1 text-sm md:text-base">Gestiona y responde las dudas de tus compradores</p>
         </div>
 
         <div className="relative w-full md:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="Buscar por pregunta, producto o cliente..."
+            placeholder="Buscar pregunta, producto..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-sm"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-sm text-sm"
           />
         </div>
       </div>
@@ -87,12 +87,12 @@ const ClientQuestions = () => {
           <p className="text-gray-600 font-medium">Cargando preguntas...</p>
         </div>
       ) : filteredQuestions.length > 0 ? (
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           {filteredQuestions.map((q) => (
             <div key={q.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all hover:shadow-md">
-              <div className="p-6">
+              <div className="p-4 md:p-6">
                 {/* Header: Product and Client info */}
-                <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-50">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-50">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                       {q.product?.images?.[0] ? (
@@ -100,37 +100,42 @@ const ClientQuestions = () => {
                           src={`${imagesUrl}${q.product.images[0].image}`}
                           alt={q.product.name}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                          }}
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                          <MessageSquare size={20} />
-                        </div>
+                        <img
+                          src="/placeholder-product.svg"
+                          alt="placeholder"
+                          className="w-full h-full object-cover"
+                        />
                       )}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-800">{q.product?.name || 'Producto desconocido'}</h3>
-                      <p className="text-sm text-gray-500">Cliente: <span className="font-medium text-gray-700">{q.client?.name || 'Anónimo'}</span></p>
+                      <h3 className="font-semibold text-gray-800 text-sm md:text-base line-clamp-1">{q.product?.name || 'Producto desconocido'}</h3>
+                      <p className="text-xs md:text-sm text-gray-500">Cliente: <span className="font-medium text-gray-700">{q.client?.name || 'Anónimo'}</span></p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${q.status === 1
+                  <div className="flex items-center justify-between sm:justify-end gap-3">
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] md:text-xs font-semibold flex items-center gap-1.5 ${q.status === 1
                       ? 'bg-green-100 text-green-700'
                       : 'bg-amber-100 text-amber-700'
                       }`}>
                       {q.status === 1 ? (
                         <>
-                          <CheckCircle size={14} />
+                          <CheckCircle size={12} className="md:w-[14px] md:h-[14px]" />
                           Respondida
                         </>
                       ) : (
                         <>
-                          <Clock size={14} />
+                          <Clock size={12} className="md:w-[14px] md:h-[14px]" />
                           Pendiente
                         </>
                       )}
                     </span>
-                    <span className="text-xs text-gray-400">{new Date(q.createdAt).toLocaleString()}</span>
+                    <span className="text-[10px] md:text-xs text-gray-400">{new Date(q.createdAt).toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -141,22 +146,22 @@ const ClientQuestions = () => {
                       <MessageSquare size={18} />
                     </div>
                     <div>
-                      <p className="text-gray-800 leading-relaxed font-medium">{q.questionText}</p>
+                      <p className="text-gray-800 leading-relaxed font-medium text-sm md:text-base">{q.questionText}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Answer Area */}
-                <div className="ml-11">
+                <div className="sm:ml-11">
                   {q.status === 1 ? (
-                    <div className="bg-gray-50 p-4 rounded-xl border-l-4 border-green-500">
+                    <div className="bg-gray-50 p-3 md:p-4 rounded-xl border-l-4 border-green-500">
                       <div className="flex items-start gap-3">
-                        <div className="text-green-600 mt-1">
+                        <div className="text-green-600 mt-1 flex-shrink-0">
                           <Send size={16} className="rotate-180" />
                         </div>
                         <div>
                           <p className="text-gray-700 text-sm leading-relaxed">{q.answerText}</p>
-                          <p className="text-xs text-gray-400 mt-2">Tu respuesta enviada el {new Date(q.updatedAt).toLocaleDateString()}</p>
+                          <p className="text-[10px] md:text-xs text-gray-400 mt-2">Tu respuesta enviada el {new Date(q.updatedAt).toLocaleDateString()}</p>
                         </div>
                       </div>
                     </div>
@@ -167,14 +172,14 @@ const ClientQuestions = () => {
                         placeholder="Escribe tu respuesta aquí..."
                         value={answers[q.id] || ''}
                         onChange={(e) => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 transition-all resize-none"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 transition-all resize-none text-sm"
                         disabled={submittingIds[q.id]}
                       />
                       <div className="flex justify-end mt-3">
                         <button
                           onClick={() => handleAnswerSubmit(q.id)}
                           disabled={!answers[q.id]?.trim() || submittingIds[q.id]}
-                          className="px-6 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white font-semibold rounded-lg transition-colors flex items-center gap-2 shadow-sm"
+                          className="w-full sm:w-auto px-6 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm text-sm"
                         >
                           {submittingIds[q.id] ? (
                             <Loader2 size={18} className="animate-spin" />

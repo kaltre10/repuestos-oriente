@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { FaTags, FaPlus, FaCheck, FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
+import { Tags, Plus, Check, X, Pencil, Trash2, Search } from 'lucide-react';
 import { useCategories } from '../../hooks/useCategories';
 import { useConfirm } from '../../hooks/useConfirm';
+
 const CategoriesConfig = () => {
   const confirm = useConfirm();
   const {
@@ -16,6 +17,11 @@ const CategoriesConfig = () => {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
   const [editingCategoryName, setEditingCategoryName] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredCategories = categories.filter(c => 
+    c.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,105 +54,152 @@ const CategoriesConfig = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
-        <h2 className="text-base font-semibold text-gray-700 flex items-center">
-          <FaTags className="mr-2 text-orange-600" />
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+      <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <Tags className="w-5 h-5 text-orange-600" />
           Categorías de Vehículos
         </h2>
+        <span className="text-xs font-medium px-2 py-1 bg-orange-100 text-orange-700 rounded-full">
+          {categories.length} Total
+        </span>
       </div>
 
-      <div className="p-4">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Formulario a la izquierda */}
-          <div className="lg:w-1/3">
-            <form onSubmit={handleAddCategory}>
-              <label htmlFor="newCategory" className="block text-xs font-medium text-gray-700 mb-1">
-                Agregar Nueva Categoría
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  id="newCategory"
-                  value={newCategoryName}
-                  onChange={(e) => setNewCategoryName(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm h-[38px]"
-                  placeholder="Ej: Camioneta"
-                  disabled={loadingCategories}
-                />
-                <button
-                  type="submit"
-                  disabled={loadingCategories || !newCategoryName.trim()}
-                  className={`flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white h-[38px] ${
-                    loadingCategories || !newCategoryName.trim() ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-                  } transition-colors duration-200`}
-                >
-                  <FaPlus />
-                </button>
-              </div>
-              {errorCategories && !editingCategoryId && <p className="mt-2 text-xs text-red-600">{errorCategories}</p>}
-            </form>
+      <div className="p-6 space-y-6 flex flex-col">
+        {/* Formulario de Agregar */}
+        <form onSubmit={handleAddCategory} className="space-y-1.5">
+          <label htmlFor="newCategory" className="block text-sm font-semibold text-gray-700">
+            Agregar Nueva Categoría
+          </label>
+          <div className="flex gap-2">
+            <div className="relative flex-1 group">
+              <input
+                type="text"
+                id="newCategory"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-gray-900"
+                placeholder="Ej: Camioneta"
+                disabled={loadingCategories}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loadingCategories || !newCategoryName.trim()}
+              className="flex items-center justify-center px-4 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded-lg transition-all active:scale-95 shadow-sm shadow-green-200"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </div>
+          {errorCategories && !editingCategoryId && (
+            <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+              <span className="w-1 h-1 bg-red-600 rounded-full" />
+              {errorCategories}
+            </p>
+          )}
+        </form>
+
+        {/* Buscador y Lista */}
+        <div className="space-y-3 flex flex-col">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-gray-700">Categorías Registradas</h3>
+            <div className="relative w-1/2">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input 
+                type="text"
+                placeholder="Buscar..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+              />
+            </div>
           </div>
 
-          {/* Lista a la derecha */}
-          <div className="lg:w-2/3">
-            <h3 className="text-xs font-medium text-gray-700 mb-2">Categorías Registradas</h3>
-            <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-md">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
-                {categories.length === 0 && !loadingCategories ? (
-                  <p className="p-4 text-center text-gray-500 text-xs italic col-span-full">No hay categorías.</p>
-                ) : (
-                  categories.map((cat) => (
-                    <div key={cat.id} className="flex items-center justify-between p-2 hover:bg-gray-50 border-b border-gray-100">
-                      {editingCategoryId === cat.id ? (
-                        <div className="flex-1 flex gap-1 items-center">
-                          <input
-                            type="text"
-                            value={editingCategoryName}
-                            onChange={(e) => setEditingCategoryName(e.target.value)}
-                            className="block w-full px-2 py-1 border border-blue-500 rounded-md text-xs focus:outline-none h-7"
-                            autoFocus
-                          />
+          <div className="overflow-y-auto border border-gray-100 rounded-xl bg-gray-50/30 max-h-[400px]">
+            {filteredCategories.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400 space-y-2">
+                <Tags className="w-8 h-8 opacity-20" />
+                <p className="text-sm italic">
+                  {searchTerm ? 'No se encontraron resultados' : 'No hay categorías registradas'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 divide-x divide-y divide-gray-100">
+                {filteredCategories.map((cat) => (
+                  <div key={cat.id} className="group flex items-center justify-between p-3 hover:bg-white transition-colors">
+                    {editingCategoryId === cat.id ? (
+                      <div className="flex-1 flex gap-2 items-center">
+                        <input
+                          type="text"
+                          value={editingCategoryName}
+                          onChange={(e) => setEditingCategoryName(e.target.value)}
+                          className="flex-1 px-3 py-1.5 bg-white border border-blue-500 rounded-lg text-sm focus:outline-none shadow-sm shadow-blue-100"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleUpdateCategory(cat.id);
+                            if (e.key === 'Escape') setEditingCategoryId(null);
+                          }}
+                        />
+                        <button
+                          onClick={() => handleUpdateCategory(cat.id)}
+                          className="p-1.5 text-green-600 hover:bg-green-50 rounded-md transition-colors"
+                        >
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setEditingCategoryId(null)}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
+                          {cat.category}
+                        </span>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
-                            onClick={() => handleUpdateCategory(cat.id)}
-                            className="text-green-600 hover:text-green-800 p-1"
+                            onClick={() => startEditingCategory(cat)}
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                            title="Editar"
                           >
-                            <FaCheck size={14} />
+                            <Pencil className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => setEditingCategoryId(null)}
-                            className="text-red-600 hover:text-red-800 p-1"
+                            onClick={() => handleDeleteCategory(cat.id)}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                            title="Eliminar"
                           >
-                            <FaTimes size={14} />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
-                      ) : (
-                        <>
-                          <span className="text-sm text-gray-800 truncate mr-2">{cat.category}</span>
-                          <div className="flex gap-1 shrink-0">
-                            <button
-                              onClick={() => startEditingCategory(cat)}
-                              className="text-blue-600 hover:text-blue-800 p-1"
-                            >
-                              <FaEdit size={12} />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteCategory(cat.id)}
-                              className="text-red-600 hover:text-red-800 p-1"
-                            >
-                              <FaTrash size={12} />
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ))
-                )}
-                {loadingCategories && (
-                  <div className="p-4 text-center text-gray-500 text-xs col-span-full">Cargando...</div>
-                )}
+                        {/* Mobile controls */}
+                        <div className="flex gap-2 md:hidden">
+                          <button
+                            onClick={() => startEditingCategory(cat)}
+                            className="p-2 text-blue-600 bg-blue-50 rounded-lg"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCategory(cat.id)}
+                            className="p-2 text-red-600 bg-red-50 rounded-lg"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
               </div>
-            </div>
+            )}
+            {loadingCategories && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-orange-600/30 border-t-orange-600 rounded-full animate-spin" />
+              </div>
+            )}
           </div>
         </div>
       </div>

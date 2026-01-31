@@ -140,30 +140,30 @@ const Sliders = () => {
     }
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
+        <div className="p-4 md:p-6 max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Gestión de Sliders</h1>
-                    <p className="text-gray-500 mt-2">Administra los banners principales de la página de inicio</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Gestión de Sliders</h1>
+                    <p className="text-sm text-gray-500 mt-1 italic">Administra los banners principales de la página de inicio.</p>
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all font-bold shadow-lg shadow-red-200"
+                    className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all font-bold shadow-lg shadow-red-100 active:scale-95"
                 >
                     <Plus className="w-5 h-5" />
-                    Nuevo Slider
+                    <span>Nuevo Slider</span>
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {sliders.map((slider, index) => (
-                    <div key={slider.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group hover:shadow-md transition-shadow">
+                    <div key={slider.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group hover:shadow-md transition-all">
                         <div className="relative aspect-video bg-gray-100">
                             {slider.image ? (
                                 <img
                                     src={getImageUrl(slider.image)}
                                     alt={slider.title}
-                                    className={`w-full h-full object-cover ${!slider.status ? 'opacity-50 grayscale' : ''}`}
+                                    className={`w-full h-full object-cover ${!slider.status ? 'opacity-40 grayscale' : ''}`}
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-gray-300">
@@ -171,7 +171,7 @@ const Sliders = () => {
                                 </div>
                             )}
                             <div className="absolute top-3 left-3 flex gap-2">
-                                <div className="bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-md">
+                                <div className="bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-md">
                                     {index + 1}
                                 </div>
                                 {!slider.status && (
@@ -180,10 +180,10 @@ const Sliders = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="absolute top-3 right-3 flex gap-2 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                 <button
                                     onClick={() => handleOpenModal(slider)}
-                                    className="p-2 bg-white/90 backdrop-blur-sm text-gray-700 hover:text-blue-600 rounded-lg shadow-sm transition-colors"
+                                    className="p-2 bg-white/95 backdrop-blur-sm text-gray-700 hover:text-blue-600 rounded-xl shadow-sm transition-colors"
                                     title="Editar"
                                 >
                                     <Type className="w-4 h-4" />
@@ -191,7 +191,7 @@ const Sliders = () => {
                                 <button
                                     onClick={() => handleDelete(slider.id)}
                                     disabled={deleting === slider.id}
-                                    className="p-2 bg-white/90 backdrop-blur-sm text-gray-700 hover:text-red-600 rounded-lg shadow-sm transition-colors disabled:opacity-50"
+                                    className="p-2 bg-white/95 backdrop-blur-sm text-gray-700 hover:text-red-600 rounded-xl shadow-sm transition-colors disabled:opacity-50"
                                     title="Eliminar"
                                 >
                                     {deleting === slider.id ? (
@@ -204,22 +204,22 @@ const Sliders = () => {
                         </div>
                         
                         <div className="p-5 flex-1 flex flex-col">
-                            <h3 className="font-bold text-gray-800 text-lg mb-1 truncate">
+                            <h3 className="font-bold text-gray-900 text-lg mb-1 truncate leading-tight">
                                 {slider.title || 'Sin título'}
                             </h3>
-                            <p className="text-sm text-gray-500 line-clamp-2 mb-4">
+                            <p className="text-sm text-gray-500 line-clamp-2 mb-4 italic">
                                 {slider.description1} {slider.description2}
                             </p>
                             
                             <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-center">
-                                <span className="text-xs font-medium text-gray-400 flex items-center gap-1">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 truncate max-w-[150px]">
                                     <LinkIcon className="w-3 h-3" /> {slider.buttonLink || 'Sin enlace'}
                                 </span>
                                 <button
                                     onClick={() => handleOpenModal(slider)}
-                                    className="text-red-600 hover:text-red-700 font-bold text-sm"
+                                    className="text-red-600 hover:text-red-700 font-bold text-xs uppercase tracking-widest transition-colors"
                                 >
-                                    Editar
+                                    Detalles
                                 </button>
                             </div>
                         </div>
@@ -243,10 +243,10 @@ const Sliders = () => {
             {/* Modal para Agregar/Editar */}
             {showModal && currentSlider && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleCloseModal}></div>
-                    <div className="bg-white rounded-3xl w-full max-w-2xl relative z-10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                        <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                            <h2 className="text-2xl font-bold text-gray-800">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleCloseModal}></div>
+                    <div className="bg-white rounded-[2rem] w-full max-w-2xl relative z-10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+                        <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+                            <h2 className="text-xl md:text-2xl font-black text-gray-800 uppercase tracking-tight">
                                 {currentSlider.id < 0 ? 'Nuevo Slider' : 'Editar Slider'}
                             </h2>
                             <button onClick={handleCloseModal} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -254,41 +254,41 @@ const Sliders = () => {
                             </button>
                         </div>
 
-                        <div className="p-8 overflow-y-auto space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-4">
+                        <div className="p-6 md:p-8 overflow-y-auto space-y-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-5">
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-1">Título Principal</label>
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Título Principal</label>
                                         <input
                                             type="text"
                                             value={currentSlider.title}
                                             onChange={(e) => handleInputChange('title', e.target.value)}
-                                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm font-medium"
                                             placeholder="Ej: CALIDAD GARANTIZADA"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-1">Descripción Línea 1</label>
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Descripción Línea 1</label>
                                         <input
                                             type="text"
                                             value={currentSlider.description1}
                                             onChange={(e) => handleInputChange('description1', e.target.value)}
-                                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm font-medium"
                                             placeholder="Ej: Los mejores repuestos"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-1">Descripción Línea 2</label>
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Descripción Línea 2</label>
                                         <input
                                             type="text"
                                             value={currentSlider.description2}
                                             onChange={(e) => handleInputChange('description2', e.target.value)}
-                                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm font-medium"
                                             placeholder="Ej: Para tu vehículo"
                                         />
                                     </div>
                                     <div className="pt-2">
-                                        <label className="flex items-center gap-3 cursor-pointer group">
+                                        <label className="flex items-center gap-4 cursor-pointer group p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
                                             <div className="relative">
                                                 <input
                                                     type="checkbox"
@@ -297,57 +297,63 @@ const Sliders = () => {
                                                     className="sr-only"
                                                 />
                                                 <div className={`w-12 h-6 rounded-full transition-colors ${currentSlider.status ? 'bg-red-600' : 'bg-gray-300'}`}></div>
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${currentSlider.status ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${currentSlider.status ? 'translate-x-6' : 'translate-x-0 shadow-sm'}`}></div>
                                             </div>
-                                            <span className="text-sm font-semibold text-gray-700">Slider Activo</span>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold text-gray-800 uppercase tracking-wider">Slider Activo</span>
+                                                <span className="text-[10px] text-gray-400 font-medium">Visible en la página principal.</span>
+                                            </div>
                                         </label>
-                                        <p className="text-xs text-gray-400 mt-1">Si está desactivado, no se mostrará en la página principal.</p>
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Imagen de Fondo</label>
-                                    <div className="relative group rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 aspect-video flex flex-col items-center justify-center transition-all hover:border-red-400">
-                                        {currentSlider.image ? (
-                                            <>
-                                                <img
-                                                    src={getImageUrl(currentSlider.image)}
-                                                    alt="Vista previa"
-                                                    className="w-full h-full object-cover"
-                                                />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <label className="cursor-pointer bg-white text-gray-900 px-4 py-2 rounded-xl flex items-center gap-2 font-medium shadow-lg hover:scale-105 transition-transform">
-                                                        <Upload className="w-4 h-4" /> Cambiar
-                                                        <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
-                                                    </label>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <label className="cursor-pointer flex flex-col items-center gap-2 text-gray-400 hover:text-red-500 transition-colors">
-                                                <Upload className="w-8 h-8" />
-                                                <span className="font-medium">Subir Imagen</span>
-                                                <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
-                                            </label>
-                                        )}
+                                <div className="space-y-6">
+                                    <div className="space-y-3">
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">Imagen de Fondo</label>
+                                        <div className="relative group rounded-3xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 aspect-video flex flex-col items-center justify-center transition-all hover:border-red-400">
+                                            {currentSlider.image ? (
+                                                <>
+                                                    <img
+                                                        src={getImageUrl(currentSlider.image)}
+                                                        alt="Vista previa"
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <label className="cursor-pointer bg-white text-gray-900 px-5 py-2.5 rounded-2xl flex items-center gap-2 font-bold text-sm shadow-xl hover:scale-105 transition-transform">
+                                                            <Upload className="w-4 h-4" /> Cambiar Imagen
+                                                            <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                                                        </label>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <label className="cursor-pointer flex flex-col items-center gap-3 text-gray-400 hover:text-red-500 transition-colors p-6">
+                                                    <div className="p-4 bg-white rounded-2xl shadow-sm">
+                                                        <Upload className="w-8 h-8" />
+                                                    </div>
+                                                    <span className="font-bold text-xs uppercase tracking-wider">Subir Banner</span>
+                                                    <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                                                </label>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4 mt-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-1">Texto Botón</label>
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Texto Botón</label>
                                             <input
                                                 type="text"
                                                 value={currentSlider.buttonText}
                                                 onChange={(e) => handleInputChange('buttonText', e.target.value)}
-                                                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm font-medium"
                                                 placeholder="Ver Más"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-1">Enlace Botón</label>
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Enlace Botón</label>
                                             <input
                                                 type="text"
                                                 value={currentSlider.buttonLink}
                                                 onChange={(e) => handleInputChange('buttonLink', e.target.value)}
-                                                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm font-medium"
                                                 placeholder="/products"
                                             />
                                         </div>
@@ -356,24 +362,30 @@ const Sliders = () => {
                             </div>
                         </div>
 
-                        <div className="p-8 border-t border-gray-100 flex justify-end gap-4 bg-gray-50/50">
+                        <div className="p-6 md:p-8 border-t border-gray-100 flex flex-col-reverse sm:flex-row justify-end gap-3">
                             <button
                                 onClick={handleCloseModal}
-                                className="px-6 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition-colors"
+                                disabled={saving !== null}
+                                className="px-6 py-3 text-sm font-bold text-gray-400 uppercase tracking-widest hover:text-gray-600 transition-colors"
                             >
                                 Cancelar
                             </button>
                             <button
                                 onClick={handleSave}
                                 disabled={saving !== null || !currentSlider.image}
-                                className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-xl flex items-center gap-2 transition-all font-bold shadow-lg shadow-red-200"
+                                className="px-8 py-3 bg-red-600 text-white rounded-2xl flex items-center justify-center gap-2 font-black uppercase tracking-widest shadow-lg shadow-red-100 hover:bg-red-700 transition-all disabled:opacity-50 active:scale-95"
                             >
                                 {saving !== null ? (
-                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        Guardando...
+                                    </>
                                 ) : (
-                                    <Save className="w-5 h-5" />
+                                    <>
+                                        <Save className="w-4 h-4" />
+                                        {currentSlider.id < 0 ? 'Crear Ahora' : 'Guardar Cambios'}
+                                    </>
                                 )}
-                                {saving !== null ? 'Guardando...' : 'Guardar Slider'}
                             </button>
                         </div>
                     </div>

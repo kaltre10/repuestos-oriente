@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaCar, FaPlus, FaCheck, FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
+import { Car, Plus, Check, X, Pencil, Trash2, Search } from 'lucide-react';
 import { useBrands } from '../../hooks/useBrands';
 import { useConfirm } from '../../hooks/useConfirm';
 
@@ -18,6 +18,11 @@ const BrandsConfig = () => {
   const [newBrandName, setNewBrandName] = useState('');
   const [editingBrandId, setEditingBrandId] = useState<number | null>(null);
   const [editingBrandName, setEditingBrandName] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredBrands = brands.filter(b => 
+    b.brand.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleAddBrand = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,104 +55,152 @@ const BrandsConfig = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
-        <h2 className="text-base font-semibold text-gray-700 flex items-center">
-          <FaCar className="mr-2 text-blue-600" />
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+      <div className="bg-gray-50/50 px-4 md:px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <Car className="w-5 h-5 text-blue-600" />
           Marcas de Vehículos
         </h2>
+        <span className="text-xs font-medium px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full self-start sm:self-auto">
+          {brands.length} Total
+        </span>
       </div>
 
-      <div className="p-4">
-        <div className="">
-          {/* Formulario a la izquierda */}
-          <div className="mb-6">
-            <form onSubmit={handleAddBrand}>
-              <label htmlFor="newBrand" className="block text-xs font-medium text-gray-700 mb-1">
-                Agregar Nueva Marca
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  id="newBrand"
-                  value={newBrandName}
-                  onChange={(e) => setNewBrandName(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm h-[38px]"
-                  placeholder="Ej: Toyota"
-                  disabled={loadingBrands}
-                />
-                <button
-                  type="submit"
-                  disabled={loadingBrands || !newBrandName.trim()}
-                  className={`flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white h-[38px] ${loadingBrands || !newBrandName.trim() ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-                    } transition-colors duration-200`}
-                >
-                  <FaPlus />
-                </button>
-              </div>
-              {errorBrands && !editingBrandId && <p className="mt-2 text-xs text-red-600">{errorBrands}</p>}
-            </form>
+      <div className="p-4 md:p-6 space-y-6 flex flex-col">
+        {/* Formulario de Agregar */}
+        <form onSubmit={handleAddBrand} className="space-y-1.5">
+          <label htmlFor="newBrand" className="block text-sm font-semibold text-gray-700">
+            Agregar Nueva Marca
+          </label>
+          <div className="flex gap-2">
+            <div className="relative flex-1 group">
+              <input
+                type="text"
+                id="newBrand"
+                value={newBrandName}
+                onChange={(e) => setNewBrandName(e.target.value)}
+                className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-gray-900"
+                placeholder="Ej: Toyota"
+                disabled={loadingBrands}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loadingBrands || !newBrandName.trim()}
+              className="flex items-center justify-center px-4 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded-lg transition-all active:scale-95 shadow-sm shadow-green-200"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </div>
+          {errorBrands && !editingBrandId && (
+            <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+              <span className="w-1 h-1 bg-red-600 rounded-full" />
+              {errorBrands}
+            </p>
+          )}
+        </form>
+
+        {/* Buscador y Lista */}
+        <div className="space-y-3 flex flex-col">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-gray-700">Marcas Registradas</h3>
+            <div className="relative w-1/2">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input 
+                type="text"
+                placeholder="Buscar..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+              />
+            </div>
           </div>
 
-          {/* Lista a la derecha */}
-          <div className="">
-            <h3 className="text-xs font-medium text-gray-700 mb-2">Marcas Registradas</h3>
-            <div className="max-h-70 overflow-y-auto border border-gray-200 rounded-md">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
-                {brands.length === 0 && !loadingBrands ? (
-                  <p className="p-4 text-center text-gray-500 text-xs italic col-span-full">No hay marcas.</p>
-                ) : (
-                  brands.map((brand) => (
-                    <div key={brand.id} className="flex bg-gray-300 items-center justify-between p-2 hover:bg-gray-50 border-b border-gray-100">
-                      {editingBrandId === brand.id ? (
-                        <div className="flex-1 flex gap-1 items-center">
-                          <input
-                            type="text"
-                            value={editingBrandName}
-                            onChange={(e) => setEditingBrandName(e.target.value)}
-                            className="block w-full px-2 py-1 border border-blue-500 rounded-md text-xs focus:outline-none h-7"
-                            autoFocus
-                          />
+          <div className="overflow-y-auto border border-gray-100 rounded-xl bg-gray-50/30 max-h-[400px]">
+            {filteredBrands.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400 space-y-2">
+                <Car className="w-8 h-8 opacity-20" />
+                <p className="text-sm italic">
+                  {searchTerm ? 'No se encontraron resultados' : 'No hay marcas registradas'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 divide-y divide-gray-100">
+                {filteredBrands.map((brand) => (
+                  <div key={brand.id} className="group flex items-center justify-between p-3 hover:bg-white transition-colors">
+                    {editingBrandId === brand.id ? (
+                      <div className="flex-1 flex gap-2 items-center">
+                        <input
+                          type="text"
+                          value={editingBrandName}
+                          onChange={(e) => setEditingBrandName(e.target.value)}
+                          className="flex-1 px-3 py-1.5 bg-white border border-blue-500 rounded-lg text-sm focus:outline-none shadow-sm shadow-blue-100"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleUpdateBrand(brand.id);
+                            if (e.key === 'Escape') setEditingBrandId(null);
+                          }}
+                        />
+                        <button
+                          onClick={() => handleUpdateBrand(brand.id)}
+                          className="p-1.5 text-green-600 hover:bg-green-50 rounded-md transition-colors"
+                        >
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setEditingBrandId(null)}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
+                          {brand.brand}
+                        </span>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
-                            onClick={() => handleUpdateBrand(brand.id)}
-                            className="text-green-600 hover:text-green-800 p-1"
+                            onClick={() => startEditingBrand(brand)}
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                            title="Editar"
                           >
-                            <FaCheck size={14} />
+                            <Pencil className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => setEditingBrandId(null)}
-                            className="text-red-600 hover:text-red-800 p-1"
+                            onClick={() => handleDeleteBrand(brand.id)}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                            title="Eliminar"
                           >
-                            <FaTimes size={14} />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
-                      ) : (
-                        <>
-                          <span className="text-sm text-gray-800 truncate mr-2">{brand.brand}</span>
-                          <div className="flex gap-1 shrink-0">
-                            <button
-                              onClick={() => startEditingBrand(brand)}
-                              className="text-blue-600 hover:text-blue-800 p-1"
-                            >
-                              <FaEdit size={12} />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteBrand(brand.id)}
-                              className="text-red-600 hover:text-red-800 p-1"
-                            >
-                              <FaTrash size={12} />
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ))
-                )}
-                {loadingBrands && (
-                  <div className="p-4 text-center text-gray-500 text-xs col-span-full">Cargando...</div>
-                )}
+                        {/* Mobile controls always visible */}
+                        <div className="flex gap-2 md:hidden">
+                          <button
+                            onClick={() => startEditingBrand(brand)}
+                            className="p-2 text-blue-600 bg-blue-50 rounded-lg"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteBrand(brand.id)}
+                            className="p-2 text-red-600 bg-red-50 rounded-lg"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
               </div>
-            </div>
+            )}
+            {loadingBrands && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
+              </div>
+            )}
           </div>
         </div>
       </div>

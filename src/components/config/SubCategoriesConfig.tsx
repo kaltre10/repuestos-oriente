@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { FaLayerGroup, FaPlus, FaCheck, FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
+import { Layers, Plus, Check, X, Pencil, Trash2, Search } from 'lucide-react';
 import { useSubCategories } from '../../hooks/useSubCategories';
 import { useCategories } from '../../hooks/useCategories';
 import { useConfirm } from '../../hooks/useConfirm';
+
 const SubCategoriesConfig = () => {
   const confirm = useConfirm()
   const {
@@ -24,6 +25,12 @@ const SubCategoriesConfig = () => {
   const [editingSubCategoryId, setEditingSubCategoryId] = useState<number | null>(null);
   const [editingSubCategoryName, setEditingSubCategoryName] = useState('');
   const [editingSubCategoryCategoryId, setEditingSubCategoryCategoryId] = useState<number>(0);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredSubCategories = subCategories.filter(s => 
+    s.subCategory.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    s.category?.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleAddSubCategory = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,138 +65,188 @@ const SubCategoriesConfig = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
-        <h2 className="text-base font-semibold text-gray-700 flex items-center">
-          <FaLayerGroup className="mr-2 text-indigo-600" />
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+      <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <Layers className="w-5 h-5 text-indigo-600" />
           Subcategorías de Productos
         </h2>
+        <span className="text-xs font-medium px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full">
+          {subCategories.length} Total
+        </span>
       </div>
 
-      <div className="p-4">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Formulario a la izquierda */}
-          <div className="lg:w-1/3 space-y-3">
-            <form onSubmit={handleAddSubCategory} className="space-y-3">
-              <div>
-                <label htmlFor="categorySelect" className="block text-xs font-medium text-gray-700 mb-1">
-                  Seleccionar Categoría
-                </label>
-                <select
-                  id="categorySelect"
-                  value={selectedCategoryId}
-                  onChange={(e) => setSelectedCategoryId(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm h-[38px]"
-                  disabled={loadingSubCategories || loadingCategories}
+      <div className="p-6 space-y-6 flex flex-col">
+        {/* Formulario de Agregar */}
+        <form onSubmit={handleAddSubCategory} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label htmlFor="categorySelect" className="block text-sm font-semibold text-gray-700">
+                Seleccionar Categoría
+              </label>
+              <select
+                id="categorySelect"
+                value={selectedCategoryId}
+                onChange={(e) => setSelectedCategoryId(e.target.value)}
+                className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-gray-900"
+                disabled={loadingSubCategories || loadingCategories}
+              >
+                <option value="">Seleccione una categoría</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.category}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="newSubCategory" className="block text-sm font-semibold text-gray-700">
+                Nombre de la Subcategoría
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  id="newSubCategory"
+                  value={newSubCategoryName}
+                  onChange={(e) => setNewSubCategoryName(e.target.value)}
+                  className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-gray-900"
+                  placeholder="Ej: Frenos"
+                  disabled={loadingSubCategories}
+                />
+                <button
+                  type="submit"
+                  disabled={loadingSubCategories || !newSubCategoryName.trim() || !selectedCategoryId}
+                  className="flex items-center justify-center px-4 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded-lg transition-all active:scale-95 shadow-sm shadow-green-200"
                 >
-                  <option value="">Seleccione una categoría</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.category}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="newSubCategory" className="block text-xs font-medium text-gray-700 mb-1">
-                  Nombre de la Subcategoría
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    id="newSubCategory"
-                    value={newSubCategoryName}
-                    onChange={(e) => setNewSubCategoryName(e.target.value)}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm h-[38px]"
-                    placeholder="Ej: Frenos"
-                    disabled={loadingSubCategories}
-                  />
-                  <button
-                    type="submit"
-                    disabled={loadingSubCategories || !newSubCategoryName.trim() || !selectedCategoryId}
-                    className={`flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white h-[38px] ${loadingSubCategories || !newSubCategoryName.trim() || !selectedCategoryId ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-                      } transition-colors duration-200`}
-                  >
-                    <FaPlus />
-                  </button>
-                </div>
-              </div>
-              {errorSubCategories && !editingSubCategoryId && <p className="mt-2 text-xs text-red-600">{errorSubCategories}</p>}
-            </form>
-          </div>
-
-          {/* Lista a la derecha */}
-          <div className="lg:w-2/3">
-            <h3 className="text-xs font-medium text-gray-700 mb-2">Subcategorías Registradas</h3>
-            <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-md">
-              <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
-                {subCategories.length === 0 && !loadingSubCategories ? (
-                  <p className="p-4 text-center text-gray-500 text-xs italic col-span-full">No hay subcategorías.</p>
-                ) : (
-                  subCategories.map((subCat) => (
-                    <div key={subCat.id} className="flex items-center justify-between p-2 hover:bg-gray-50 border-b border-gray-100">
-                      {editingSubCategoryId === subCat.id ? (
-                        <div className="flex-1 space-y-2">
-                          <select
-                            value={editingSubCategoryCategoryId}
-                            onChange={(e) => setEditingSubCategoryCategoryId(parseInt(e.target.value))}
-                            className="block w-full px-2 py-1 border border-blue-500 rounded-md text-xs focus:outline-none"
-                          >
-                            {categories.map(cat => (
-                              <option key={cat.id} value={cat.id}>{cat.category}</option>
-                            ))}
-                          </select>
-                          <div className="flex gap-1 items-center">
-                            <input
-                              type="text"
-                              value={editingSubCategoryName}
-                              onChange={(e) => setEditingSubCategoryName(e.target.value)}
-                              className="block w-full px-2 py-1 border border-blue-500 rounded-md text-xs focus:outline-none h-7"
-                              autoFocus
-                            />
-                            <button
-                              onClick={() => handleUpdateSubCategory(subCat.id)}
-                              className="text-green-600 hover:text-green-800 p-1"
-                            >
-                              <FaCheck size={14} />
-                            </button>
-                            <button
-                              onClick={() => setEditingSubCategoryId(null)}
-                              className="text-red-600 hover:text-red-800 p-1"
-                            >
-                              <FaTimes size={14} />
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex flex-col truncate mr-2">
-                            <span className="text-sm font-medium text-gray-800 truncate">{subCat.subCategory}</span>
-                            <span className="text-[10px] text-gray-500 uppercase">{subCat.category?.category}</span>
-                          </div>
-                          <div className="flex gap-1 shrink-0">
-                            <button
-                              onClick={() => startEditingSubCategory(subCat)}
-                              className="text-blue-600 hover:text-blue-800 p-1"
-                            >
-                              <FaEdit size={12} />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteSubCategory(subCat.id)}
-                              className="text-red-600 hover:text-red-800 p-1"
-                            >
-                              <FaTrash size={12} />
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ))
-                )}
-                {loadingSubCategories && (
-                  <div className="p-4 text-center text-gray-500 text-xs col-span-full">Cargando...</div>
-                )}
+                  <Plus className="w-5 h-5" />
+                </button>
               </div>
             </div>
+          </div>
+          {errorSubCategories && !editingSubCategoryId && (
+            <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+              <span className="w-1 h-1 bg-red-600 rounded-full" />
+              {errorSubCategories}
+            </p>
+          )}
+        </form>
+
+        {/* Buscador y Lista */}
+        <div className="space-y-3 flex flex-col">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-gray-700">Subcategorías Registradas</h3>
+            <div className="relative w-1/2">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input 
+                type="text"
+                placeholder="Buscar por subcategoría o categoría..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="overflow-y-auto border border-gray-100 rounded-xl bg-gray-50/30 max-h-[400px]">
+            {filteredSubCategories.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400 space-y-2">
+                <Layers className="w-8 h-8 opacity-20" />
+                <p className="text-sm italic">
+                  {searchTerm ? 'No se encontraron resultados' : 'No hay subcategorías registradas'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 divide-x divide-y divide-gray-100">
+                {filteredSubCategories.map((subCat) => (
+                  <div key={subCat.id} className="group flex items-center justify-between p-3 hover:bg-white transition-colors">
+                    {editingSubCategoryId === subCat.id ? (
+                      <div className="flex-1 space-y-2">
+                        <select
+                          value={editingSubCategoryCategoryId}
+                          onChange={(e) => setEditingSubCategoryCategoryId(parseInt(e.target.value))}
+                          className="block w-full px-3 py-1.5 bg-white border border-blue-500 rounded-lg text-xs focus:outline-none shadow-sm shadow-blue-100"
+                        >
+                          {categories.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.category}</option>
+                          ))}
+                        </select>
+                        <div className="flex gap-2 items-center">
+                          <input
+                            type="text"
+                            value={editingSubCategoryName}
+                            onChange={(e) => setEditingSubCategoryName(e.target.value)}
+                            className="flex-1 px-3 py-1.5 bg-white border border-blue-500 rounded-lg text-sm focus:outline-none shadow-sm shadow-blue-100"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleUpdateSubCategory(subCat.id);
+                              if (e.key === 'Escape') setEditingSubCategoryId(null);
+                            }}
+                          />
+                          <button
+                            onClick={() => handleUpdateSubCategory(subCat.id)}
+                            className="p-1.5 text-green-600 hover:bg-green-50 rounded-md transition-colors"
+                          >
+                            <Check className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => setEditingSubCategoryId(null)}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex flex-col truncate mr-2">
+                          <span className="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">
+                            {subCat.subCategory}
+                          </span>
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            {subCat.category?.category}
+                          </span>
+                        </div>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                          <button
+                            onClick={() => startEditingSubCategory(subCat)}
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                            title="Editar"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSubCategory(subCat.id)}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                            title="Eliminar"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        {/* Mobile controls */}
+                        <div className="flex gap-2 md:hidden shrink-0">
+                          <button
+                            onClick={() => startEditingSubCategory(subCat)}
+                            className="p-2 text-blue-600 bg-blue-50 rounded-lg"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSubCategory(subCat.id)}
+                            className="p-2 text-red-600 bg-red-50 rounded-lg"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            {loadingSubCategories && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
+              </div>
+            )}
           </div>
         </div>
       </div>

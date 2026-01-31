@@ -165,30 +165,30 @@ const Advertising = () => {
     }
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
+        <div className="p-4 md:p-6 max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Gestión de Publicidad</h1>
-                    <p className="text-gray-500 mt-2">Administra el banner publicitario emergente. Solo una publicidad puede estar activa a la vez.</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Gestión de Publicidad</h1>
+                    <p className="text-sm text-gray-500 mt-1 italic">Administra el banner publicitario emergente.</p>
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all font-bold shadow-lg shadow-red-200"
+                    className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all font-bold shadow-lg shadow-red-100 active:scale-95"
                 >
                     <Plus className="w-5 h-5" />
-                    Nueva Publicidad
+                    <span>Nueva Publicidad</span>
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {advertisements.map((adv) => (
-                    <div key={adv.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group hover:shadow-md transition-shadow">
+                    <div key={adv.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group hover:shadow-md transition-all">
                         <div className="relative aspect-video bg-gray-100">
                             {adv.image ? (
                                 <img
                                     src={getImageUrl(adv.image)}
                                     alt="Publicidad"
-                                    className={`w-full h-full object-cover ${!adv.status ? 'opacity-50 grayscale' : ''}`}
+                                    className={`w-full h-full object-cover ${!adv.status ? 'opacity-40 grayscale' : ''}`}
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-gray-300">
@@ -208,18 +208,18 @@ const Advertising = () => {
                                 )}
                             </div>
 
-                            <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="absolute top-3 right-3 flex gap-2 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                 <button
                                     onClick={() => handleOpenModal(adv)}
-                                    className="p-2 bg-white/90 backdrop-blur-sm text-gray-700 hover:text-blue-600 rounded-lg shadow-sm transition-colors"
+                                    className="p-2 bg-white/95 backdrop-blur-sm text-gray-700 hover:text-blue-600 rounded-xl shadow-sm transition-colors"
                                     title="Editar"
                                 >
-                                    <X className="w-4 h-4 rotate-45" /> {/* Using X rotated as a placeholder for edit if no other icon is preferred */}
+                                    <X className="w-4 h-4 rotate-45" />
                                 </button>
                                 <button
                                     onClick={() => handleDelete(adv.id)}
                                     disabled={deleting === adv.id}
-                                    className="p-2 bg-white/90 backdrop-blur-sm text-gray-700 hover:text-red-600 rounded-lg shadow-sm transition-colors disabled:opacity-50"
+                                    className="p-2 bg-white/95 backdrop-blur-sm text-gray-700 hover:text-red-600 rounded-xl shadow-sm transition-colors disabled:opacity-50"
                                     title="Eliminar"
                                 >
                                     {deleting === adv.id ? (
@@ -232,32 +232,37 @@ const Advertising = () => {
                         </div>
                         
                         <div className="p-5 flex-1 flex flex-col">
-                            <div className="flex items-center gap-2 mb-2 text-sm text-gray-500">
+                            <div className="flex items-center gap-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-widest">
                                 <LinkIcon className="w-3 h-3 shrink-0" />
                                 <span className="truncate">{adv.link || 'Sin enlace'}</span>
                             </div>
                             {adv.link && (
-                                <div className="flex items-center gap-2 mb-4 text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-lg w-fit">
-                                    <span className="text-gray-400 font-normal">Botón:</span> {adv.buttonText}
+                                <div className="flex items-center gap-2 mb-4 text-[10px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded-lg w-fit uppercase tracking-wider">
+                                    Botón: {adv.buttonText}
                                 </div>
                             )}
                             
                             <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-center">
-                                {!adv.status && (
+                                {!adv.status ? (
                                     <button
                                         onClick={() => handleToggleStatus(adv)}
                                         disabled={saving === adv.id}
-                                        className="text-green-600 hover:text-green-700 font-bold text-sm flex items-center gap-1 disabled:opacity-50"
+                                        className="text-green-600 hover:text-green-700 font-bold text-xs uppercase tracking-widest flex items-center gap-1.5 disabled:opacity-50 transition-colors"
                                     >
-                                        {saving === adv.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3 h-3" />}
+                                        {saving === adv.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                                         Activar
                                     </button>
+                                ) : (
+                                    <span className="text-gray-300 font-bold text-xs uppercase tracking-widest flex items-center gap-1.5">
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                        En uso
+                                    </span>
                                 )}
                                 <button
                                     onClick={() => handleOpenModal(adv)}
-                                    className="text-red-600 hover:text-red-700 font-bold text-sm ml-auto"
+                                    className="text-red-600 hover:text-red-700 font-bold text-xs uppercase tracking-widest transition-colors ml-auto"
                                 >
-                                    Editar
+                                    Detalles
                                 </button>
                             </div>
                         </div>
@@ -267,25 +272,24 @@ const Advertising = () => {
                 {advertisements.length === 0 && (
                     <div className="col-span-full text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
                         <ImageIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-500 font-medium">No se encontraron publicidades.</p>
+                        <p className="text-gray-500 font-medium">No hay publicidades configuradas.</p>
                         <button
                             onClick={() => handleOpenModal()}
                             className="mt-4 text-red-600 font-bold hover:underline"
                         >
-                            Crear la primera ahora
+                            Crear una ahora
                         </button>
                     </div>
                 )}
             </div>
 
-
             {/* Modal para Agregar/Editar */}
             {showModal && currentAdv && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleCloseModal}></div>
-                    <div className="bg-white rounded-3xl w-full max-w-xl relative z-10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                        <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                            <h2 className="text-2xl font-bold text-gray-800">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleCloseModal}></div>
+                    <div className="bg-white rounded-[2rem] w-full max-w-xl relative z-10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+                        <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+                            <h2 className="text-xl md:text-2xl font-black text-gray-800 uppercase tracking-tight">
                                 {currentAdv.id < 0 ? 'Nueva Publicidad' : 'Editar Publicidad'}
                             </h2>
                             <button onClick={handleCloseModal} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -293,10 +297,10 @@ const Advertising = () => {
                             </button>
                         </div>
 
-                        <div className="p-8 overflow-y-auto space-y-6">
-                            <div className="space-y-4">
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Imagen Publicitaria</label>
-                                <div className="relative group rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 aspect-video flex flex-col items-center justify-center transition-all hover:border-red-400">
+                        <div className="p-6 md:p-8 overflow-y-auto space-y-6">
+                            <div className="space-y-3">
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">Imagen Publicitaria</label>
+                                <div className="relative group rounded-3xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 aspect-video flex flex-col items-center justify-center transition-all hover:border-red-400">
                                     {currentAdv.image ? (
                                         <>
                                             <img
@@ -305,95 +309,98 @@ const Advertising = () => {
                                                 className="w-full h-full object-cover"
                                             />
                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                <label className="cursor-pointer bg-white text-gray-900 px-4 py-2 rounded-xl flex items-center gap-2 font-medium shadow-lg hover:scale-105 transition-transform">
-                                                    <Upload className="w-4 h-4" /> Cambiar
+                                                <label className="cursor-pointer bg-white text-gray-900 px-5 py-2.5 rounded-2xl flex items-center gap-2 font-bold text-sm shadow-xl hover:scale-105 transition-transform">
+                                                    <Upload className="w-4 h-4" /> Cambiar Imagen
                                                     <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
                                                 </label>
                                             </div>
                                         </>
                                     ) : (
-                                        <label className="cursor-pointer flex flex-col items-center gap-2 text-gray-400 hover:text-red-500 transition-colors">
-                                            <Upload className="w-8 h-8" />
-                                            <span className="font-medium">Subir Imagen</span>
+                                        <label className="cursor-pointer flex flex-col items-center gap-3 text-gray-400 hover:text-red-500 transition-colors p-10">
+                                            <div className="p-4 bg-white rounded-2xl shadow-sm">
+                                                <Upload className="w-8 h-8" />
+                                            </div>
+                                            <span className="font-bold text-sm uppercase tracking-wider">Subir Banner</span>
                                             <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
                                         </label>
                                     )}
                                 </div>
-                                <p className="text-xs text-gray-400 italic">Recomendado: 1200x800px o similar para que se vea bien en el modal.</p>
+                                <p className="text-[10px] text-gray-400 italic text-center font-medium">Formato recomendado: 1200x800px for mejor visualización.</p>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-1">Enlace (Link)</label>
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Enlace de Acción</label>
                                         <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <LinkIcon className="h-4 w-4 text-gray-400" />
+                                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                <LinkIcon className="h-4 w-4 text-gray-300" />
                                             </div>
                                             <input
                                                 type="text"
                                                 value={currentAdv.link}
                                                 onChange={(e) => handleInputChange('link', e.target.value)}
-                                                className="w-full pl-10 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
-                                                placeholder="https://ejemplo.com/oferta o /productos"
+                                                className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm font-medium"
+                                                placeholder="https://o-ruta-interna"
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-1">Texto del Botón</label>
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Texto del Botón</label>
                                         <input
                                             type="text"
                                             value={currentAdv.buttonText}
                                             onChange={(e) => handleInputChange('buttonText', e.target.value)}
-                                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
-                                            placeholder="Ver más"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm font-medium"
+                                            placeholder="Ej: Ver más"
                                             disabled={!currentAdv.link}
                                         />
                                     </div>
                                 </div>
-                                <p className="text-xs text-gray-400 mt-1">Si dejas el link vacío, no se mostrará el botón de acción en el modal.</p>
                             </div>
 
-                                <div className="pt-2">
-                                    <label className="flex items-center gap-3 cursor-pointer group">
-                                        <div className="relative">
-                                            <input
-                                                type="checkbox"
-                                                checked={currentAdv.status}
-                                                onChange={(e) => handleInputChange('status', e.target.checked)}
-                                                className="sr-only"
-                                            />
-                                            <div className={`w-12 h-6 rounded-full transition-colors ${currentAdv.status ? 'bg-red-600' : 'bg-gray-300'}`}></div>
-                                            <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${currentAdv.status ? 'translate-x-6' : 'translate-x-0'}`}></div>
-                                        </div>
-                                        <span className="text-sm font-semibold text-gray-700">Publicidad Activa</span>
-                                    </label>
-                                    <p className="text-xs text-gray-400 mt-1">Activar esta publicidad desactivará automáticamente cualquier otra que esté activa.</p>
-                                </div>
+                            <div className="pt-2">
+                                <label className="flex items-center gap-4 cursor-pointer group p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
+                                    <div className="relative">
+                                        <input
+                                            type="checkbox"
+                                            checked={currentAdv.status}
+                                            onChange={(e) => handleInputChange('status', e.target.checked)}
+                                            className="sr-only"
+                                        />
+                                        <div className={`w-12 h-6 rounded-full transition-colors ${currentAdv.status ? 'bg-red-600' : 'bg-gray-300'}`}></div>
+                                        <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${currentAdv.status ? 'translate-x-6' : 'translate-x-0 shadow-sm'}`}></div>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold text-gray-800 uppercase tracking-wider">Publicidad Activa</span>
+                                        <span className="text-[10px] text-gray-400 font-medium">Desactivará automáticamente la publicidad actual.</span>
+                                    </div>
+                                </label>
                             </div>
+                        </div>
 
-                        <div className="p-8 border-t border-gray-100 flex justify-end gap-4 bg-gray-50/50">
+                        <div className="p-6 md:p-8 border-t border-gray-100 flex flex-col-reverse sm:flex-row justify-end gap-3">
                             <button
                                 onClick={handleCloseModal}
                                 disabled={saving !== null}
-                                className="px-6 py-2 text-gray-600 font-semibold hover:bg-gray-100 rounded-xl transition-colors disabled:opacity-50"
+                                className="px-6 py-3 text-sm font-bold text-gray-400 uppercase tracking-widest hover:text-gray-600 transition-colors"
                             >
                                 Cancelar
                             </button>
                             <button
                                 onClick={handleSave}
                                 disabled={saving !== null}
-                                className="bg-red-600 hover:bg-red-700 text-white px-8 py-2 rounded-xl flex items-center gap-2 transition-all font-bold shadow-lg shadow-red-200 disabled:opacity-50"
+                                className="px-8 py-3 bg-red-600 text-white rounded-2xl flex items-center justify-center gap-2 font-black uppercase tracking-widest shadow-lg shadow-red-100 hover:bg-red-700 transition-all disabled:opacity-50 active:scale-95"
                             >
                                 {saving !== null ? (
                                     <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <Loader2 className="w-4 h-4 animate-spin" />
                                         Guardando...
                                     </>
                                 ) : (
                                     <>
-                                        <Save className="w-5 h-5" />
-                                        Guardar Publicidad
+                                        <Save className="w-4 h-4" />
+                                        {currentAdv.id < 0 ? 'Crear Ahora' : 'Guardar Cambios'}
                                     </>
                                 )}
                             </button>

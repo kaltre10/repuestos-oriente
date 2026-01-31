@@ -1,4 +1,4 @@
-import { FaDollarSign, FaSave, FaTruck, FaBox } from 'react-icons/fa';
+import { DollarSign, Save, Truck, Package } from 'lucide-react';
 import { useDollarRate } from '../../hooks/useDollarRate';
 import useNotify from '../../hooks/useNotify';
 
@@ -25,24 +25,23 @@ const DollarRateConfig = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
-        <h2 className="text-base font-semibold text-gray-700 flex items-center">
-          <FaDollarSign className="mr-2 text-green-600" />
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-gray-50/50 px-4 md:px-6 py-4 border-b border-gray-100">
+        <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <DollarSign className="w-5 h-5 text-green-600" />
           Configuraciones Generales
         </h2>
       </div>
 
-      <div className="p-4 space-y-6">
-        {/* Tasa del Dólar */}
-        <div className="flex flex-col md:flex-row items-end gap-4">
-          <div className="flex-1">
-            <label htmlFor="dollarRate" className="block text-xs font-medium text-gray-700 mb-1">
+      <div className="p-4 md:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-end gap-4 md:gap-6">
+          <div className="space-y-1.5">
+            <label htmlFor="dollarRate" className="block text-sm font-semibold text-gray-700">
               Precio del Dólar (USD)
             </label>
-            <div className="relative">
+            <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-500 sm:text-sm">$</span>
+                <span className="text-gray-400 group-focus-within:text-blue-500 transition-colors">$</span>
               </div>
               <input
                 type="number"
@@ -50,21 +49,21 @@ const DollarRateConfig = () => {
                 id="dollarRate"
                 value={dollarRate}
                 onChange={(e) => setDollarRate(e.target.value)}
-                className="block w-full pl-7 pr-12 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="block w-full pl-8 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-gray-900"
                 placeholder="0.00"
                 disabled={loadingDollar}
               />
             </div>
           </div>
 
-          <div className="flex-1">
-            <label htmlFor="freeShippingThreshold" className="block text-xs font-medium text-gray-700 mb-1 flex items-center">
-              <FaTruck className="mr-1 text-blue-500" />
-              Cantidad para Envío Gratis (USD)
+          <div className="space-y-1.5">
+            <label htmlFor="freeShippingThreshold" className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <Truck className="w-4 h-4 text-blue-500" />
+              Envío Gratis desde (USD)
             </label>
-            <div className="relative">
+            <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-500 sm:text-sm">$</span>
+                <span className="text-gray-400 group-focus-within:text-blue-500 transition-colors">$</span>
               </div>
               <input
                 type="number"
@@ -72,21 +71,21 @@ const DollarRateConfig = () => {
                 id="freeShippingThreshold"
                 value={freeShippingThreshold}
                 onChange={(e) => setLocalFreeShippingThreshold(e.target.value)}
-                className="block w-full pl-7 pr-12 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="block w-full pl-8 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-gray-900"
                 placeholder="0.00"
                 disabled={loadingDollar}
               />
             </div>
           </div>
 
-          <div className="flex-1">
-            <label htmlFor="shippingPrice" className="block text-xs font-medium text-gray-700 mb-1 flex items-center">
-              <FaBox className="mr-1 text-orange-500" />
+          <div className="space-y-1.5">
+            <label htmlFor="shippingPrice" className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <Package className="w-4 h-4 text-orange-500" />
               Precio de Envío (USD)
             </label>
-            <div className="relative">
+            <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-500 sm:text-sm">$</span>
+                <span className="text-gray-400 group-focus-within:text-blue-500 transition-colors">$</span>
               </div>
               <input
                 type="number"
@@ -94,7 +93,7 @@ const DollarRateConfig = () => {
                 id="shippingPrice"
                 value={shippingPrice}
                 onChange={(e) => setLocalShippingPrice(e.target.value)}
-                className="block w-full pl-7 pr-12 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="block w-full pl-8 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-gray-900"
                 placeholder="0.00"
                 disabled={loadingDollar}
               />
@@ -104,20 +103,24 @@ const DollarRateConfig = () => {
           <button
             onClick={handleSaveConfig}
             disabled={loadingDollar}
-            className={`whitespace-nowrap flex justify-center items-center py-2 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white h-[38px] ${loadingDollar ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'}
-              } transition-colors duration-200`}
+            className="w-full flex justify-center items-center gap-2 py-2.5 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold rounded-lg shadow-sm shadow-blue-200 transition-all active:scale-[0.98]"
           >
             {loadingDollar ? (
-              <span>Guardando...</span>
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <>
-                <FaSave className="mr-2" />
-                Guardar Configuraciones
+                <Save className="w-5 h-5" />
+                Guardar
               </>
             )}
           </button>
         </div>
-        {errorDollar && <p className="mt-2 text-xs text-red-600">{errorDollar}</p>}
+        {errorDollar && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-600 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse" />
+            {errorDollar}
+          </div>
+        )}
       </div>
     </div>
   );

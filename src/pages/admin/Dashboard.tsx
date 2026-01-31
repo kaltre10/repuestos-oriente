@@ -107,25 +107,25 @@ const Dashboard = () => {
     );
 
     return (
-        <div className="space-y-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-6 md:space-y-8">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Dashboard</h1>
                     <p className="text-gray-500">Bienvenido al panel de administración</p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-100">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-100 overflow-x-auto no-scrollbar">
                         {[
                             { id: 'day', label: 'Día' },
-                            { id: 'week', label: 'Semana' },
+                            { id: 'week', label: 'Sem' },
                             { id: 'month', label: 'Mes' },
                             { id: 'lastMonth', label: 'Mes Pasado' },
                         ].map((range) => (
                             <button
                                 key={range.id}
                                 onClick={() => setTimeRange(range.id)}
-                                className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
+                                className={`px-3 md:px-4 py-1.5 text-xs md:text-sm font-medium rounded-lg transition-all whitespace-nowrap ${
                                     timeRange === range.id
                                         ? 'bg-red-600 text-white shadow-md'
                                         : 'text-gray-500 hover:text-gray-700'
@@ -139,17 +139,19 @@ const Dashboard = () => {
                     <div className="relative">
                         <button
                             onClick={() => setShowDatePicker(!showDatePicker)}
-                            className={`flex items-center gap-2 px-4 py-2.5 bg-white text-gray-700 text-sm font-medium rounded-xl shadow-sm border border-gray-100 hover:bg-gray-50 transition-all ${
+                            className={`w-full flex items-center justify-between gap-2 px-4 py-2.5 bg-white text-gray-700 text-sm font-medium rounded-xl shadow-sm border border-gray-100 hover:bg-gray-50 transition-all ${
                                 timeRange === 'custom' ? 'ring-2 ring-red-600' : ''
                             }`}
                         >
-                            <CalendarIcon className="w-4 h-4 text-red-600" />
-                            Personalizado
-                            <ChevronDown className="w-4 h-4" />
+                            <div className="flex items-center gap-2">
+                                <CalendarIcon className="w-4 h-4 text-red-600" />
+                                <span>Personalizado</span>
+                            </div>
+                            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showDatePicker ? 'rotate-180' : ''}`} />
                         </button>
 
                         {showDatePicker && (
-                            <div className="absolute right-0 mt-2 w-72 bg-white p-4 rounded-2xl shadow-xl border border-gray-100 z-10 animate-in fade-in zoom-in duration-200">
+                            <div className="absolute right-0 mt-2 w-full sm:w-72 bg-white p-4 rounded-2xl shadow-xl border border-gray-100 z-10 animate-in fade-in zoom-in duration-200">
                                 <form onSubmit={handleCustomRangeSubmit} className="space-y-4">
                                     <div>
                                         <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Desde</label>
@@ -185,30 +187,30 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 <StatCard 
-                    title="Usuarios Registrados" 
+                    title="Usuarios" 
                     value={stats?.usersCount || 0} 
                     icon={Users} 
                     color="bg-blue-50 text-blue-600"
                     trend="+12% este mes"
                 />
                 <StatCard 
-                    title="Ventas Realizadas" 
+                    title="Ventas" 
                     value={stats?.salesCount || 0} 
                     icon={ShoppingBag} 
                     color="bg-orange-50 text-orange-600"
                     trend="+5% esta semana"
                 />
                 <StatCard 
-                    title="Total Ingresos" 
+                    title="Ingresos" 
                     value={<FormattedPrice price={stats?.totalRevenue || 0} />} 
                     icon={DollarSign} 
                     color="bg-red-50 text-red-600"
                     trend="+8% esta semana"
                 />
                 <StatCard 
-                    title="Visitas Totales" 
+                    title="Visitas" 
                     value={stats?.visitsCount || 0} 
                     icon={Eye} 
                     color="bg-green-50 text-green-600"
@@ -216,15 +218,15 @@ const Dashboard = () => {
                 />
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between mb-8">
+            <div className="bg-white p-4 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
                     <div>
                         <h2 className="text-xl font-bold text-gray-900">Ventas en el Tiempo</h2>
                         <p className="text-sm text-gray-500">Resumen de ingresos generados</p>
                     </div>
                 </div>
 
-                <div className="h-[400px] w-full">
+                <div className="h-[300px] md:h-[400px] w-full">
                     {loading ? (
                         <div className="flex items-center justify-center h-full">
                             <Loader2 className="w-8 h-8 text-red-600 animate-spin" />

@@ -1,5 +1,15 @@
 import { useState, useEffect } from 'react';
-import { FaEdit, FaTrash, FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
+import { 
+  Pencil, 
+  Trash2, 
+  Plus, 
+  CheckCircle2, 
+  XCircle, 
+  X, 
+  CreditCard, 
+  Settings2,
+  AlertCircle
+} from 'lucide-react';
 import request from '../../utils/request';
 import { apiUrl } from '../../utils/utils';
 import useNotify from '../../hooks/useNotify';
@@ -302,89 +312,91 @@ const PaymentMethods = () => {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-4 md:p-6 max-w-[1600px] mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Métodos de Pago</h1>
-          <p className="text-gray-500">Gestiona las opciones de pago disponibles para los clientes</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Métodos de Pago</h1>
+          <p className="text-sm text-gray-500 mt-1 italic">Gestiona las opciones de pago disponibles para los clientes</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3">
           <button
             onClick={() => setShowTypeForm(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all font-bold shadow-lg shadow-emerald-100 active:scale-95"
           >
-            <FaPlus />
-            Tipo de Pago
+            <Settings2 className="w-5 h-5" />
+            <span>Tipo de Pago</span>
           </button>
           <button
             onClick={() => setShowForm(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all font-bold shadow-lg shadow-blue-100 active:scale-95"
           >
-            <FaPlus />
-            Nuevo Método
+            <Plus className="w-5 h-5" />
+            <span>Nuevo Método</span>
           </button>
         </div>
       </div>
 
       {/* Sección de Tipos de Pago */}
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Tipos de Pago</h2>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          {/* Responsive table wrapper */}
-          <div className="overflow-x-auto">
+      <div className="mb-10">
+        <div className="flex items-center gap-2 mb-4">
+          <Settings2 className="w-5 h-5 text-emerald-600" />
+          <h2 className="text-xl font-bold text-gray-800">Tipos de Pago</h2>
+        </div>
+        <div className="bg-white rounded-[1.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+          {/* Desktop Table */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50/50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Nombre</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Propiedades</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Acciones</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Nombre</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Propiedades</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-100">
                 {paymentTypes.length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="px-4 py-10 text-center text-gray-500 sm:px-6">
-                      No hay tipos de pago configurados. Usa el botón "Tipo de Pago" para crear uno.
+                    <td colSpan={3} className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center gap-2 text-gray-400">
+                        <AlertCircle className="w-8 h-8" />
+                        <p>No hay tipos de pago configurados.</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
                   paymentTypes.map((type) => (
-                    <tr key={type.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                        <div className="text-sm font-medium text-gray-900">{type.name}</div>
+                    <tr key={type.id} className="hover:bg-gray-50/50 transition-colors group">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-bold text-gray-900">{type.name}</div>
                       </td>
-                      <td className="px-4 py-4 sm:px-6">
-                        <div className="text-xs text-gray-500 space-y-1">
-                          {Array.isArray(type.properties) ? (
-                            type.properties.length > 0 ? (
-                              type.properties.map((property, index) => (
-                                <div key={index} className="inline-block mr-2 mb-1 bg-gray-100 px-2 py-1 rounded">
-                                  {property}
-                                </div>
-                              ))
-                            ) : (
-                              <div className="text-gray-400 italic">No hay propiedades configuradas</div>
-                            )
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-2">
+                          {Array.isArray(type.properties) && type.properties.length > 0 ? (
+                            type.properties.map((property, index) => (
+                              <span key={index} className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                {property}
+                              </span>
+                            ))
                           ) : (
-                            <div className="text-gray-400 italic">No hay propiedades configuradas</div>
+                            <span className="text-xs text-gray-400 italic">Sin propiedades</span>
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm font-medium sm:px-6">
-                        <div className="flex gap-2">
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => handleTypeEdit(type)}
-                            className="text-blue-600 hover:text-blue-900 transition-colors"
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Editar"
                           >
-                            <FaEdit size={16} />
+                            <Pencil className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleTypeDelete(type.id)}
-                            className="text-red-600 hover:text-red-900 transition-colors"
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Eliminar"
                           >
-                            <FaTrash size={16} />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -393,89 +405,127 @@ const PaymentMethods = () => {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card Layout */}
+          <div className="md:hidden divide-y divide-gray-100">
+            {paymentTypes.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                <AlertCircle className="w-10 h-10 mx-auto mb-2 text-gray-300" />
+                <p>No hay tipos de pago configurados.</p>
+              </div>
+            ) : (
+              paymentTypes.map((type) => (
+                <div key={type.id} className="p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div className="font-bold text-gray-900">{type.name}</div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleTypeEdit(type)}
+                        className="p-2 text-blue-600 bg-blue-50 rounded-lg"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleTypeDelete(type.id)}
+                        className="p-2 text-red-600 bg-red-50 rounded-lg"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {Array.isArray(type.properties) && type.properties.map((property, index) => (
+                      <span key={index} className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-md text-[10px] font-bold uppercase tracking-wider border border-emerald-100">
+                        {property}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
 
       {/* Sección de Métodos de Pago */}
       <div>
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Métodos de Pago</h2>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          {/* Responsive table wrapper */}
-          <div className="overflow-x-auto">
+        <div className="flex items-center gap-2 mb-4">
+          <CreditCard className="w-5 h-5 text-blue-600" />
+          <h2 className="text-xl font-bold text-gray-800">Métodos de Pago</h2>
+        </div>
+        <div className="bg-white rounded-[1.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+          {/* Desktop Table */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50/50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Nombre</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Tipo de Pago</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Datos Principales</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Estado</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Acciones</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Nombre</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Tipo</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Datos Principales</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-400 uppercase tracking-wider">Estado</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-100">
                 {paymentMethods.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-gray-500 sm:px-6">
-                      No hay métodos de pago configurados.
+                    <td colSpan={5} className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center gap-2 text-gray-400">
+                        <AlertCircle className="w-8 h-8" />
+                        <p>No hay métodos de pago configurados.</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
                   paymentMethods.map((method) => (
-                    <tr key={method.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                        <div className="text-sm font-medium text-gray-900">{method.name}</div>
+                    <tr key={method.id} className="hover:bg-gray-50/50 transition-colors group">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-bold text-gray-900">{method.name}</div>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                        <div className="text-sm text-gray-700">{method.paymentType?.name || 'No especificado'}</div>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 uppercase tracking-wider">
+                          {method.paymentType?.name || 'No especificado'}
+                        </span>
                       </td>
-                      <td className="px-4 py-4 sm:px-6">
-                        <div className="text-xs text-gray-500 space-y-1">
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1">
                           {(() => {
                             const properties = method.properties || {};
                             const entries = Object.entries(properties);
-                            
-                            if (entries.length === 0) {
-                              return <div className="text-gray-400 italic">No hay propiedades configuradas</div>;
-                            }
-                            
+                            if (entries.length === 0) return <span className="text-xs text-gray-400 italic">Sin datos</span>;
                             return entries.map(([key, value]) => (
-                              <div key={key} className="flex flex-wrap gap-1">
-                                <span className="font-semibold text-gray-700">{key}:</span>
-                                <span className="text-gray-600">{value || '-'}</span>
+                              <div key={key} className="text-xs">
+                                <span className="font-bold text-gray-500 uppercase text-[10px] tracking-wider">{key}:</span>
+                                <span className="ml-1 text-gray-700">{String(value) || '-'}</span>
                               </div>
                             ));
                           })()}
                         </div>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                        {method.isActive ? (
-                          <span className="flex items-center text-green-600 text-sm">
-                            <FaCheck className="mr-1" />
-                            <span className="hidden sm:inline">Activo</span>
-                          </span>
-                        ) : (
-                          <span className="flex items-center text-red-600 text-sm">
-                            <FaTimes className="mr-1" />
-                            <span className="hidden sm:inline">Inactivo</span>
-                          </span>
-                        )}
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${
+                          method.isActive 
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
+                            : 'bg-red-50 text-red-700 border border-red-100'
+                        }`}>
+                          {method.isActive ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                          {method.isActive ? 'Activo' : 'Inactivo'}
+                        </span>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm font-medium sm:px-6">
-                        <div className="flex gap-2">
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => handleEdit(method)}
-                            className="text-blue-600 hover:text-blue-900 transition-colors"
-                            title="Editar"
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           >
-                            <FaEdit size={16} />
+                            <Pencil className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(method.id)}
-                            className="text-red-600 hover:text-red-900 transition-colors"
-                            title="Eliminar"
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           >
-                            <FaTrash size={16} />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -485,232 +535,302 @@ const PaymentMethods = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Mobile Card Layout */}
+          <div className="md:hidden divide-y divide-gray-100">
+            {paymentMethods.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                <AlertCircle className="w-10 h-10 mx-auto mb-2 text-gray-300" />
+                <p>No hay métodos de pago configurados.</p>
+              </div>
+            ) : (
+              paymentMethods.map((method) => (
+                <div key={method.id} className="p-4 space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <div className="font-bold text-gray-900">{method.name}</div>
+                      <span className="inline-block px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold uppercase tracking-wider">
+                        {method.paymentType?.name || 'No especificado'}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(method)}
+                        className="p-2 text-blue-600 bg-blue-50 rounded-lg"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(method.id)}
+                        className="p-2 text-red-600 bg-red-50 rounded-lg"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-xl p-3 space-y-2">
+                    {Object.entries(method.properties || {}).map(([key, value]) => (
+                      <div key={key} className="flex justify-between items-center text-xs">
+                        <span className="font-bold text-gray-400 uppercase text-[10px] tracking-wider">{key}</span>
+                        <span className="text-gray-700 font-medium">{String(value) || '-'}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-50">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Estado</span>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      method.isActive 
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
+                        : 'bg-red-50 text-red-700 border border-red-100'
+                    }`}>
+                      {method.isActive ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                      {method.isActive ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
       {/* Modal Form for Payment Methods */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 my-8">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
-              <h2 className="text-xl font-bold text-gray-800">
-                {editingId ? 'Editar Método de Pago' : 'Nuevo Método de Pago'}
-              </h2>
-              <button onClick={handleCloseForm} className="text-gray-400 hover:text-gray-600">
-                <FaTimes size={20} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleCloseForm}></div>
+          <div className="bg-white rounded-[2rem] w-full max-w-lg relative z-10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-20">
+              <div>
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+                  {editingId ? 'Editar Método' : 'Nuevo Método'}
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">Configura los detalles del método de pago.</p>
+              </div>
+              <button
+                onClick={handleCloseForm}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-400" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Nombre del Método *</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="Ej: Transferencia Banesco"
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                    required
-                  />
-                </div>
+            <div className="overflow-y-auto flex-1 p-6 md:p-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">
+                      Nombre del Método
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="Ej: Transferencia Banesco"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium"
+                      required
+                    />
+                  </div>
 
-                <div className="col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Tipo de Pago *</label>
-                  <select
-                    name="paymentTypeId"
-                    value={formData.paymentTypeId}
-                    onChange={handleInputChange}
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                    required
-                  >
-                    <option value={0} disabled>Seleccione un tipo de pago</option>
-                    {paymentTypes.map((type) => (
-                      <option key={type.id} value={type.id}>
-                        {type.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">
+                      Tipo de Pago
+                    </label>
+                    <select
+                      name="paymentTypeId"
+                      value={formData.paymentTypeId}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium appearance-none"
+                      required
+                    >
+                      <option value={0}>Selecciona un tipo...</option>
+                      {paymentTypes.map((type) => (
+                        <option key={type.id} value={type.id}>{type.name}</option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* Campos dinámicos basados en el tipo de pago seleccionado */}
-              {formData.paymentTypeId > 0 && (
-                <div className="pt-4">
-                  {(() => {
-                    const selectedType = paymentTypes.find(type => type.id === formData.paymentTypeId);
-                    const properties = selectedType && Array.isArray(selectedType.properties) ? selectedType.properties : [];
-                    
-                    return (
-                      <>
-                        <h3 className="text-sm font-semibold text-gray-700 mb-3">
-                          Propiedades de {selectedType?.name}
-                        </h3>
-                        
-                        {properties.length > 0 ? (
-                          <div className="space-y-3">
-                            {properties.map((propertyName) => (
-                              <div key={propertyName} className="flex gap-2 items-center">
-                                <div className="flex-1">
-                                  <label className="block text-sm font-semibold text-gray-700 mb-1 capitalize">{propertyName}</label>
-                                  <input
-                                    type="text"
-                                    value={formData.properties[propertyName] || ''}
-                                    onChange={(e) => handlePropertyChange(propertyName, e.target.value)}
-                                    placeholder={`Valor para ${propertyName}`}
-                                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                                    required
-                                  />
-                                </div>
-                              </div>
-                            ))}
+                  {formData.paymentTypeId > 0 && (
+                    <div className="space-y-4 pt-4 border-t border-gray-100">
+                      <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                        <Settings2 className="w-4 h-4 text-blue-600" />
+                        Campos Requeridos
+                      </h3>
+                      <div className="grid grid-cols-1 gap-4">
+                        {paymentTypes.find(t => t.id === formData.paymentTypeId)?.properties.map((prop) => (
+                          <div key={prop}>
+                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">
+                              {prop}
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.properties[prop] || ''}
+                              onChange={(e) => handlePropertyChange(prop, e.target.value)}
+                              placeholder={`Ingresa ${prop.toLowerCase()}`}
+                              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium"
+                              required
+                            />
                           </div>
-                        ) : (
-                          <p className="text-sm text-gray-500 italic">Este tipo de pago no tiene propiedades configuradas</p>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-              )}
-
-              <div className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  name="isActive"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
-                  Método de pago activo
-                </label>
-              </div>
-
-              <div className="pt-4 flex gap-3 sticky bottom-0 bg-white">
-                <button
-                  type="button"
-                  onClick={handleCloseForm}
-                  className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={formLoading}
-                  className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex justify-center items-center"
-                >
-                  {formLoading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  ) : (
-                    editingId ? 'Actualizar' : 'Crear Método'
+                        ))}
+                      </div>
+                    </div>
                   )}
-                </button>
-              </div>
-            </form>
+
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl">
+                    <input
+                      type="checkbox"
+                      id="isActive"
+                      name="isActive"
+                      checked={formData.isActive}
+                      onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                      className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <label htmlFor="isActive" className="text-sm font-bold text-gray-700">
+                      Método de pago activo
+                    </label>
+                  </div>
+                </div>
+
+                <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 sticky bottom-0 bg-white">
+                  <button
+                    type="button"
+                    onClick={handleCloseForm}
+                    className="flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-gray-50 transition-all active:scale-95"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={formLoading}
+                    className="flex-[2] px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex justify-center items-center gap-2 active:scale-95 disabled:opacity-50"
+                  >
+                    {formLoading ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-5 h-5" />
+                        <span>{editingId ? 'Guardar Cambios' : 'Crear Método'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
       {/* Modal Form for Payment Types */}
       {showTypeForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 my-8">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
-              <h2 className="text-xl font-bold text-gray-800">
-                {editingTypeId ? 'Editar Tipo de Pago' : 'Nuevo Tipo de Pago'}
-              </h2>
-              <button onClick={handleCloseTypeForm} className="text-gray-400 hover:text-gray-600">
-                <FaTimes size={20} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleCloseTypeForm}></div>
+          <div className="bg-white rounded-[2rem] w-full max-w-lg relative z-10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-20">
+              <div>
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+                  {editingTypeId ? 'Editar Tipo' : 'Nuevo Tipo'}
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">Define las propiedades de este tipo de pago.</p>
+              </div>
+              <button
+                onClick={handleCloseTypeForm}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-400" />
               </button>
             </div>
 
-            <form onSubmit={handleTypeSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Nombre del Tipo *</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={typeFormData.name}
-                  onChange={handleTypeInputChange}
-                  placeholder="Ej: Pago Móvil, Zelle, Transferencia"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                  required
-                />
-              </div>
+            <div className="overflow-y-auto flex-1 p-6 md:p-8">
+              <form onSubmit={handleTypeSubmit} className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">
+                      Nombre del Tipo
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={typeFormData.name}
+                      onChange={handleTypeInputChange}
+                      placeholder="Ej: Pago Móvil, Zelle"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium"
+                      required
+                    />
+                  </div>
 
-              {/* Sección de Propiedades */}
-              <div className="pt-4">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Propiedades Necesarias</h3>
-                
-                {/* Agregar Nueva Propiedad */}
-                <div className="flex gap-2 mb-4">
-                  <input
-                    type="text"
-                    value={newPropertyName}
-                    onChange={(e) => setNewPropertyName(e.target.value)}
-                    placeholder="Nombre de la propiedad (ej: Banco, Teléfono, CI/RIF)"
-                    className="flex-1 p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                  />
+                  <div className="pt-4 space-y-4">
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">
+                      Propiedades Necesarias
+                    </label>
+                    
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newPropertyName}
+                        onChange={(e) => setNewPropertyName(e.target.value)}
+                        placeholder="Ej: Banco, Teléfono"
+                        className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium"
+                      />
+                      <button
+                        type="button"
+                        onClick={addProperty}
+                        disabled={!newPropertyName.trim()}
+                        className="px-4 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 disabled:opacity-50 transition-all active:scale-95"
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-2 min-h-[40px] p-3 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                      {typeFormData.properties.length > 0 ? (
+                        typeFormData.properties.map((property) => (
+                          <div key={property} className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-100 shadow-sm animate-in fade-in slide-in-from-left-2 duration-200">
+                            <span className="text-sm font-medium text-gray-700">{property}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeProperty(property)}
+                              className="text-red-500 hover:bg-red-50 p-1 rounded-md transition-colors"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-xs text-gray-400 italic w-full text-center py-2">No hay propiedades agregadas</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 sticky bottom-0 bg-white">
                   <button
                     type="button"
-                    onClick={addProperty}
-                    disabled={!newPropertyName.trim()}
-                    className={`px-4 py-2.5 rounded-lg font-semibold transition-colors ${!newPropertyName.trim() ? 'bg-gray-300 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}
+                    onClick={handleCloseTypeForm}
+                    className="flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-gray-50 transition-all active:scale-95"
                   >
-                    Agregar
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={typeFormLoading}
+                    className="flex-[2] px-6 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 flex justify-center items-center gap-2 active:scale-95 disabled:opacity-50"
+                  >
+                    {typeFormLoading ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-5 h-5" />
+                        <span>{editingTypeId ? 'Guardar Cambios' : 'Crear Tipo'}</span>
+                      </>
+                    )}
                   </button>
                 </div>
-                
-                {/* Lista de Propiedades */}
-                {Array.isArray(typeFormData.properties) ? (
-                  typeFormData.properties.length > 0 ? (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {typeFormData.properties.map((property, index) => (
-                        <div key={index} className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg">
-                          <span className="text-sm text-gray-700">{property}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeProperty(property)}
-                            className="text-red-600 hover:text-red-800 transition-colors"
-                            title="Eliminar propiedad"
-                          >
-                            <FaTrash size={14} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-500 italic">No hay propiedades agregadas</p>
-                  )
-                ) : (
-                  <p className="text-sm text-gray-500 italic">No hay propiedades agregadas</p>
-                )}
-              </div>
-
-              <div className="pt-4 flex gap-3 sticky bottom-0 bg-white">
-                <button
-                  type="button"
-                  onClick={handleCloseTypeForm}
-                  className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={typeFormLoading}
-                  className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex justify-center items-center"
-                >
-                  {typeFormLoading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  ) : (
-                    editingTypeId ? 'Actualizar' : 'Crear Tipo'
-                  )}
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}
