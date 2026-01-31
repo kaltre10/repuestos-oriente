@@ -9,7 +9,7 @@ const AuthPage = () => {
     formData, showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword,
     rememberCredentials, handleRemember, loading, error, setIsLogin,
     isForgotPassword, setIsForgotPassword, handleForgotPassword, successMessage } = useAuth()
-    document.title = `Repuestos Oriente - ${isLogin ? "Login" : "Registro"}`;
+    document.title = `Repuestos Picha - ${isLogin ? "Login" : "Registro"}`;
   if (isForgotPassword) {
     return (
       <div className="h-screen bg-gray-50 flex flex-col justify-center py-12 px-6 lg:px-8">

@@ -5,7 +5,7 @@ import useAuth from '../hooks/useAuth';
 import logo from '../assets/logo.png';
 
 const ResetPasswordPage = () => {
-  document.title = "Repuestos Oriente";
+  document.title = "Repuestos Picha";
   const { token } = useParams<{ token: string }>();
   const { handleResetPassword, loading, error, successMessage } = useAuth();
   
