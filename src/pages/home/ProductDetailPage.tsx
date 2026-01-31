@@ -6,6 +6,7 @@ import { imagesUrl, apiUrl } from '../../utils/utils';
 import request from '../../utils/request';
 import CartModal from '../../components/CartModal';
 import ImageGallery from '../../components/ImageGallery';
+import ProductCard from '../../components/ProductCard';
 import useStore from '../../states/global';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
@@ -49,10 +50,10 @@ const ProductDetailPage = () => {
             reviews: productData.reviews || 0,
             image: productData.images && productData.images.length > 0
               ? `${imagesUrl}${productData.images[0].image}`
-              : '/placeholder-product.png',
+              : '/placeholder-product.svg',
             images: productData.images && productData.images.length > 0
               ? productData.images.map((img: any) => `${imagesUrl}${img.image}`)
-              : ['/placeholder-product.png'],
+              : ['/placeholder-product.svg'],
             category: productData.categories,
             categories: productData.categories,
             subcategories: productData.subcategories,
@@ -474,57 +475,19 @@ const ProductDetailPage = () => {
                 .slice(0, 6)
                 .map(relatedProductRaw => {
                   const raw = relatedProductRaw as any;
-                  const discount = raw.discount || 0;
-                  const price = discount > 0
-                    ? Number(raw.price) * (1 - (Number(discount) / 100))
-                    : Number(raw.price);
-
-                  const relatedProduct = {
+                  // Adaptamos el objeto al formato que espera ProductCard
+                  const productForCard = {
                     ...raw,
-                    image: raw.images && raw.images.length > 0
-                      ? `${imagesUrl}${raw.images[0].image}`
-                      : '/placeholder-product.png',
                     category: raw.categories,
-                    discountedPrice: price,
-                    originalPrice: Number(raw.price)
+                    rating: raw.rating || 0,
+                    reviews: raw.reviews || 0
                   };
 
                   return (
-                    <div
-                      key={relatedProduct.id}
-                      onClick={() => {
-                        navigate(`/producto/${relatedProduct.id}`);
-                        window.scrollTo(0, 0);
-                      }}
-                      className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-all group"
-                    >
-                      <div className="relative h-40 overflow-hidden">
-                        <img
-                          src={relatedProduct.image}
-                          alt={relatedProduct.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        {discount > 0 && (
-                          <div className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-full">
-                            {discount}% OFF
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-3">
-                        <p className="text-[10px] text-gray-400 uppercase font-bold mb-1 truncate">{relatedProduct.category}</p>
-                        <h3 className="text-sm font-semibold text-gray-700 mb-2 line-clamp-2 h-10 leading-tight">{relatedProduct.name}</h3>
-                        <div className="flex flex-col">
-                          {discount > 0 && (
-                            <span className="text-[10px] text-gray-400 line-through">
-                              <FormattedPrice price={relatedProduct.originalPrice} />
-                            </span>
-                          )}
-                          <p className="text-red-600 font-bold text-base">
-                            <FormattedPrice price={relatedProduct.discountedPrice} />
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    <ProductCard
+                      key={productForCard.id}
+                      product={productForCard}
+                    />
                   );
                 })}
             </div>
