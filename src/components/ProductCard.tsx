@@ -34,6 +34,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     ? `${imagesUrl}${product.images[0].image}`
     : (product.image?.startsWith('http') ? product.image : '/placeholder-product.svg');
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = '/placeholder-product.svg';
+  };
+
   const basePrice = Number(product.price);
   const discountPercent = product.discount ? Number(product.discount) : 0;
   const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
@@ -55,6 +59,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <img
           src={displayImage}
           alt={product.name}
+          onError={handleImageError}
           className="w-full h-56 object-cover cursor-pointer"
         />
         <div onClick={handleImageClick} className="cursor-pointer absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>

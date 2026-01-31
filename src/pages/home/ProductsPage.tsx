@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { List, Grid2X2, Grid3X3, Star, Plus, Minus, Loader2, Trash2 } from 'lucide-react';
 import { useProducts } from '../../hooks/useProducts';
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { imagesUrl } from '../../utils/utils';
 import ProductCard from '../../components/ProductCard';
 import ProductFilters from '../../components/ProductFilters';
@@ -19,6 +20,34 @@ const ProductsPage = () => {
     const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
     const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
 
+    // Filter states
+    const [selectedYear, setSelectedYear] = useState('');
+    const [selectedBrand, setSelectedBrand] = useState('');
+    const [selectedModel, setSelectedModel] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedSubcategory, setSelectedSubcategory] = useState('');
+    const [filtersExpanded, setFiltersExpanded] = useState(false);
+
+    // Fetch products when filters or sort changes
+    useEffect(() => {
+        getProducts({ year: selectedYear, page: 1, limit: 20, sortBy });
+    }, [selectedYear, sortBy]);
+
+    const loadMoreProducts = useCallback(async (nextPage: number) => {
+        const result = await getProducts({ year: selectedYear, page: nextPage, limit: 20, sortBy });
+        return result.pagination.hasMore;
+    }, [getProducts, selectedYear, sortBy]);
+
+    const { hasMore, isLoading, loadMoreRef, reset } = useInfiniteScroll({
+        loadMore: loadMoreProducts,
+        initialPage: 1
+    });
+
+    // Reset scroll when filters change
+    useEffect(() => {
+        reset();
+    }, [selectedYear, sortBy, reset]);
+
     // Load saved grid layout from localStorage on component mount
     useEffect(() => {
         document.title = "Repuestos Picha - Productos";
@@ -33,19 +62,6 @@ const ProductsPage = () => {
         setGridLayout(layout);
         localStorage.setItem('products-grid-layout', layout);
     };
-
-    // Filter states
-    const [selectedYear, setSelectedYear] = useState('');
-    const [selectedBrand, setSelectedBrand] = useState('');
-    const [selectedModel, setSelectedModel] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [selectedSubcategory, setSelectedSubcategory] = useState('');
-    const [filtersExpanded, setFiltersExpanded] = useState(false);
-
-    // Fetch products when year changes
-    useEffect(() => {
-        getProducts({ year: selectedYear });
-    }, [selectedYear]);
 
     const filteredProducts = useMemo(() => {
         let filtered = products.map((p: any) => ({
@@ -397,6 +413,18 @@ const ProductsPage = () => {
                                     >
                                         Limpiar filtros
                                     </button>
+                                </div>
+                            )}
+
+                            {/* Infinite Scroll Loader */}
+                            {hasMore && (
+                                <div ref={loadMoreRef} className="flex justify-center py-12">
+                                    {isLoading && (
+                                        <div className="flex flex-col items-center gap-2">
+                                            <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+                                            <p className="text-sm text-gray-500">Cargando más productos...</p>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import { useProducts } from '../../hooks/useProducts';
 import ProductModal from '../../components/modals/ProductModal';
@@ -19,7 +20,12 @@ const Products = () => {
     handleDelete,
     handleEdit,
     setShowForm,
+    getProducts
   } = useProducts();
+
+  useEffect(() => {
+    getProducts({ limit: 20 });
+  }, []);
 
   if (loading) {
     return (

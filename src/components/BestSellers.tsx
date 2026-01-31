@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { List, Grid2X2, Grid3X3, Loader2, Plus, Minus, Trash2 } from 'lucide-react';
 import { useProducts } from '../hooks/useProducts';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { imagesUrl } from '../utils/utils';
 import ProductCard from './ProductCard';
 import Rating from './Rating';
@@ -13,9 +14,29 @@ import useNotify from '../hooks/useNotify';
 const BestSellers = () => {
   const { notify } = useNotify();
   const navigate = useNavigate();
-  const { products, loading } = useProducts();
+  const { products, loading, getProducts } = useProducts();
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
   const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
+
+  // Carga inicial de productos
+  useEffect(() => {
+    getProducts({ page: 1, limit: 20, sortBy });
+  }, [sortBy]);
+
+  const loadMoreProducts = useCallback(async (nextPage: number) => {
+    const result = await getProducts({ page: nextPage, limit: 20, sortBy });
+    return result.pagination.hasMore;
+  }, [getProducts, sortBy]);
+
+  const { hasMore, isLoading, loadMoreRef, reset } = useInfiniteScroll({
+    loadMore: loadMoreProducts,
+    initialPage: 1
+  });
+
+  // Reiniciar scroll cuando cambia el ordenamiento
+  useEffect(() => {
+    reset();
+  }, [sortBy, reset]);
 
   // Load saved grid layout from localStorage on component mount
   useEffect(() => {
@@ -31,32 +52,15 @@ const BestSellers = () => {
     localStorage.setItem('bestsellers-grid-layout', layout);
   };
 
-  const filteredProducts = useMemo(() => {
-    let filtered = products.map((p: any) => ({
+  const processedProducts = useMemo(() => {
+    return products.map((p: any) => ({
       ...p,
-      rating: p.rating || 0,
-      reviews: p.reviews || 0,
       image: p.images && p.images.length > 0 
         ? `${imagesUrl}${p.images[0].image}` 
         : '/placeholder-product.svg',
       category: p.categories
     }));
-
-    // Apply sorting
-    switch (sortBy) {
-      case 'popular':
-        filtered = [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0));
-        break;
-      case 'price-low':
-        filtered = [...filtered].sort((a, b) => Number(a.price) - Number(b.price));
-        break;
-      case 'price-high':
-        filtered = [...filtered].sort((a, b) => Number(b.price) - Number(a.price));
-        break;
-    }
-
-    return filtered;
-  }, [products, sortBy]);
+  }, [products]);
 
   const getGridClasses = () => {
     switch (gridLayout) {
@@ -241,15 +245,25 @@ const BestSellers = () => {
 
         {gridLayout === '1' ? (
           <div className="space-y-6">
-            {filteredProducts.map(product => renderListItem(product))}
+            {processedProducts.map(product => renderListItem(product))}
           </div>
         ) : (
           <div className={`grid ${getGridClasses()} gap-6`}>
-            {filteredProducts.map(product => (
+            {processedProducts.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         )}
+
+        {/* Elemento observador para scroll infinito */}
+        <div ref={loadMoreRef} className="py-10 flex justify-center">
+          {hasMore && (
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 className="w-8 h-8 text-red-600 animate-spin" />
+              <p className="text-sm text-gray-500 font-medium">Cargando más productos...</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

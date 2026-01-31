@@ -6,7 +6,7 @@ class ProductService {
 
   async getAllProducts(filters = {}) {
     try {
-      const { year, onSale } = filters;
+      const { year, onSale, page = 1, limit = 20, sortBy } = filters;
       
       let where = {};
       
@@ -18,7 +18,7 @@ class ProductService {
 
       let products = await Product.findAll({
         where,
-        order: [['createdAt', 'DESC']],
+        order: [['id', 'ASC']],
         include: [
           {
             model: models.ProductImage,
@@ -44,7 +44,7 @@ class ProductService {
       });
 
       // Calcular rating promedio para cada producto
-      const processedProducts = products.map(product => {
+      let processedProducts = products.map(product => {
         const productJSON = product.toJSON();
         const salesData = productJSON.sales || [];
         
@@ -65,14 +65,12 @@ class ProductService {
         return productJSON;
       });
 
-      let finalProducts = processedProducts;
-
+      // Aplicar filtro de año en memoria
       if (year) {
         const targetYear = parseInt(year);
-        finalProducts = processedProducts.filter(product => {
+        processedProducts = processedProducts.filter(product => {
           if (!product.years) return false;
           
-          // Formato esperado: XXXX-XXXX
           const range = product.years.split('-');
           if (range.length === 2) {
             const startYear = parseInt(range[0]);
@@ -80,7 +78,6 @@ class ProductService {
             return targetYear >= startYear && targetYear <= endYear;
           }
           
-          // Caso en que solo sea un año individual XXXX
           if (range.length === 1) {
             return parseInt(range[0]) === targetYear;
           }
@@ -89,7 +86,33 @@ class ProductService {
         });
       }
 
-      return finalProducts;
+      // Aplicar ordenamiento en memoria
+      if (sortBy === 'price-low') {
+        processedProducts.sort((a, b) => a.price - b.price);
+      } else if (sortBy === 'price-high') {
+        processedProducts.sort((a, b) => b.price - a.price);
+      } else if (sortBy === 'popular') {
+        processedProducts.sort((a, b) => b.rating - a.rating);
+      } else {
+        // Orden predeterminado: por inserción (ID ascendente)
+        processedProducts.sort((a, b) => a.id - b.id);
+      }
+
+      // Paginación en memoria
+      const total = processedProducts.length;
+      const start = (page - 1) * limit;
+      const paginatedProducts = processedProducts.slice(start, start + limit);
+      const hasMore = start + limit < total;
+
+      return {
+        products: paginatedProducts,
+        pagination: {
+          total,
+          page,
+          limit,
+          hasMore
+        }
+      };
     } catch (error) {
       throw new Error(`Error al obtener productos: ${error.message}`);
     }

@@ -25,17 +25,22 @@ export const useProducts = () => {
 
 
   useEffect(() => {
-    getProducts();
+    // Solo cargamos productos inicialmente si no estamos en una página que maneja su propia carga (como BestSellers)
+    // Para evitar cargar todos los productos sin filtros.
+    // getProducts(); 
   }, []);
 
-  const getProducts = async (filters: { year?: string, onSale?: boolean } = {}) => {
+  const getProducts = async (filters: { year?: string, onSale?: boolean, page?: number, limit?: number, sortBy?: string } = {}) => {
     try {
       setLoading(true)
-      const { year, onSale } = filters;
+      const { year, onSale, page = 1, limit = 20, sortBy } = filters;
       let url = `${apiUrl}/products`;
       const params = new URLSearchParams();
       if (year) params.append('year', year);
       if (onSale) params.append('onSale', 'true');
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
+      if (sortBy) params.append('sortBy', sortBy);
       
       const queryString = params.toString();
       if (queryString) url += `?${queryString}`;
@@ -49,10 +54,21 @@ export const useProducts = () => {
         rating: p.rating || 0,
         reviews: p.reviews || 0
       }))
-      setProducts(fetchedProducts)
+
+      if (page && page > 1) {
+        setProducts([...products, ...fetchedProducts]);
+      } else {
+        setProducts(fetchedProducts);
+      }
+      
+      return {
+        products: fetchedProducts,
+        pagination: response.data.body.pagination || { total: fetchedProducts.length, hasMore: false }
+      };
 
     } catch (error) {
       console.log(error)
+      return { products: [], pagination: { total: 0, hasMore: false } };
     } finally {
       setLoading(false)
     }
@@ -247,10 +263,6 @@ export const useProducts = () => {
       [name]: type === 'checkbox' ? checked : value,
     });
   };
-
-  useEffect(() => {
-    getProducts()
-  }, []);
 
   return {
     // Data

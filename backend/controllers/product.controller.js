@@ -7,11 +7,17 @@ const asyncHandler = (fn) => (req, res, next) => {
 };
 
 const getProducts = asyncHandler(async (req, res) => {
-  const { year, onSale } = req.query;
-  const products = await productService.getAllProducts({ year, onSale });
+  const { year, onSale, page, limit, sortBy } = req.query;
+  const { products, pagination } = await productService.getAllProducts({ 
+    year, 
+    onSale, 
+    page: parseInt(page) || 1, 
+    limit: parseInt(limit) || 20,
+    sortBy 
+  });
   responser.success({
     res,
-    body: { products },
+    body: { products, pagination },
   });
 });
 

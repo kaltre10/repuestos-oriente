@@ -175,6 +175,10 @@ const ProductDetailPage = () => {
     notify.success(`${product.name} agregado al carrito`);
   };
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = '/placeholder-product.svg';
+  };
+
   const isInCart = cart.some(item => item.id === product.id);
   const cartItem = cart.find(item => item.id === product.id);
   const cartItemCount = cartItem ? cartItem.quantity : 0;
@@ -213,6 +217,7 @@ const ProductDetailPage = () => {
                 <img
                   src={productImages[selectedImage]}
                   alt={product.name}
+                  onError={handleImageError}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
@@ -236,6 +241,7 @@ const ProductDetailPage = () => {
                     <img
                       src={image}
                       alt={`${product.name} ${index + 1}`}
+                      onError={handleImageError}
                       className="w-full h-full object-cover"
                     />
                   </button>

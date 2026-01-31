@@ -1,8 +1,9 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { List, Grid2X2, Grid3X3, Tag, Loader2 } from 'lucide-react';
 import ProductCard from '../../components/ProductCard';
 import CartModal from '../../components/CartModal';
 import { useProducts } from '../../hooks/useProducts';
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { imagesUrl } from '../../utils/utils';
 
 const OffersPage = () => {
@@ -10,10 +11,26 @@ const OffersPage = () => {
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high' | 'discount'>('discount');
   const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
 
+  // Carga inicial
   useEffect(() => {
     document.title = "Repuestos Picha - Ofertas";
-    getProducts({ onSale: true });
-  }, []);
+    getProducts({ onSale: true, page: 1, limit: 20, sortBy });
+  }, [sortBy]);
+
+  const loadMoreProducts = useCallback(async (nextPage: number) => {
+    const result = await getProducts({ onSale: true, page: nextPage, limit: 20, sortBy });
+    return result.pagination.hasMore;
+  }, [getProducts, sortBy]);
+
+  const { hasMore, isLoading, loadMoreRef, reset } = useInfiniteScroll({
+    loadMore: loadMoreProducts,
+    initialPage: 1
+  });
+
+  // Reiniciar scroll cuando cambia el ordenamiento
+  useEffect(() => {
+    reset();
+  }, [sortBy, reset]);
 
   const filteredProducts = useMemo(() => {
     if (!products || !Array.isArray(products)) return [];
@@ -158,6 +175,18 @@ const OffersPage = () => {
               </div>
             )}
           </div>
+
+          {/* Infinite Scroll Loader */}
+          {hasMore && (
+            <div ref={loadMoreRef} className="flex justify-center py-12">
+              {isLoading && (
+                <div className="flex flex-col items-center gap-2">
+                  <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+                  <p className="text-sm text-gray-500">Cargando más ofertas...</p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Call to action */}
           <div className="mt-12 text-center">
