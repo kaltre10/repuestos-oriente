@@ -96,7 +96,7 @@ const Purchases = () => {
     try {
       const response = await request.get(`${apiUrl}/sales/user/${user.id}`);
       if (response.data) {
-        console.log(response.data.body.sales)
+
         setPurchases(response.data.body.sales);
       } else {
         setError('No se pudieron cargar las compras');
@@ -436,7 +436,7 @@ const Purchases = () => {
                   const shippingCost = selectedPurchase.order?.shippingCost || 0;
                   const subtotal = currentGroup.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
                   const total = selectedPurchase.order?.total || subtotal + shippingCost;
-                  console.log(selectedPurchase)
+              
                   return (
                     <>
                       <div className="space-y-3">

@@ -29,7 +29,6 @@ const Sliders = () => {
     const fetchSliders = async () => {
         try { 
             const response = await request.get(`${apiUrl}/sliders`);
-            console.log('Response sliders:', response);
             if (response.data.success) {
                 setSliders(response.data.body.sliders);
             }

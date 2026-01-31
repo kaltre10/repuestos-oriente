@@ -1,7 +1,7 @@
-// export const apiUrl = 'http://localhost:3001/api/v1';
-// export const imagesUrl = 'http://localhost:3001/images/products/';
-export const apiUrl = 'https://server.somosdev.pw/api/v1';
-export const imagesUrl = 'https://server.somosdev.pw/images/products/';
+export const apiUrl = 'http://localhost:3001/api/v1';
+export const imagesUrl = 'http://localhost:3001/images/products/';
+// export const apiUrl = 'https://server.somosdev.pw/api/v1';
+// export const imagesUrl = 'https://server.somosdev.pw/images/products/';
 
 export const bancos = [
   { "codigo": "0001", "nombre": "Banco Central de Venezuela" },

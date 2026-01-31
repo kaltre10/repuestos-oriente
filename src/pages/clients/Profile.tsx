@@ -203,16 +203,12 @@ const mapRef = useRef<LeafletMap | null>(null);
       );
       const data = await response.json();
 
-      console.log('Search results:', data);
-
       if (Array.isArray(data) && data.length > 0) {
         setSearchResults(data);
         setShowResults(true);
-        console.log('Show results set to true');
       } else {
         setSearchResults([]);
         setShowResults(false);
-        console.log('No results found');
       }
     } catch (error) {
       console.error('Error searching address:', error);

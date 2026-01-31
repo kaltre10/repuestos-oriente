@@ -22,11 +22,11 @@ const OffersPage = () => {
       .filter((p: any) => (p.discount || 0) > 0)
       .map((p: any) => ({
         ...p,
-        rating: p.rating || 5,
+        rating: p.rating || 0,
         reviews: p.reviews || 0,
         image: p.images && p.images.length > 0
           ? `${imagesUrl}${p.images[0].image}`
-          : '/placeholder-product.png',
+          : '/placeholder-product.svg',
         category: p.categories
       }));
 

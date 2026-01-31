@@ -19,6 +19,7 @@ const AdvertisingModal = () => {
         const fetchActiveAdvertising = async () => {
             try {
                 const response = await request.get(`${apiUrl}/advertising/active`);
+               
                 const advertisingData = response.data.body;
                 const id = advertisingData.id;
                 const advertisingId = localStorage.getItem(`advertisingId`);

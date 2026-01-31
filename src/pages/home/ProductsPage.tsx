@@ -21,7 +21,7 @@ const ProductsPage = () => {
 
     // Load saved grid layout from localStorage on component mount
     useEffect(() => {
-        document.title = "Repuestos Oriente - Productos";
+        document.title = "Repuestos Picha - Productos";
         const savedLayout = localStorage.getItem('products-grid-layout');
         if (savedLayout && ['1', '3', '4'].includes(savedLayout)) {
             setGridLayout(savedLayout as '1' | '3' | '4');
@@ -50,11 +50,11 @@ const ProductsPage = () => {
     const filteredProducts = useMemo(() => {
         let filtered = products.map((p: any) => ({
             ...p,
-            rating: p.rating || 5, // Default rating if not in DB
+            rating: p.rating || 0, // Default rating if not in DB
             reviews: p.reviews || 0, // Default reviews if not in DB
             image: p.images && p.images.length > 0
                 ? `${imagesUrl}${p.images[0].image}`
-                : '/placeholder-product.png', // Default image if none
+                : '/placeholder-product.svg', // Default image if none
             category: p.categories // Map categories from DB to category for UI
         }));
 
