@@ -14,16 +14,14 @@ class SaleService {
       // Usar la misma lógica que la consulta manual
       const where = {};
       
-      // Filtro por fecha
+      // Filtro por fecha usando literales para comparación directa en MySQL
       if (startDate && endDate) {
-        
-        // Crear fechas con la zona horaria configurada (America/Caracas)
-        // Parsear fechas en formato YYYY-MM-DD con horas locales
-        const start = new Date(`${startDate}T00:00:00`);
-        const end = new Date(`${endDate}T23:59:59.999`);
-        
-        
-        where.saleDate = { [Op.between]: [start, end] };
+        where.saleDate = {
+          [Op.between]: [
+            `${startDate} 00:00:00`,
+            `${endDate} 23:59:59`
+          ]
+        };
       }
       
       // Filtro por método de pago
@@ -117,13 +115,29 @@ class SaleService {
     }
   }
 
-  async getSalesByUserId(userId) {
+  async getSalesByUserId(userId, options = {}) {
     try {
+      const { startDate, endDate, page = 1, limit = 20 } = options;
+      const offset = (page - 1) * limit;
+      
+      const where = { buyerId: userId };
+      
+      if (startDate && endDate) {
+        // Usar literales de fecha para que MySQL compare directamente sin conversiones de zona horaria de JS
+        // Esto busca entre el inicio del día y el final del día en el formato de la base de datos
+        where.saleDate = {
+          [Op.between]: [
+            `${startDate} 00:00:00`,
+            `${endDate} 23:59:59`
+          ]
+        };
+      }
+
       const sales = await Sale.findAll({
-        where: {
-          buyerId: userId
-        },
+        where,
         order: [['createdAt', 'DESC']],
+        limit: parseInt(limit),
+        offset: parseInt(offset),
         include: [{
           model: models.Product,
           as: 'product',

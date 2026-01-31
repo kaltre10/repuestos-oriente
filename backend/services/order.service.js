@@ -90,11 +90,28 @@ class OrderService {
     }
   }
 
-  async getOrdersByBuyerId(buyerId) {
+  async getOrdersByBuyerId(buyerId, options = {}) {
     try {
+      const { startDate, endDate, page = 1, limit = 20 } = options;
+      const offset = (page - 1) * limit;
+
+      const where = { buyerId };
+
+      if (startDate && endDate) {
+        // Usar literales de fecha para comparación directa en MySQL (campo createdAt)
+        where.createdAt = {
+          [Op.between]: [
+            `${startDate} 00:00:00`,
+            `${endDate} 23:59:59`
+          ]
+        };
+      }
+
       const orders = await Order.findAll({
-        where: { buyerId },
+        where,
         order: [['createdAt', 'DESC']],
+        limit: parseInt(limit),
+        offset: parseInt(offset),
         include: [
           {
             model: models.User,
@@ -105,6 +122,18 @@ class OrderService {
             model: models.PaymentMethod,
             as: 'paymentMethod',
             attributes: ['id', 'name']
+          },
+          {
+            model: models.Sale,
+            as: 'sales',
+            include: [
+              {
+                model: models.Product,
+                as: 'product',
+                attributes: ['id', 'name', 'price', 'partNumber'],
+                include: [{ model: models.ProductImage, as: 'images', attributes: ['image'] }]
+              }
+            ]
           }
         ]
       });

@@ -26,6 +26,8 @@ const getOrder = asyncHandler(async (req, res) => {
 
 const getOrdersByBuyerId = asyncHandler(async (req, res) => {
   const { buyerId } = req.params;
+  const { startDate, endDate, page = 1, limit = 20 } = req.query;
+
   if (!buyerId) {
     return responser.error({
       res,
@@ -33,7 +35,7 @@ const getOrdersByBuyerId = asyncHandler(async (req, res) => {
       status: 400,
     });
   }
-  const orders = await orderService.getOrdersByBuyerId(buyerId);
+  const orders = await orderService.getOrdersByBuyerId(buyerId, { startDate, endDate, page, limit });
   responser.success({
     res,
     body: { orders },

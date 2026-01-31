@@ -31,6 +31,8 @@ const getSale = asyncHandler(async (req, res) => {
 
 const getSalesByUserId = asyncHandler(async (req, res) => {
   const { userId } = req.params;
+  const { startDate, endDate, page = 1, limit = 20 } = req.query;
+  
   if (!userId) {
     return responser.error({
       res,
@@ -38,7 +40,8 @@ const getSalesByUserId = asyncHandler(async (req, res) => {
       status: 400,
     });
   }
-  const sales = await saleService.getSalesByUserId(userId);
+  
+  const sales = await saleService.getSalesByUserId(userId, { startDate, endDate, page, limit });
   responser.success({
     res,
     body: { sales },
