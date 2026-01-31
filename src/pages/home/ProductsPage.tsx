@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { List, Grid2X2, Grid3X3, Star, Plus, Minus, Loader2, Trash2 } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { List, Grid2X2, Grid3X3, Star, Plus, Minus, Loader2, Trash2, Search } from 'lucide-react';
 import { useProducts } from '../../hooks/useProducts';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { imagesUrl } from '../../utils/utils';
@@ -16,6 +16,24 @@ import { Dropdown, DropdownItem } from 'flowbite-react';
 const ProductsPage = () => {
     const { notify } = useNotify();
     const navigate = useNavigate();
+    const location = useLocation();
+    
+    // Obtener búsqueda de la URL
+    const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+    const searchParam = queryParams.get('search') || '';
+
+    // Función para limpiar la búsqueda de la URL
+    const clearSearchParam = useCallback(() => {
+        if (queryParams.has('search')) {
+            queryParams.delete('search');
+            const newSearch = queryParams.toString();
+            navigate({
+                pathname: location.pathname,
+                search: newSearch ? `?${newSearch}` : ''
+            }, { replace: true });
+        }
+    }, [location.pathname, queryParams, navigate]);
+
     const { products, loading, getProducts } = useProducts();
     const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
     const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
@@ -28,25 +46,25 @@ const ProductsPage = () => {
     const [selectedSubcategory, setSelectedSubcategory] = useState('');
     const [filtersExpanded, setFiltersExpanded] = useState(false);
 
-    // Fetch products when filters or sort changes
+    // Fetch products when filters, sort or search changes
     useEffect(() => {
-        getProducts({ year: selectedYear, page: 1, limit: 20, sortBy });
-    }, [selectedYear, sortBy]);
+        getProducts({ year: selectedYear, page: 1, limit: 20, sortBy, search: searchParam });
+    }, [selectedYear, sortBy, searchParam]);
 
     const loadMoreProducts = useCallback(async (nextPage: number) => {
-        const result = await getProducts({ year: selectedYear, page: nextPage, limit: 20, sortBy });
+        const result = await getProducts({ year: selectedYear, page: nextPage, limit: 20, sortBy, search: searchParam });
         return result.pagination.hasMore;
-    }, [getProducts, selectedYear, sortBy]);
+    }, [getProducts, selectedYear, sortBy, searchParam]);
 
     const { hasMore, isLoading, loadMoreRef, reset } = useInfiniteScroll({
         loadMore: loadMoreProducts,
         initialPage: 1
     });
 
-    // Reset scroll when filters change
+    // Reset scroll when filters or search change
     useEffect(() => {
         reset();
-    }, [selectedYear, sortBy, reset]);
+    }, [selectedYear, sortBy, searchParam, reset]);
 
     // Load saved grid layout from localStorage on component mount
     useEffect(() => {
@@ -117,12 +135,38 @@ const ProductsPage = () => {
         return filtered;
     }, [products, sortBy, selectedYear, selectedBrand, selectedModel, selectedCategory, selectedSubcategory]);
 
+    const handleYearChange = (year: string) => {
+        setSelectedYear(year);
+        clearSearchParam();
+    };
+
+    const handleBrandChange = (brand: string) => {
+        setSelectedBrand(brand);
+        clearSearchParam();
+    };
+
+    const handleModelChange = (model: string) => {
+        setSelectedModel(model);
+        clearSearchParam();
+    };
+
+    const handleCategoryChange = (category: string) => {
+        setSelectedCategory(category);
+        clearSearchParam();
+    };
+
+    const handleSubcategoryChange = (subcategory: string) => {
+        setSelectedSubcategory(subcategory);
+        clearSearchParam();
+    };
+
     const clearFilters = () => {
         setSelectedYear('');
         setSelectedBrand('');
         setSelectedModel('');
         setSelectedCategory('');
         setSelectedSubcategory('');
+        clearSearchParam();
     };
 
     const { addToCart, cart, incrementQuantity, decrementQuantity, removeFromCart } = useStore();
@@ -298,11 +342,11 @@ const ProductsPage = () => {
                                     selectedModel={selectedModel}
                                     selectedCategory={selectedCategory}
                                     selectedSubcategory={selectedSubcategory}
-                                    onYearChange={setSelectedYear}
-                                    onBrandChange={setSelectedBrand}
-                                    onModelChange={setSelectedModel}
-                                    onCategoryChange={setSelectedCategory}
-                                    onSubcategoryChange={setSelectedSubcategory}
+                                    onYearChange={handleYearChange}
+                                    onBrandChange={handleBrandChange}
+                                    onModelChange={handleModelChange}
+                                    onCategoryChange={handleCategoryChange}
+                                    onSubcategoryChange={handleSubcategoryChange}
                                     onClearFilters={clearFilters}
                                 />
                             </div>
@@ -316,11 +360,11 @@ const ProductsPage = () => {
                                 selectedModel={selectedModel}
                                 selectedCategory={selectedCategory}
                                 selectedSubcategory={selectedSubcategory}
-                                onYearChange={setSelectedYear}
-                                onBrandChange={setSelectedBrand}
-                                onModelChange={setSelectedModel}
-                                onCategoryChange={setSelectedCategory}
-                                onSubcategoryChange={setSelectedSubcategory}
+                                onYearChange={handleYearChange}
+                                onBrandChange={handleBrandChange}
+                                onModelChange={handleModelChange}
+                                onCategoryChange={handleCategoryChange}
+                                onSubcategoryChange={handleSubcategoryChange}
                                 onClearFilters={clearFilters}
                             />
                         </div>
@@ -401,6 +445,27 @@ const ProductsPage = () => {
                                     {filteredProducts.map(product => (
                                         <ProductCard key={product.id} product={product} />
                                     ))}
+                                </div>
+                            )}
+
+                            {/* Active search indicator */}
+                            {searchParam && (
+                                <div className="mb-6 flex items-center justify-between bg-red-50 p-4 rounded-xl border border-red-100 animate-in fade-in slide-in-from-top-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-red-100 rounded-lg">
+                                            <Search className="w-5 h-5 text-red-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-gray-900">Resultados para: <span className="text-red-600 italic">"{searchParam}"</span></p>
+                                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">{filteredProducts.length} productos encontrados</p>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={() => navigate('/productos')}
+                                        className="text-xs font-black text-red-600 hover:text-red-700 bg-white px-4 py-2 rounded-lg shadow-sm border border-red-100 transition-all active:scale-95 uppercase"
+                                    >
+                                        Limpiar búsqueda
+                                    </button>
                                 </div>
                             )}
 

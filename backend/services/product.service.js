@@ -6,13 +6,19 @@ class ProductService {
 
   async getAllProducts(filters = {}) {
     try {
-      const { year, onSale, page = 1, limit = 20, sortBy } = filters;
+      const { year, onSale, page = 1, limit = 20, sortBy, search } = filters;
       
       let where = {};
       
       if (onSale === 'true') {
         where.discount = {
           [Op.gt]: 0
+        };
+      }
+
+      if (search) {
+        where.name = {
+          [Op.like]: `%${search}%`
         };
       }
 

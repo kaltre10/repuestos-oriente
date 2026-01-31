@@ -1,8 +1,12 @@
-import { Search, User, ShoppingCart, Menu, X } from 'lucide-react';
-import { useState, memo, useMemo, useCallback } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Search, User, ShoppingCart, Menu, X, Package, MapPin as MapPinLucide } from 'lucide-react';
+import { useState, memo, useMemo, useCallback, useRef, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useStore from '../states/global';
 import TopBanner from './TopBanner';
+import { useProducts } from '../hooks/useProducts';
+import { imagesUrl, apiUrl } from '../utils/utils';
+import FormattedPrice from './FormattedPrice';
+import request from '../utils/request';
 
 // Componentes memoizados individualmente
 const SearchToggleButton = memo(({ 
@@ -74,19 +78,154 @@ const SearchBar = memo(({
   isSearchExpanded 
 }: { 
   isSearchExpanded: boolean 
-}) => (
-  <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isSearchExpanded ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'}`}>
-    <div className="relative w-full p-1">
-      <input
-        type="text"
-        placeholder="Busca repuestos para tu vehículo..."
-        className="w-full bg-gray-50 text-gray-900 rounded-full py-3 pl-6 pr-12 border border-gray-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition-all shadow-sm"
-        autoFocus={isSearchExpanded}
-      />
-      <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+}) => {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const { getProducts } = useProducts();
+  const navigate = useNavigate();
+  const searchRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleSearch = useCallback(async (searchTerm: string) => {
+    if (!searchTerm.trim()) {
+      setResults([]);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Usamos apiUrl importado para asegurar que la ruta sea correcta
+      const url = `${apiUrl}/products?search=${searchTerm}&limit=5`;
+      const response = await request.get(url);
+      
+      if (response && response.data && response.data.body && response.data.body.products) {
+        setResults(response.data.body.products);
+      } else {
+        setResults([]);
+      }
+    } catch (error) {
+      console.error('Error searching products:', error);
+      setResults([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    
+    if (query.length >= 2) {
+      setShowResults(true);
+      timeoutRef.current = setTimeout(() => {
+        handleSearch(query);
+      }, 500);
+    } else {
+      setResults([]);
+      setShowResults(false);
+    }
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [query, handleSearch]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  const handleProductClick = (productId: number) => {
+    navigate(`/producto/${productId}`);
+    setShowResults(false);
+    setQuery('');
+    setResults([]);
+  };
+
+  return (
+    <div ref={searchRef} className={`transition-all duration-500 ease-in-out relative ${isSearchExpanded ? 'opacity-100 mb-4 h-auto' : 'h-0 opacity-0 overflow-hidden'}`}>
+      <div className="relative w-full p-1">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => query.length >= 2 && setShowResults(true)}
+          placeholder="Busca repuestos para tu vehículo..."
+          className="w-full bg-gray-50 text-gray-900 rounded-full py-3.5 pl-6 pr-12 border border-gray-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition-all shadow-sm"
+          autoFocus={isSearchExpanded}
+        />
+        <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+
+        {/* Resultados del Buscador */}
+        {showResults && (
+          <div className="absolute z-[100] mt-2 w-full bg-white border border-gray-100 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+            {isLoading ? (
+              <div className="p-6 text-center">
+                <div className="flex items-center justify-center gap-3 text-gray-500 font-bold">
+                  <div className="w-5 h-5 border-3 border-red-600/30 border-t-red-600 rounded-full animate-spin" />
+                  Buscando productos...
+                </div>
+              </div>
+            ) : results.length > 0 ? (
+              <div className="max-h-96 overflow-y-auto">
+                {results.map((product) => (
+                  <div
+                    key={product.id}
+                    onClick={() => handleProductClick(product.id)}
+                    className="px-4 py-3 hover:bg-red-50 cursor-pointer transition-colors border-b border-gray-50 last:border-b-0 flex items-center gap-4"
+                  >
+                    <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                      <img
+                        src={product.images?.[0]?.image ? `${imagesUrl}${product.images[0].image}` : '/placeholder-product.svg'}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => (e.currentTarget.src = '/placeholder-product.svg')}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-bold text-gray-900 truncate uppercase">{product.name}</h4>
+                      <p className="text-xs text-gray-500 font-bold">{product.categories}</p>
+                    </div>
+                    <div className="text-right">
+                      <FormattedPrice 
+                        price={product.discount > 0 ? product.price * (1 - product.discount / 100) : product.price} 
+                        className="text-sm font-black text-red-600"
+                      />
+                    </div>
+                  </div>
+                ))}
+                <Link 
+                  to={`/productos?search=${query}`}
+                  onClick={() => {
+                    setShowResults(false);
+                    setQuery('');
+                    setResults([]);
+                  }}
+                  className="block p-3 text-center text-xs font-black text-gray-500 hover:bg-gray-50 border-t border-gray-100 uppercase tracking-widest"
+                >
+                  Ver todos los resultados
+                </Link>
+              </div>
+            ) : query.length >= 2 ? (
+              <div className="p-6 text-center text-gray-500 font-bold">
+                No encontramos productos que coincidan con tu búsqueda
+              </div>
+            ) : null}
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-));
+  );
+});
 
 // Componente para enlaces de navegación
 const NavLink = memo(({ 
