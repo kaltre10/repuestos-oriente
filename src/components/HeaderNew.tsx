@@ -304,6 +304,19 @@ const MobileNavigation = memo(({
 const HeaderNew = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   
   // Solo suscribirse a las partes necesarias del store
   const cartCount = useStore(state => {
@@ -331,25 +344,27 @@ const HeaderNew = () => {
   const branding = useMemo(() => (
     <Link to="/" className="flex items-center space-x-2">
       <img 
-        className='logo h-14 w-14 rounded-full bg-red-500 object-cover shadow-md' 
+        className={`logo rounded-full bg-red-500 object-cover shadow-md transition-all duration-300 ${isScrolled ? 'h-10 w-10' : 'h-14 w-14'}`} 
         src="./logo.png" 
         alt="Repuestos Picha" 
       />
-      <span className="text-2xl sm:text-3xl font-black text-gray-900">
+      <span className={`font-black text-gray-900 transition-all duration-300 ${isScrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'}`}>
         <span className="text-red-600">REPUESTOS</span>PICHA
       </span>
     </Link>
-  ), []);
+  ), [isScrolled]);
   
   return (
-    <header className="bg-white text-gray-800 top-0 left-0 right-0 z-50 shadow-sm">
-      {/* Top Banner */}
-      <TopBanner />
+    <header className={`fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md text-gray-800 shadow-sm transition-all duration-300`}>
+      {/* Top Banner - Ocultar al hacer scroll */}
+      <div className={`transition-all duration-300 overflow-hidden ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-10 opacity-100'}`}>
+        <TopBanner />
+      </div>
       
       {/* Main Header Container */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* First Row - Branding and Quick Actions */}
-        <div className="flex flex-col md:flex-row items-center justify-between py-2 gap-1">
+        <div className={`flex flex-col md:flex-row items-center justify-between transition-all duration-300 gap-1 ${isScrolled ? 'py-1' : 'py-2'}`}>
           {/* Branding */}
           {branding}
           
@@ -377,8 +392,10 @@ const HeaderNew = () => {
         {/* Search Bar */}
         <SearchBar isSearchExpanded={isSearchExpanded} />
         
-        {/* Desktop Navigation */}
-        <DesktopNavigation isActive={isActive} />
+        {/* Desktop Navigation - Ocultar al hacer scroll para ahorrar espacio */}
+        <div className={`transition-all duration-300 overflow-hidden ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-20 opacity-100'}`}>
+          <DesktopNavigation isActive={isActive} />
+        </div>
         
         {/* Mobile Navigation */}
         <MobileNavigation 

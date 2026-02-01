@@ -428,7 +428,7 @@ const CheckoutPage = () => {
                           <p className="text-sm text-gray-500 mb-4">Agrega una dirección en tu perfil para continuar</p>
                           <button
                             type="button"
-                            onClick={() => navigate('../clients/profile')}
+                            onClick={() => user ? navigate('../clients/profile') : navigate('/auth')}
                             className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition-colors shadow-md hover:shadow-lg"
                           >
                             Ir a Perfil

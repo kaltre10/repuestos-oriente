@@ -8,10 +8,12 @@ import Footer from "../../components/Footer";
 
 const HomeLayout = () => {
   return (
-    <div className="">
+    <div className="flex flex-col min-h-screen">
       <MobileBottomNav />
       <HeaderNew />
-      <Outlet />
+      <main className="flex-grow pt-[120px] md:pt-[180px]">
+        <Outlet />
+      </main>
       <Footer />
     </div>
   );
