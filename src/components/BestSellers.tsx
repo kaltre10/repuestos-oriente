@@ -95,17 +95,17 @@ const BestSellers = () => {
     const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
 
     return (
-      <div key={product.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row border border-gray-100">
-        <div className="relative cursor-pointer w-full sm:w-48 h-48 sm:h-auto flex-shrink-0" onClick={() => navigate(`/producto/${product.id}`)}>
+      <div key={product.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col sm:flex-row border border-gray-100 group hover:scale-[1.01] animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="relative cursor-pointer w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 overflow-hidden" onClick={() => navigate(`/producto/${product.id}`)}>
           <img
             src={product.image || '/placeholder-product.svg'}
             alt={product.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             onError={(e) => {
               (e.target as HTMLImageElement).src = '/placeholder-product.svg';
             }}
           />
-          <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors"></div>
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
         </div>
         <div className="flex-1 p-4 sm:p-5 flex flex-col">
           <div className="flex justify-between items-start mb-1">
@@ -126,7 +126,7 @@ const BestSellers = () => {
                     <span className="text-xs text-gray-400 line-through">
                       <FormattedPrice price={basePrice} />
                     </span>
-                    <span className="text-white text-[10px] font-black bg-red-600 px-1.5 py-0.5 rounded-sm">
+                    <span className="text-white text-[10px] font-black bg-red-600 px-1.5 py-0.5 rounded-sm animate-pulse">
                       -{discountPercent}%
                     </span>
                   </div>
@@ -140,7 +140,7 @@ const BestSellers = () => {
             <div className="w-full sm:w-auto">
               {isInCart ? (
                 <div className="flex items-center gap-1 sm:gap-2">
-                  <div className="flex items-center bg-gray-50 border border-gray-100 rounded-lg p-0.5 sm:p-1 flex-1 sm:flex-none justify-between">
+                  <div className="flex items-center bg-gray-50 border border-gray-100 rounded-lg p-0.5 sm:p-1 flex-1 sm:flex-none justify-between shadow-inner">
                     <button
                       onClick={() => decrementQuantity(product.id)}
                       className="flex-1 sm:flex-none flex justify-center p-1.5 sm:p-2 hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90"
@@ -162,7 +162,7 @@ const BestSellers = () => {
                   </div>
                   <button
                     onClick={() => removeFromCart(product.id)}
-                    className="p-2 sm:p-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors active:scale-90 shadow-sm border border-red-100"
+                    className="p-2 sm:p-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all active:scale-90 shadow-sm border border-red-100"
                     title="Eliminar del carrito"
                   >
                     <Trash2 className="size-4 sm:size-5" />
@@ -171,7 +171,7 @@ const BestSellers = () => {
               ) : (
                 <button
                   onClick={() => handleAddToCart(product)}
-                  className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-black px-8 py-3 rounded-lg transition-all active:scale-95 text-xs uppercase tracking-widest shadow-sm"
+                  className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-black px-8 py-3 rounded-lg transition-all active:scale-95 text-xs uppercase tracking-widest shadow-lg hover:shadow-red-200"
                 >
                   Comprar
                 </button>
@@ -185,15 +185,18 @@ const BestSellers = () => {
 
   if (loading) {
     return (
-      <div className="py-12 flex flex-col items-center justify-center">
-        <Loader2 className="w-10 h-10 text-red-600 animate-spin mb-2" />
-        <p className="text-gray-500">Cargando productos destacados...</p>
+      <div className="py-24 flex flex-col items-center justify-center animate-fade-in">
+        <div className="relative">
+          <Loader2 className="w-12 h-12 text-red-600 animate-spin mb-4" />
+          <div className="absolute inset-0 w-12 h-12 border-4 border-red-100 rounded-full"></div>
+        </div>
+        <p className="text-gray-400 font-medium animate-pulse">Descubriendo lo mejor para ti...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white py-16">
+    <div className="bg-white py-16 animate-in fade-in duration-1000">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-3">MÁS VENDIDOS</h2>
@@ -249,17 +252,25 @@ const BestSellers = () => {
           </div>
         </div>
 
-        {gridLayout === '1' ? (
-          <div className="space-y-6">
-            {processedProducts.map(product => renderListItem(product))}
-          </div>
-        ) : (
-          <div className={`grid ${getGridClasses()} gap-6`}>
-            {processedProducts.map(product => (
-              <ProductCard key={product.id} product={product} compact={gridLayout === '4'} />
-            ))}
-          </div>
-        )}
+        {/* Products Grid */}
+        <div 
+          key={gridLayout}
+          className={`${getGridClasses()} animate-zoom-in`}
+        >
+          {processedProducts.map((product, index) => (
+            <div 
+              key={product.id} 
+              className="animate-slide-up"
+              style={{ animationDelay: `${Math.min(index * 30, 300)}ms`, fillMode: 'both' }}
+            >
+              {gridLayout === '1' ? (
+                renderListItem(product)
+              ) : (
+                <ProductCard product={product} compact={gridLayout === '4'} />
+              )}
+            </div>
+          ))}
+        </div>
 
         {/* Elemento observador para scroll infinito */}
         <div ref={loadMoreRef} className="py-10 flex justify-center">

@@ -164,25 +164,25 @@ const PaymentPage = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 py-12 animate-fade-in">
+      <div className="container mx-auto px-4 max-w-6xl">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center text-gray-600 hover:text-red-600 mb-8 transition-colors"
+          className="flex items-center text-gray-600 hover:text-red-600 mb-8 transition-all hover:-translate-x-1 animate-slide-up"
         >
           <ChevronLeft className="w-5 h-5 mr-1" />
           Volver al checkout
         </button>
 
-        <div className="flex items-center space-x-3 mb-8">
+        <div className="flex items-center space-x-3 mb-8 animate-in slide-in-from-left-8 duration-500">
           <CreditCard className="text-red-600 w-8 h-8" />
           <h1 className="text-3xl font-bold text-gray-800">Método de Pago</h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left Column - Payment Selection & Info */}
-          <div className="space-y-6">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+          <div className="space-y-6 animate-in slide-in-from-left-10 duration-700">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <h2 className="text-lg font-bold text-gray-800 mb-4">Seleccione su método</h2>
               
               {loadingMethods ? (
@@ -191,42 +191,43 @@ const PaymentPage = () => {
                 </div>
               ) : paymentMethods.length > 0 ? (
                 <div className="grid grid-cols-1 gap-4">
-                  {paymentMethods.map((method) => (
+                  {paymentMethods.map((method, index) => (
                     <div
                       key={method.id}
                       onClick={() => setSelectedMethod(method)}
-                      className={`p-5 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-md ${
+                      className={`p-5 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-md animate-in fade-in slide-in-from-bottom-2 ${
                         selectedMethod?.id === method.id
-                          ? 'border-red-500 bg-red-50'
+                          ? 'border-red-500 bg-red-50 scale-[1.02]'
                           : 'border-gray-200 bg-white hover:border-red-300'
                       }`}
+                      style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <div className="flex items-start space-x-4">
-                        <div className={`p-3 rounded-full ${
+                        <div className={`p-3 rounded-full transition-colors duration-300 ${
                           selectedMethod?.id === method.id ? 'bg-red-100' : 'bg-gray-100'
                         }`}>
                           {method.type === 'Pago Movil' ? (
-                            <Smartphone className={`w-6 h-6 ${
+                            <Smartphone className={`w-6 h-6 transition-colors duration-300 ${
                               selectedMethod?.id === method.id ? 'text-red-600' : 'text-gray-500'
                             }`} />
                           ) : (
-                            <CreditCard className={`w-6 h-6 ${
+                            <CreditCard className={`w-6 h-6 transition-colors duration-300 ${
                               selectedMethod?.id === method.id ? 'text-red-600' : 'text-gray-500'
                             }`} />
                           )}
                         </div>
                         <div className="flex-1">
-                          <h3 className={`font-bold text-gray-800 mb-1 ${
+                          <h3 className={`font-bold text-gray-800 mb-1 transition-colors duration-300 ${
                             selectedMethod?.id === method.id ? 'text-red-600' : ''
                           }`}>{method.name}</h3>
                           <p className="text-sm text-gray-500">{method.type}</p>
                         </div>
                         <div className="flex items-center">
-                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            selectedMethod?.id === method.id ? 'border-red-500 bg-red-500' : 'border-gray-300 bg-white'
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                            selectedMethod?.id === method.id ? 'border-red-500 bg-red-500 scale-110' : 'border-gray-300 bg-white'
                           }`}>
                             {selectedMethod?.id === method.id && (
-                              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <svg className="w-4 h-4 text-white animate-in zoom-in duration-300" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
                             )}
@@ -242,26 +243,11 @@ const PaymentPage = () => {
             </div>
 
             {selectedMethod && (
-              <div className="bg-red-600 p-8 rounded-2xl shadow-xl text-white relative overflow-hidden">
+              <div className="bg-red-600 p-8 rounded-2xl shadow-xl text-white relative overflow-hidden animate-in zoom-in-95 duration-500">
                 <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                 <h2 className="text-xl font-bold mb-6 flex items-center">
-                  {/* Obtener tipo de pago de manera segura */}
-                  {(() => {
-                    const paymentType = selectedMethod.type || '';
-                    const lowerType = paymentType.toLowerCase();
-                    return lowerType.includes('pago movil') || lowerType.includes('movil');
-                  })() && <Smartphone className="mr-2" />}
-                  {(() => {
-                    const paymentType = selectedMethod.type || '';
-                    const lowerType = paymentType.toLowerCase();
-                    return lowerType.includes('zelle') || lowerType.includes('transferencia');
-                  })() && <CreditCard className="mr-2" />}
-                  {(() => {
-                    const paymentType = selectedMethod.type || '';
-                    const lowerType = paymentType.toLowerCase();
-                    return lowerType.includes('efectivo');
-                  })() && <span className="mr-2">💵</span>}
-                  Datos para el pago
+                  <CheckCircle className="w-6 h-6 mr-2 animate-pulse" />
+                  Información para el pago
                 </h2>
 
                 <div className="space-y-4 relative z-10">

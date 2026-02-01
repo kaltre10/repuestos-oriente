@@ -21,9 +21,12 @@ interface Slider {
 const Hero = () => {
   const [sliders, setSliders] = useState<Slider[]>([]);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchSliders = async () => {
       try {
+        setLoading(true);
         const response = await request.get(`${apiUrl}/sliders`);
         if (response.data.success) {
           const activeSliders = response.data.body.sliders.filter((s: Slider) => s.status === true);
@@ -31,10 +34,20 @@ const Hero = () => {
         }
       } catch (error) {
         console.error('Error fetching sliders:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchSliders();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="w-full h-[55vh] bg-gray-100 animate-pulse flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   if (sliders.length === 0) return null;
 
@@ -46,7 +59,7 @@ const Hero = () => {
 
   return (<>
    
-    <div className="relative w-full overflow-hidden">
+    <div className="relative w-full overflow-hidden animate-in fade-in duration-1000">
       <style>{`
         .hero-swiper-custom {
           height: 100% !important;

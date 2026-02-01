@@ -139,9 +139,12 @@ const ProductDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
-        <Loader2 className="w-12 h-12 text-red-600 animate-spin mb-4" />
-        <p className="text-gray-600 font-medium">Cargando detalles del producto...</p>
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center animate-in fade-in duration-700">
+        <div className="relative">
+          <Loader2 className="w-12 h-12 text-red-600 animate-spin mb-4" />
+          <div className="absolute inset-0 w-12 h-12 border-4 border-red-100 rounded-full"></div>
+        </div>
+        <p className="text-gray-400 font-medium animate-pulse">Cargando detalles del producto...</p>
       </div>
     );
   }
@@ -197,7 +200,7 @@ const ProductDetailPage = () => {
         onClose={() => setIsGalleryOpen(false)}
       />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 animate-in fade-in duration-1000">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Back Button */}
           <button

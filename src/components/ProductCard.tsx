@@ -57,15 +57,15 @@ const ProductCard = ({ product, compact }: ProductCardProps) => {
   };
 
   return (
-    <div className="bg-white text-gray-800 rounded-lg overflow-hidden group shadow-md flex flex-col h-full hover:shadow-lg transition-shadow">
-      <div className="relative aspect-square sm:aspect-auto sm:h-56">
+    <div className="bg-white text-gray-800 rounded-lg overflow-hidden group shadow-md flex flex-col h-full hover:shadow-xl transition-all duration-300 ease-out hover:scale-[1.02]">
+      <div className="relative aspect-square sm:aspect-auto sm:h-56 overflow-hidden">
         <img
           src={displayImage}
           alt={product.name}
           onError={handleImageError}
-          className="w-full h-full object-cover cursor-pointer"
+          className="w-full h-full object-cover cursor-pointer transition-transform duration-500 ease-out group-hover:scale-110"
         />
-        <div onClick={handleImageClick} className="cursor-pointer absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors"></div>
+        <div onClick={handleImageClick} className="cursor-pointer absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
       </div>
       <div className="p-3 sm:p-4 flex flex-col flex-1">
         <h3 onClick={handleImageClick} className="hover:underline cursor-pointer font-bold text-sm sm:text-base mt-1 line-clamp-2 text-gray-800 min-h-[2.5rem] sm:min-h-0">{product.name}</h3>

@@ -193,17 +193,17 @@ const ProductsPage = () => {
         const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
 
         return (
-            <div key={product.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row border border-gray-100">
-                <div onClick={() => navigate(`/producto/${product.id}`)} className="cursor-pointer relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
+            <div key={product.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col sm:flex-row border border-gray-100 group hover:scale-[1.01] animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div onClick={() => navigate(`/producto/${product.id}`)} className="cursor-pointer relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 overflow-hidden">
                     <img
                         src={product.image || '/placeholder-product.svg'}
                         alt={product.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         onError={(e) => {
                             (e.target as HTMLImageElement).src = '/placeholder-product.svg';
                         }}
                     />
-                    <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors"></div>
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                 </div>
                 <div className="flex-1 p-4 sm:p-5 flex flex-col">
                     <div className="flex justify-between items-start mb-1">
@@ -301,9 +301,12 @@ const ProductsPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
-                <Loader2 className="w-12 h-12 text-red-600 animate-spin mb-4" />
-                <p className="text-gray-600 font-medium">Cargando productos...</p>
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center animate-fade-in">
+                <div className="relative">
+                    <Loader2 className="w-12 h-12 text-red-600 animate-spin mb-4" />
+                    <div className="absolute inset-0 w-12 h-12 border-4 border-red-100 rounded-full"></div>
+                </div>
+                <p className="text-gray-400 font-medium animate-pulse">Explorando nuestro inventario...</p>
             </div>
         );
     }
@@ -436,17 +439,24 @@ const ProductsPage = () => {
                                 </p>
                             </div>
 
-                            {gridLayout === '1' ? (
-                                <div className="space-y-6">
-                                    {filteredProducts.map(product => renderListItem(product))}
-                                </div>
-                            ) : (
-                                <div className={`grid ${getGridClasses()}`}>
-                                    {filteredProducts.map(product => (
-                                        <ProductCard key={product.id} product={product} compact={gridLayout === '4'} />
-                                    ))}
-                                </div>
-                            )}
+                            <div 
+                                key={gridLayout}
+                                className={`${gridLayout === '1' ? 'space-y-6' : `grid ${getGridClasses()}`} animate-fade-in`}
+                            >
+                                {filteredProducts.map((product: any, index: number) => (
+                                    <div 
+                                        key={product.id} 
+                                        className="animate-slide-up"
+                                        style={{ animationDelay: `${Math.min(index * 30, 300)}ms`, fillMode: 'both' }}
+                                    >
+                                        {gridLayout === '1' ? (
+                                            renderListItem(product)
+                                        ) : (
+                                            <ProductCard product={product} compact={gridLayout === '4'} />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
 
                             {/* Active search indicator */}
                             {searchParam && (
