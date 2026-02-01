@@ -8,6 +8,7 @@ import {
   deleteSubCategory 
 } from '../controllers/subcategory.controller.js';
 import responser from '../controllers/responser.js';
+import validateToken from "../midelwares/validateToken.js";
 
 const router = express.Router();
 
@@ -19,8 +20,8 @@ router.get('/subcategories', getSubCategories);
 router.get('/subcategories/category/:categoryId', getSubCategoriesByCategory);
 router.get('/subcategories/:id', getSubCategory);
 
-router.post('/subcategories', createSubCategory);
-router.put('/subcategories/:id', updateSubCategory);
-router.delete('/subcategories/:id', deleteSubCategory);
+router.post('/subcategories',validateToken, createSubCategory);
+router.put('/subcategories/:id', validateToken, updateSubCategory);
+router.delete('/subcategories/:id', validateToken, deleteSubCategory);
 
 export default router;

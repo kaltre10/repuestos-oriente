@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom"
 import ClientSidebar from "../../components/ClientSidebar"
 import { FaBars } from 'react-icons/fa'
 import Guard from "../../components/Guard"
-
+/* import AdvertisingModal from '../../components/AdvertisingModal'; */
 const ClientLayout = () => {
   useEffect(() => {
     document.title = "Área de Clientes | Repuestos Picha";
@@ -11,6 +11,7 @@ const ClientLayout = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   return (<Guard allow={['admin', 'client']} >
+    {/* <AdvertisingModal /> */}
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       <ClientSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 

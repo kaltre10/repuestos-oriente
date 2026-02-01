@@ -1,13 +1,12 @@
-
-
-
 import { Outlet } from "react-router-dom";
 import HeaderNew from "../../components/HeaderNew";
 import MobileBottomNav from '../../components/MobileBottomNav';
 import Footer from "../../components/Footer";
+import AdvertisingModal from '../../components/AdvertisingModal';
 
 const HomeLayout = () => {
-  return (
+  return (<>
+    <AdvertisingModal />
     <div className="flex flex-col min-h-screen">
       <MobileBottomNav />
       <HeaderNew />
@@ -16,6 +15,7 @@ const HomeLayout = () => {
       </main>
       <Footer />
     </div>
+  </>
   );
 };
 

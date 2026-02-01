@@ -820,7 +820,7 @@ const Sales = () => {
                                           />
                                         </div>
                                       ) : (
-                                        <span className="bg-yellow-200 text-gray-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-gray-200">
+                                        <span className="bg-gray-100 text-gray-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-gray-200">
                                           No se ha calificado aún
                                         </span>
                                       )}
