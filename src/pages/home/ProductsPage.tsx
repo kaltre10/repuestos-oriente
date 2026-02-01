@@ -447,7 +447,7 @@ const ProductsPage = () => {
                                     <div 
                                         key={product.id} 
                                         className="animate-slide-up"
-                                        style={{ animationDelay: `${Math.min(index * 30, 300)}ms`, fillMode: 'both' }}
+                                        style={{ animationDelay: `${Math.min(index * 30, 300)}ms`, animationFillMode: 'both' }}
                                     >
                                         {gridLayout === '1' ? (
                                             renderListItem(product)

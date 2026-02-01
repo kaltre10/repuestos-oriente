@@ -55,10 +55,13 @@ const CartModal = () => {
           ) : (
             <div className="space-y-4">
               {cart.map((item, index) => (
-                <div 
+               <div 
                   key={item.id} 
                   className="flex gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0 group animate-slide-in-right"
-                  style={{ animationDelay: `${index * 50}ms`, fillMode: 'both' }}
+                  style={{ 
+                    animationDelay: `${index * 50}ms`, 
+                    animationFillMode: 'both' 
+                  }}
                 >
                   <div className="relative flex-shrink-0 overflow-hidden rounded-xl">
                     <img

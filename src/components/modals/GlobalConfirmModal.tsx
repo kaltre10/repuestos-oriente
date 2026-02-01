@@ -9,7 +9,7 @@ export const GlobalConfirmModal: FC = () => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
             <div className="bg-white w-[90vw] max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
                 <div className="p-8 text-center">
                     <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6">
