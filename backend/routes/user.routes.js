@@ -10,13 +10,13 @@ router.post('/auth/forgot-password', forgotPassword);
 router.post('/auth/reset-password', resetPassword);
 
 // Aplicar middleware de validación de token solo a rutas de usuario
-router.use('/users', validateToken);
 
-router.get('/users', getUsers);
-router.post('/users', createUser);
-router.get('/users/:id', getUser);
-router.put('/users/:id', updateUser);
-router.put('/users/:id/password', changePassword);
-router.delete('/users/:id', deleteUser);
+router.get('/users/:id',validateToken, getUser);
+
+router.get('/users',validateToken, getUsers);
+router.post('/users', validateToken, createUser);
+router.put('/users/:id', validateToken, updateUser);
+router.put('/users/:id/password', validateToken, changePassword);
+router.delete('/users/:id', validateToken, deleteUser);
 
 export default router;

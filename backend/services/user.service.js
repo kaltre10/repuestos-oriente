@@ -206,13 +206,13 @@ class UserService {
       // Find user by email
       const user = await User.findOne({ where: { email } });
       if (!user) {
-        throw new Error('Email o contraseña invalida');
+        throw new Error('Este correo electrónico no se encuentra registrado');
       }
 
       // Check password
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
-        throw new Error('Email o contraseña invalida');
+        throw new Error('Contraseña incorrecta');
       }
 
       return user;
@@ -235,9 +235,8 @@ class UserService {
     try {
       const user = await User.findOne({ where: { email } });
       
-      // For security, don't reveal if user exists or not
       if (!user) {
-        return { message: 'Si el correo electrónico está registrado, recibirás un enlace para restablecer tu contraseña.' };
+        throw new Error('Este correo electrónico no se encuentra registrado');
       }
 
       // Generate token
@@ -254,7 +253,7 @@ class UserService {
 
       return { message: 'Si el correo electrónico está registrado, recibirás un enlace para restablecer tu contraseña.' };
     } catch (error) {
-      throw new Error(`Error al procesar el olvido de contraseña: ${error.message}`);
+      throw new Error(`Error: ${error.message}`);
     }
   }
 

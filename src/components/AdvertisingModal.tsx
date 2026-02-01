@@ -15,28 +15,31 @@ const AdvertisingModal = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [advertising, setAdvertising] = useState<Advertising | null>(null)
 
-    useEffect(() => {
-        const fetchActiveAdvertising = async () => {
-            try {
-                const response = await request.get(`${apiUrl}/advertising/active`);
-               
-                const advertisingData = response.data.body;
-                const id = advertisingData.id;
-                const advertisingId = localStorage.getItem(`advertisingId`);
+    const fetchActiveAdvertising = async () => {
+        try {
+            const response = await request.get(`${apiUrl}/advertising/active`);
 
+            const advertisingData = response.data.body;
 
+            console.log(advertisingData)
+            /* const id = advertisingData.id;
+            const advertisingId = localStorage.getItem(`advertisingId`); */
 
-                if (response.data.success && response.data.body) {
-                    setAdvertising(response.data.body);
-                    if (id !== Number(advertisingId)) {
-                        setIsOpen(true);
-                    }
-                }
+            if (response.data.success && response.data.body) {
+                setAdvertising(response.data.body);
 
-            } catch (error) {
-                // console.error('Error fetching active advertising:', error);
+                setIsOpen(true);
+
             }
-        };
+
+        } catch (error) {
+            console.error("Error fetching advertising", error)
+            // console.error('Error fetching active advertising:', error);
+        }
+    };
+
+    useEffect(() => {
+
 
         fetchActiveAdvertising();
     }, [])
