@@ -31,10 +31,19 @@ const createSlider = asyncHandler(async (req, res) => {
     });
   }
 
-  const { title, description, link } = req.body;
+  const { title, description1, description2, buttonText, buttonLink, status } = req.body;
   const image = `${req.file.filename}`;
 
-  const newSlider = await sliderService.createSlider({ title, description, image, link });
+  const newSlider = await sliderService.createSlider({ 
+    title, 
+    description1, 
+    description2, 
+    buttonText, 
+    buttonLink, 
+    image,
+    status: status === 'true' || status === true
+  });
+
   responser.success({
     res,
     message: 'Slider creado con éxito',
@@ -44,14 +53,23 @@ const createSlider = asyncHandler(async (req, res) => {
 
 const updateSlider = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { title, description, link, status } = req.body;
+  const { title, description1, description2, buttonText, buttonLink, status } = req.body;
   let image;
 
   if (req.file) {
     image = `${req.file.filename}`;
   }
 
-  const updatedSlider = await sliderService.updateSlider(id, { title, description, image, link, status });
+  const updatedSlider = await sliderService.updateSlider(id, { 
+    title, 
+    description1, 
+    description2, 
+    buttonText, 
+    buttonLink, 
+    image, 
+    status: status === 'true' || status === true
+  });
+
   responser.success({
     res,
     message: 'Slider actualizado con éxito',

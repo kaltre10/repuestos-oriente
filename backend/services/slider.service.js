@@ -64,7 +64,7 @@ class SliderService {
         throw new Error('Slider no encontrado');
       }
 
-      let imageData = data.image;
+      let imageData = data.image || slider.image;
 
       // Handle base64 image
       if (data.image && data.image.startsWith('data:image')) {
@@ -89,6 +89,18 @@ class SliderService {
 
         fs.writeFileSync(filePath, base64Data, 'base64');
         imageData = fileName;
+      } else if (data.image && data.image !== slider.image) {
+        // If a new image filename was provided (from Multer)
+        const dir = path.join(process.cwd(), 'images', 'sliders');
+        
+        // Delete old image if exists
+        if (slider.image && !slider.image.startsWith('http')) {
+          const oldPath = path.join(dir, slider.image);
+          if (fs.existsSync(oldPath)) {
+            fs.unlinkSync(oldPath);
+          }
+        }
+        imageData = data.image;
       }
 
       await slider.update({

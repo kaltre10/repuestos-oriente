@@ -6,13 +6,13 @@ import imageCompression from 'browser-image-compression';
  * - Ajusta las dimensiones a un máximo recomendado para productos (1024px).
  * - Mantiene el aspect ratio original.
  */
-export const optimizeImage = async (file: File): Promise<File> => {
+export const optimizeImage = async (file: File, isSlider: boolean = false): Promise<File> => {
   const options = {
-    maxSizeMB: 0.8, // Tamaño máximo recomendado para carga ultra rápida
-    maxWidthOrHeight: 1024, // Dimensión máxima estándar para webs modernas (Retina-ready)
-    useWebWorker: true, // Usa hilos de fondo para no bloquear la interfaz de usuario
-    initialQuality: 0.75, // Calidad optimizada para el equilibrio perfecto peso/nitidez
-    fileType: 'image/webp' as string, // Forzar WebP por ser el estándar de la industria para rendimiento
+    maxSizeMB: isSlider ? 1.5 : 0.8, // Sliders necesitan más detalle por su tamaño
+    maxWidthOrHeight: isSlider ? 1920 : 1024, // Full HD para sliders, 1024px para productos
+    useWebWorker: true,
+    initialQuality: isSlider ? 0.85 : 0.75, // Mayor calidad inicial para banners
+    fileType: 'image/webp' as string,
   };
 
   try {

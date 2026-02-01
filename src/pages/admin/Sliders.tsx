@@ -26,6 +26,7 @@ const Sliders = () => {
     const [deleting, setDeleting] = useState<number | null>(null);
     const [showModal, setShowModal] = useState(false);
     const [currentSlider, setCurrentSlider] = useState<Slider | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const fetchSliders = async () => {
         try { 
@@ -46,6 +47,7 @@ const Sliders = () => {
     }, []);
 
     const handleOpenModal = (slider?: Slider) => {
+        setSelectedFile(null);
         if (slider) {
             setCurrentSlider({ ...slider });
         } else {
@@ -66,6 +68,7 @@ const Sliders = () => {
     const handleCloseModal = () => {
         setShowModal(false);
         setCurrentSlider(null);
+        setSelectedFile(null);
     };
 
     const handleInputChange = (field: string, value: string | boolean) => {
@@ -79,7 +82,8 @@ const Sliders = () => {
 
         try {
             setSaving(-1);
-            const optimizedFile = await optimizeImage(file);
+            const optimizedFile = await optimizeImage(file, true);
+            setSelectedFile(optimizedFile as File);
             const reader = new FileReader();
             reader.onloadend = () => {
                 const base64String = reader.result as string;
@@ -95,13 +99,37 @@ const Sliders = () => {
 
     const handleSave = async () => {
         if (!currentSlider) return;
+        
+        // Validar que haya una imagen si es un slider nuevo
+        if (currentSlider.id < 0 && !selectedFile) {
+            notify.error('Debes seleccionar una imagen para el nuevo slider');
+            return;
+        }
+
         setSaving(currentSlider.id);
         try {
             const isNew = currentSlider.id < 0;
             const url = isNew ? `${apiUrl}/sliders` : `${apiUrl}/sliders/${currentSlider.id}`;
             const method = isNew ? 'post' : 'put';
             
-            const response = await request[method](url, currentSlider);
+            const formData = new FormData();
+            formData.append('title', currentSlider.title);
+            formData.append('description1', currentSlider.description1);
+            formData.append('description2', currentSlider.description2);
+            formData.append('buttonText', currentSlider.buttonText);
+            formData.append('buttonLink', currentSlider.buttonLink);
+            formData.append('status', String(currentSlider.status));
+            
+            if (selectedFile) {
+                formData.append('image', selectedFile);
+            }
+
+            const response = await request[method](url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
             if (response.data.success) {
                 notify.success(`Slider ${isNew ? 'creado' : 'actualizado'} correctamente`);
                 fetchSliders();
