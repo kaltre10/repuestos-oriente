@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ShoppingBag, Package, Calendar, Clock, ChevronRight, AlertCircle, ExternalLink, X, CreditCard, Hash, Image as ImageIcon, Upload, CheckCircle2, UserIcon, Filter, Trash2, Loader2 } from 'lucide-react';
 import useStore from '../../states/global';
 import { apiUrl, imagesUrl } from '../../utils/utils';
@@ -75,7 +75,7 @@ const Purchases = () => {
     end: today
   });
   const [showFilters, setShowFilters] = useState(false);
-  const [isFiltered, setIsFiltered] = useState(false);
+  const [, setIsFiltered] = useState(false);
 
   const lastOrderElementRef = useCallback((node: HTMLDivElement | null) => {
     if (loading || isFetchingMore) return;

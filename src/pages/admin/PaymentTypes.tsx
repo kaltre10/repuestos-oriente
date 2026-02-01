@@ -4,7 +4,6 @@ import {
   Trash2, 
   Plus, 
   X, 
-  Settings2,
   AlertCircle,
   CheckCircle2
 } from 'lucide-react';

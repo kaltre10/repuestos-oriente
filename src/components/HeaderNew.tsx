@@ -1,9 +1,9 @@
-import { Search, User, ShoppingCart, Menu, X, Package, MapPin as MapPinLucide } from 'lucide-react';
+import { Search, User, ShoppingCart, Menu, X } from 'lucide-react';
 import { useState, memo, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useStore from '../states/global';
 import TopBanner from './TopBanner';
-import { useProducts } from '../hooks/useProducts';
+// import { useProducts } from '../hooks/useProducts';
 import { imagesUrl, apiUrl } from '../utils/utils';
 import FormattedPrice from './FormattedPrice';
 import request from '../utils/request';
@@ -83,7 +83,7 @@ const SearchBar = memo(({
   const [results, setResults] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const { getProducts } = useProducts();
+  // const { getProducts } = useProducts();
   const navigate = useNavigate();
   const searchRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

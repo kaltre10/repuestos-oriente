@@ -28,7 +28,7 @@ const BestSellers = () => {
     return result.pagination.hasMore;
   }, [getProducts, sortBy]);
 
-  const { hasMore, isLoading, loadMoreRef, reset } = useInfiniteScroll({
+  const { hasMore, loadMoreRef, reset } = useInfiniteScroll({
     loadMore: loadMoreProducts,
     initialPage: 1
   });
