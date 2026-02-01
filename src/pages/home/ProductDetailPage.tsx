@@ -12,6 +12,7 @@ import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
 import { useDollarRate } from '../../hooks/useDollarRate';
 import Rating from '../../components/Rating';
+import SEO from '../../components/SEO';
 
 const ProductDetailPage = () => {
   const { notify } = useNotify()
@@ -83,16 +84,35 @@ const ProductDetailPage = () => {
   }, [id, navigate]);
 
   useEffect(() => {
-    if (product?.name) {
-      document.title = `${product.name} | Repuestos Picha`;
-    }
-  }, [product?.name]);
-
-  useEffect(() => {
     if (id) {
       fetchQuestions();
     }
   }, [id]);
+
+  const productSchema = product ? {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.images,
+    "description": product.description || `Comprar ${product.name} en Repuestos Picha Venezuela. Calidad garantizada.`,
+    "brand": {
+      "@type": "Brand",
+      "name": product.brand?.name || "Repuestos Picha"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": window.location.href,
+      "priceCurrency": "USD",
+      "price": product.price,
+      "availability": product.amount > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "itemCondition": "https://schema.org/NewCondition"
+    },
+    "aggregateRating": product.reviews > 0 ? {
+      "@type": "AggregateRating",
+      "ratingValue": product.rating,
+      "reviewCount": product.reviews
+    } : undefined
+  } : undefined;
 
   const fetchQuestions = async () => {
     try {
@@ -191,6 +211,12 @@ const ProductDetailPage = () => {
 
   return (
     <>
+      <SEO 
+        title={product?.name} 
+        description={product?.description || `Comprar ${product?.name} en Repuestos Picha. Los mejores repuestos de autos en Venezuela.`}
+        ogImage={product?.image}
+        structuredData={productSchema}
+      />
       <CartModal />
 
       <ImageGallery
@@ -319,7 +345,9 @@ const ProductDetailPage = () => {
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Disponibilidad:</span>
-                    <p className="text-green-600">En stock</p>
+                    <p className={Number(product.amount) > 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                      {Number(product.amount) > 0 ? 'En stock' : 'Sin stock'}
+                    </p>
                   </div>
                 </div>
               </div>
