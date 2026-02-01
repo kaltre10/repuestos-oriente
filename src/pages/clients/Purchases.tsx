@@ -6,6 +6,7 @@ import request from '../../utils/request';
 import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
 import Rating from '../../components/Rating';
+import { optimizeImage } from '../../utils/imageOptimizer';
 
 // Sale interface updated for the new Order table structure
 // The status field is now in the Order table, not in the Sale table
@@ -198,11 +199,14 @@ const Purchases = () => {
     if (!selectedFile || !selectedOrder) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append('receiptImage', selectedFile);
-    formData.append('saleIds', JSON.stringify(selectedOrder.sales.map(s => s.id)));
-
     try {
+      // Optimizar el comprobante antes de subirlo
+      const optimizedFile = await optimizeImage(selectedFile);
+      
+      const formData = new FormData();
+      formData.append('receiptImage', optimizedFile);
+      formData.append('saleIds', JSON.stringify(selectedOrder.sales.map(s => s.id)));
+
       const response = await request.postImage(`${apiUrl}/sales/upload-receipt`, formData);
 
       if (response.data) {

@@ -2,9 +2,11 @@ import { useState, useCallback } from 'react';
 import request from '../utils/request';
 import { apiUrl } from '../utils/utils';
 import axios from 'axios'
+import { optimizeImages } from '../utils/imageOptimizer';
 
 interface UseImageUploadReturn {
   uploading: boolean;
+  optimizing: boolean;
   error: string | null;
   uploadImages: (productId: number, files: File[]) => Promise<any>;
   deleteImage: (imageId: number) => Promise<void>;
@@ -13,15 +15,21 @@ interface UseImageUploadReturn {
 
 export const useImageUpload = (): UseImageUploadReturn => {
   const [uploading, setUploading] = useState(false);
+  const [optimizing, setOptimizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const uploadImages = useCallback(async (productId: number, files: File[]) => {
     setUploading(true);
     setError(null);
     try {
+      // Optimizar imágenes antes de la subida
+      setOptimizing(true);
+      const optimizedFiles = await optimizeImages(files);
+      setOptimizing(false);
+
       const formData = new FormData();
       formData.append('productId', productId.toString());
-      files.forEach((file) => {
+      optimizedFiles.forEach((file) => {
         formData.append('images', file);
       });
 
@@ -68,6 +76,7 @@ export const useImageUpload = (): UseImageUploadReturn => {
 
   return {
     uploading,
+    optimizing,
     error,
     uploadImages,
     deleteImage,

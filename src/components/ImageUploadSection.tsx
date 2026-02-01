@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaCloudUploadAlt, FaTrash, FaTimes } from 'react-icons/fa';
 import { imagesUrl } from '../utils/utils';
+import { optimizeImages } from '../utils/imageOptimizer';
 
 interface ImageUploadSectionProps {
   onImagesChange: (files: File[]) => void;
@@ -14,20 +15,31 @@ const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
   onDeleteExisting
 }) => {
 
-  console.log("existingImages: ", existingImages)
   const [previews, setPreviews] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isOptimizing, setIsOptimizing] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      const newFiles = [...selectedFiles, ...filesArray].slice(0, 5); // Limit to 5
-      setSelectedFiles(newFiles);
-      onImagesChange(newFiles);
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setIsOptimizing(true);
+      try {
+        const filesArray = Array.from(e.target.files);
+        
+        // Optimizar imágenes inmediatamente al cargar
+        const optimizedFiles = await optimizeImages(filesArray);
+        
+        const newFiles = [...selectedFiles, ...optimizedFiles].slice(0, 5); // Limit to 5
+        setSelectedFiles(newFiles);
+        onImagesChange(newFiles);
 
-      // Create previews
-      const newPreviews = newFiles.map(file => URL.createObjectURL(file));
-      setPreviews(newPreviews);
+        // Create previews
+        const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+        setPreviews(newPreviews);
+      } catch (error) {
+        console.error("Error al procesar imágenes:", error);
+      } finally {
+        setIsOptimizing(false);
+      }
     }
   };
 
@@ -81,21 +93,28 @@ const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
 
         {/* Upload Button */}
         {(existingImages.length + selectedFiles.length) < 5 && (
-          <label className="flex flex-col items-center justify-center aspect-square rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all">
-            <FaCloudUploadAlt className="text-gray-400 text-2xl mb-1" />
-            <span className="text-[10px] text-gray-500 text-center px-2">Subir Imagen</span>
+          <label className={`flex flex-col items-center justify-center aspect-square rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all ${isOptimizing ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            {isOptimizing ? (
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+            ) : (
+              <>
+                <FaCloudUploadAlt className="text-gray-400 text-2xl mb-1" />
+                <span className="text-[10px] text-gray-500 text-center px-2">Subir Imagen</span>
+              </>
+            )}
             <input
               type="file"
               multiple
               accept="image/*"
               className="hidden"
               onChange={handleFileChange}
+              disabled={isOptimizing}
             />
           </label>
         )}
       </div>
-      <p className="text-[10px] text-gray-400">
-        Formatos permitidos: JPG, PNG, WEBP. Tamaño máximo: 5MB por imagen.
+      <p className="text-[10px] text-gray-400 italic">
+        {isOptimizing ? 'Optimizando imágenes para mejor rendimiento...' : 'Las imágenes se optimizan automáticamente al cargarlas.'}
       </p>
     </div>
   );

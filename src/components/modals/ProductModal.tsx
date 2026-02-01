@@ -30,7 +30,7 @@ const ProductModal = () => {
     getProducts, // Assuming it's exported or we can call it after submit
   } = useProducts();
 
-  const { uploadImages, fetchProductImages, deleteImage } = useImageUpload();
+  const { uploadImages, fetchProductImages, deleteImage, optimizing, uploading: imageUploading } = useImageUpload();
 
   const { brands } = useBrands();
   const { models } = useModels();
@@ -618,19 +618,19 @@ const ProductModal = () => {
               type="button"
               onClick={handleCloseForm}
               className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
-              disabled={formLoading}
+              disabled={formLoading || imageUploading || optimizing}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              disabled={formLoading}
+              disabled={formLoading || imageUploading || optimizing}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              {formLoading && (
+              {(formLoading || imageUploading || optimizing) && (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               )}
-              {editingProduct ? 'Actualizar' : 'Crear'}
+              {optimizing ? 'Optimizando...' : (imageUploading ? 'Subiendo...' : (editingProduct ? 'Actualizar' : 'Crear'))}
             </button>
           </div>
         </form>

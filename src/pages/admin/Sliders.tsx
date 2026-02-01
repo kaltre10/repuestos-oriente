@@ -4,6 +4,7 @@ import request from '../../utils/request';
 import { apiUrl } from '../../utils/utils';
 import useNotify from '../../hooks/useNotify';
 import { useConfirm } from '../../hooks/useConfirm';
+import { optimizeImage } from '../../utils/imageOptimizer';
 
 interface Slider {
     id: number;
@@ -76,12 +77,20 @@ const Sliders = () => {
         const file = e.target.files?.[0];
         if (!file || !currentSlider) return;
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64String = reader.result as string;
-            setCurrentSlider(prev => prev ? { ...prev, image: base64String } : null);
-        };
-        reader.readAsDataURL(file);
+        try {
+            setSaving(-1);
+            const optimizedFile = await optimizeImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                setCurrentSlider(prev => prev ? { ...prev, image: base64String } : null);
+                setSaving(null);
+            };
+            reader.readAsDataURL(optimizedFile);
+        } catch (error) {
+            console.error("Error optimizando imagen:", error);
+            setSaving(null);
+        }
     };
 
     const handleSave = async () => {
