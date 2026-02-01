@@ -196,9 +196,12 @@ const ProductsPage = () => {
             <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md flex flex-col sm:flex-row">
                 <div onClick={() => navigate(`/producto/${product.id}`)} className="cursor-pointer relative w-full sm:w-40 h-40 sm:h-48 flex-shrink-0">
                     <img
-                        src={product.image}
+                        src={product.image || '/placeholder-product.svg'}
                         alt={product.name}
                         className="w-full h-full object-cover cursor-pointer"
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                        }}
                     />
                     <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
                 </div>

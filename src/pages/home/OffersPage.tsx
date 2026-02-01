@@ -1,15 +1,140 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { List, Grid2X2, Grid3X3, Tag, Loader2 } from 'lucide-react';
+import { List, Grid2X2, Grid3X3, Tag, Loader2, Star, Minus, Plus, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard';
 import CartModal from '../../components/CartModal';
+import FormattedPrice from '../../components/FormattedPrice';
 import { useProducts } from '../../hooks/useProducts';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { imagesUrl } from '../../utils/utils';
+import useStore from '../../states/global';
+import useNotify from '../../hooks/useNotify';
 
 const OffersPage = () => {
   const { products, loading, getProducts } = useProducts();
+  const navigate = useNavigate();
+  const { notify } = useNotify();
+  const { addToCart, cart, incrementQuantity, decrementQuantity, removeFromCart } = useStore();
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high' | 'discount'>('discount');
   const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
+
+  const handleAddToCart = (product: any) => {
+    if (!cart.some(item => item.id === product.id)) {
+      const discountPercent = product.discount ? Number(product.discount) : 0;
+      const basePrice = Number(product.price);
+      const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
+      addToCart({ ...product, price: discountedPrice });
+      notify.success(`${product.name} agregado al carrito`);
+    }
+  };
+
+  const getCartItem = (productId: number) => {
+    return cart.find(item => item.id === productId);
+  };
+
+  const renderListItem = (product: any) => {
+    const cartItem = getCartItem(product.id);
+    const isInCart = !!cartItem;
+    const basePrice = Number(product.price);
+    const discountPercent = product.discount ? Number(product.discount) : 0;
+    const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
+
+    return (
+      <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md flex flex-col sm:flex-row w-full">
+        <div onClick={() => navigate(`/producto/${product.id}`)} className="cursor-pointer relative w-full sm:w-40 h-40 sm:h-48 flex-shrink-0">
+          <img
+            src={product.image || '/placeholder-product.svg'}
+            alt={product.name}
+            className="w-full h-full object-cover cursor-pointer"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+            }}
+          />
+          <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
+        </div>
+        <div className="flex-1 p-4 sm:p-6 relative text-left">
+          <p className="text-gray-500 text-xs sm:text-sm mb-1">{product.category}</p>
+          <h3 onClick={() => navigate(`/producto/${product.id}`)} className="cursor-pointer hover:underline font-semibold text-base sm:text-lg mb-2 text-gray-800 line-clamp-2">{product.name}</h3>
+          <div className="flex items-center mb-3">
+            <div className="flex text-yellow-400 mr-2">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="size-3.5 sm:size-4 text-yellow-400">
+                  <Star
+                    fill={i < product.rating ? 'currentColor' : 'none'}
+                    className="size-full"
+                  />
+                </div>
+              ))}
+            </div>
+            <span className="text-gray-500 text-xs sm:text-sm">{product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'}</span>
+          </div>
+
+          {/* Price */}
+          <div className="mb-4 sm:mb-0">
+            {discountPercent > 0 ? (
+              <>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs sm:text-sm text-gray-400 line-through">
+                    <FormattedPrice price={basePrice} />
+                  </span>
+                  <span className="text-red-600 text-xs font-bold bg-red-50 px-1.5 py-0.5 rounded">
+                    {discountPercent}% OFF
+                  </span>
+                </div>
+                <FormattedPrice price={discountedPrice} className="text-red-500 font-bold text-xl sm:text-2xl" />
+              </>
+            ) : (
+              <FormattedPrice price={basePrice} className="text-red-500 font-bold text-lg sm:text-xl" />
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="mt-4 sm:mt-0 sm:absolute sm:bottom-4 sm:right-4">
+            {isInCart ? (
+              <div className="flex items-center gap-1 sm:gap-2">
+                <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => decrementQuantity(product.id)}
+                    className="p-1 hover:bg-white rounded-md transition-colors text-gray-600 disabled:opacity-50"
+                    disabled={cartItem.quantity <= 1}
+                  >
+                    <div className="inline-block size-4 sm:size-[18px]">
+                      <Minus className="size-full" />
+                    </div>
+                  </button>
+                  <span className="px-2 sm:px-3 font-bold text-xs sm:text-sm">
+                    {cartItem.quantity}
+                  </span>
+                  <button
+                    onClick={() => incrementQuantity(product.id)}
+                    className="p-1 hover:bg-white rounded-md transition-colors text-gray-600"
+                  >
+                    <Plus className="size-4 sm:size-[18px]" />
+                  </button>
+                </div>
+                <button
+                  onClick={() => removeFromCart(product.id)}
+                  className="p-1.5 sm:p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                  title="Eliminar del carrito"
+                >
+                  <div className="size-4 sm:size-[18px]">
+                    <Trash2 className="size-full" />
+                  </div>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => handleAddToCart(product)}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded transition-colors cursor-pointer text-sm"
+              >
+                Agregar al carrito
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // Carga inicial
   useEffect(() => {
@@ -154,17 +279,21 @@ const OffersPage = () => {
                 <p className="text-gray-600 font-medium">Cargando ofertas...</p>
               </div>
             ) : filteredProducts.length > 0 ? (
-              <div className={`grid ${getGridClasses()} gap-8 w-full`}>
+              <div className={gridLayout === '1' ? 'space-y-6 w-full' : `grid ${getGridClasses()} gap-8 w-full`}>
                 {filteredProducts.map(product => (
-                  <div key={product.id} className="relative">
-                    {/* Discount badge */}
-                    {product.discount > 0 && (
-                      <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold z-10">
-                        -{product.discount}%
-                      </div>
-                    )}
-                    <ProductCard product={product as any} />
-                  </div>
+                  gridLayout === '1' ? (
+                    renderListItem(product)
+                  ) : (
+                    <div key={product.id} className="relative">
+                      {/* Discount badge */}
+                      {product.discount > 0 && (
+                        <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold z-10">
+                          -{product.discount}%
+                        </div>
+                      )}
+                      <ProductCard product={product as any} />
+                    </div>
+                  )
                 ))}
               </div>
             ) : (

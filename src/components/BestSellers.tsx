@@ -102,9 +102,12 @@ const BestSellers = () => {
       <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md flex">
         <div className="relative cursor-pointer w-48 h-48" onClick={() => navigate(`/producto/${product.id}`)}>
           <img
-            src={product.image}
+            src={product.image || '/placeholder-product.svg'}
             alt={product.name}
-            className="w-full  h-full object-cover"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+            }}
           />
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
         </div>
