@@ -1,15 +1,15 @@
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
-import { useGoogleLogin, CredentialResponse, GoogleLogin } from '@react-oauth/google';
+import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import useAuth from '../hooks/useAuth';
 import useStore from '../states/global';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
+// import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png'
 
 const AuthPage = () => {
   const { user } = useStore();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const { isLogin, handleSubmit, handleInputChange,
     formData, showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword,
@@ -281,7 +281,7 @@ const AuthPage = () => {
                 size="large"
                 width="350"
                 text="continue_with"
-                locale="es"
+                // locale="es" 
               />
             </div>
           </div>

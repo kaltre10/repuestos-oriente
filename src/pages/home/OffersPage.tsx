@@ -170,10 +170,10 @@ const OffersPage = () => {
     }
   }, []);
 
-  const handleGridLayoutChange = (layout: '1' | '2' | '4') => {
-    setGridLayout(layout);
-    localStorage.setItem('offers-grid-layout', layout);
-  };
+  // const handleGridLayoutChange = (layout: '1' | '2' | '4') => { 
+  //   setGridLayout(layout);
+  //   localStorage.setItem('offers-grid-layout', layout);
+  // };
 
   const filteredProducts = useMemo(() => {
     if (!products || !Array.isArray(products)) return [];
