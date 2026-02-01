@@ -267,7 +267,7 @@ const AuthPage = () => {
               </div>
             </div>
 
-            <div className="mt-4 flex justify-center">
+            <div className="mt-4 flex justify-center w-full overflow-hidden">
               <GoogleLogin
                 onSuccess={(credentialResponse: CredentialResponse) => {
                   if (credentialResponse.credential) {
@@ -279,7 +279,8 @@ const AuthPage = () => {
                 }}
                 theme="outline"
                 size="large"
-                width="350"
+                shape="rectangular"
+                width="100%"
                 text="continue_with"
                 // locale="es" 
               />

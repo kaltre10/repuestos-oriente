@@ -336,7 +336,7 @@ const ProductsPage = () => {
             />
             <CartModal />
             <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-                    <h1 className="text-4xl font-bold text-gray-800 text-center mb-8">NUESTROS PRODUCTOS</h1>
+                    <h1 className="text-4xl font-bold text-gray-800 text-center mb-8 mt-4 md:mt-0">NUESTROS PRODUCTOS</h1>
 
                     {/* Filters Toggle Button - Only visible on mobile */}
                     <div className="mb-6 md:hidden">

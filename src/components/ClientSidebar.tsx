@@ -42,7 +42,7 @@ const ClientSidebar = ({ isOpen, onClose }: ClientSidebarProps) => {
       <div className={`
         fixed lg:static inset-y-0 left-0 z-50
         w-64 bg-white shadow-xl h-screen flex flex-col border-r border-gray-100
-        transition-transform duration-300 ease-in-out
+        transition-transform duration-300 ease-in-out h-screen 
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="p-6 border-b border-gray-50 flex items-center justify-between">
