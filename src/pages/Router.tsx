@@ -10,6 +10,7 @@ import OffersPage from "./home/OffersPage"
 import ProductDetailPage from "./home/ProductDetailPage"
 import AuthPage from "./AuthPage"
 import ResetPasswordPage from "./ResetPasswordPage"
+import NotFoundPage from "./NotFoundPage"
 import ClientsPage from "./clients/ClientsPage"
 import AdminLayout from './admin/AdminLayout';
 import HomeLayout from './home/HomeLayout';
@@ -70,6 +71,7 @@ const Router = () => {
             <Route path='/test' element={<Test />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+            <Route path="*" element={<NotFoundPage />} />
         </Routes>
     );
 };
