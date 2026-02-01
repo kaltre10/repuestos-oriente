@@ -12,6 +12,7 @@ import FormattedPrice from '../../components/FormattedPrice';
 import useStore from '../../states/global';
 import useNotify from '../../hooks/useNotify';
 import { Dropdown, DropdownItem } from 'flowbite-react';
+import SEO from '../../components/SEO';
 
 const ProductsPage = () => {
     const { notify } = useNotify();
@@ -68,7 +69,6 @@ const ProductsPage = () => {
 
     // Load saved grid layout from localStorage on component mount
     useEffect(() => {
-        document.title = "Repuestos Picha - Productos";
         const savedLayout = localStorage.getItem('products-grid-layout');
         if (savedLayout && ['1', '2', '4'].includes(savedLayout)) {
             setGridLayout(savedLayout as '1' | '2' | '4');
@@ -170,6 +170,17 @@ const ProductsPage = () => {
     };
 
     const { addToCart, cart, incrementQuantity, decrementQuantity, removeFromCart } = useStore();
+
+    const itemListSchema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": products.slice(0, 10).map((p, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "url": `${window.location.origin}/product/${p.id}`,
+        "name": p.name
+      }))
+    };
 
     const handleAddToCart = (product: any) => {
         if (!cart.some(item => item.id === product.id)) {
@@ -278,9 +289,14 @@ const ProductsPage = () => {
                             ) : (
                                 <button
                                     onClick={() => handleAddToCart(product)}
-                                    className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-black px-8 py-3 rounded-lg transition-all active:scale-95 text-xs uppercase tracking-widest shadow-sm"
+                                    disabled={Number(product.amount) <= 0}
+                                    className={`w-full sm:w-auto font-black px-8 py-3 rounded-lg transition-all active:scale-95 text-xs uppercase tracking-widest shadow-sm ${
+                                        Number(product.amount) <= 0 
+                                            ? 'bg-gray-400 cursor-not-allowed text-white' 
+                                            : 'bg-red-600 hover:bg-red-700 text-white'
+                                    }`}
                                 >
-                                    Comprar
+                                    {Number(product.amount) <= 0 ? 'Sin Stock' : 'Comprar'}
                                 </button>
                             )}
                         </div>
@@ -312,10 +328,14 @@ const ProductsPage = () => {
     }
 
     return (
-        <>
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+            <SEO 
+                title={searchParam ? `Resultados para "${searchParam}"` : "Catálogo de Repuestos"}
+                description="Explora nuestro catálogo completo de repuestos para autos en Venezuela. Filtrar por marca, modelo, año y más."
+                structuredData={itemListSchema}
+            />
             <CartModal />
-            <div className="min-h-screen bg-gray-50">
-                <div className="container mx-auto px-4 sm:px-1 lg:px-8 py-8">
+            <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
                     <h1 className="text-4xl font-bold text-gray-800 text-center mb-8">NUESTROS PRODUCTOS</h1>
 
                     {/* Filters Toggle Button - Only visible on mobile */}
@@ -502,11 +522,10 @@ const ProductsPage = () => {
                                     )}
                                 </div>
                             )}
-                        </div>
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

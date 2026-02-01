@@ -12,6 +12,7 @@ import FormattedPrice from '../../components/FormattedPrice';
 import useNotify from '../../hooks/useNotify';
 import { useDollarRate } from '../../hooks/useDollarRate';
 import Rating from '../../components/Rating';
+import SEO from '../../components/SEO';
 
 const ProductDetailPage = () => {
   const { notify } = useNotify()
@@ -83,16 +84,35 @@ const ProductDetailPage = () => {
   }, [id, navigate]);
 
   useEffect(() => {
-    if (product?.name) {
-      document.title = `${product.name} | Repuestos Picha`;
-    }
-  }, [product?.name]);
-
-  useEffect(() => {
     if (id) {
       fetchQuestions();
     }
   }, [id]);
+
+  const productSchema = product ? {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.images,
+    "description": product.description || `Comprar ${product.name} en Repuestos Picha Venezuela. Calidad garantizada.`,
+    "brand": {
+      "@type": "Brand",
+      "name": product.brand?.name || "Repuestos Picha"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": window.location.href,
+      "priceCurrency": "USD",
+      "price": product.price,
+      "availability": product.amount > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "itemCondition": "https://schema.org/NewCondition"
+    },
+    "aggregateRating": product.reviews > 0 ? {
+      "@type": "AggregateRating",
+      "ratingValue": product.rating,
+      "reviewCount": product.reviews
+    } : undefined
+  } : undefined;
 
   const fetchQuestions = async () => {
     try {
@@ -191,6 +211,12 @@ const ProductDetailPage = () => {
 
   return (
     <>
+      <SEO 
+        title={product?.name} 
+        description={product?.description || `Comprar ${product?.name} en Repuestos Picha. Los mejores repuestos de autos en Venezuela.`}
+        ogImage={product?.image}
+        structuredData={productSchema}
+      />
       <CartModal />
 
       <ImageGallery
@@ -319,7 +345,9 @@ const ProductDetailPage = () => {
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Disponibilidad:</span>
-                    <p className="text-green-600">En stock</p>
+                    <p className={Number(product.amount) > 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                      {Number(product.amount) > 0 ? 'En stock' : 'Sin stock'}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -335,16 +363,18 @@ const ProductDetailPage = () => {
                       <div className="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden">
                         <button
                           onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                          className="p-2 hover:bg-gray-100 transition-colors text-gray-600 border-r border-gray-300"
+                          className="p-2 hover:bg-gray-100 transition-colors text-gray-600 border-r border-gray-300 disabled:opacity-30"
+                          disabled={Number(product.amount) <= 0}
                         >
                           <Minus size={18} />
                         </button>
                         <span className="w-12 text-center font-bold">
-                          {quantity}
+                          {Number(product.amount) <= 0 ? 0 : quantity}
                         </span>
                         <button
-                          onClick={() => setQuantity(quantity + 1)}
-                          className="p-2 hover:bg-gray-100 transition-colors text-gray-600 border-l border-gray-300"
+                          onClick={() => setQuantity(Math.min(Number(product.amount), quantity + 1))}
+                          className="p-2 hover:bg-gray-100 transition-colors text-gray-600 border-l border-gray-300 disabled:opacity-30"
+                          disabled={Number(product.amount) <= 0 || quantity >= Number(product.amount)}
                         >
                           <Plus size={18} />
                         </button>
@@ -354,10 +384,15 @@ const ProductDetailPage = () => {
                     <div className="flex gap-4">
                       <button
                         onClick={handleAddToCart}
-                        className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-red-200"
+                        disabled={Number(product.amount) <= 0}
+                        className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 font-bold rounded-xl transition-all shadow-lg ${
+                          Number(product.amount) <= 0 
+                            ? 'bg-gray-400 cursor-not-allowed text-white shadow-none' 
+                            : 'bg-red-600 hover:bg-red-700 text-white shadow-red-200'
+                        }`}
                       >
                         <ShoppingCart size={22} />
-                        Agregar al carrito
+                        {Number(product.amount) <= 0 ? 'Sin Stock' : 'Agregar al carrito'}
                       </button>
                     </div>
                   </>

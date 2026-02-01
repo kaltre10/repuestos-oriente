@@ -9,6 +9,7 @@ import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { imagesUrl } from '../../utils/utils';
 import useStore from '../../states/global';
 import useNotify from '../../hooks/useNotify';
+import SEO from '../../components/SEO';
 
 const OffersPage = () => {
   const { products, loading, getProducts } = useProducts();
@@ -125,9 +126,14 @@ const OffersPage = () => {
               ) : (
                 <button
                   onClick={() => handleAddToCart(product)}
-                  className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-black px-8 py-3 rounded-lg transition-all active:scale-95 text-xs uppercase tracking-widest shadow-sm"
+                  disabled={Number(product.amount) <= 0}
+                  className={`w-full sm:w-auto font-black px-8 py-3 rounded-lg transition-all active:scale-95 text-xs uppercase tracking-widest shadow-sm ${
+                    Number(product.amount) <= 0 
+                      ? 'bg-gray-400 cursor-not-allowed text-white' 
+                      : 'bg-red-600 hover:bg-red-700 text-white'
+                  }`}
                 >
-                  Comprar
+                  {Number(product.amount) <= 0 ? 'Sin Stock' : 'Comprar'}
                 </button>
               )}
             </div>
@@ -139,7 +145,6 @@ const OffersPage = () => {
 
   // Carga inicial
   useEffect(() => {
-    document.title = "Repuestos Picha - Ofertas";
     getProducts({ onSale: true, page: 1, limit: 20, sortBy });
   }, [sortBy]);
 
@@ -157,6 +162,18 @@ const OffersPage = () => {
   useEffect(() => {
     reset();
   }, [sortBy, reset]);
+
+  useEffect(() => {
+    const savedLayout = localStorage.getItem('offers-grid-layout');
+    if (savedLayout && ['1', '2', '4'].includes(savedLayout)) {
+      setGridLayout(savedLayout as '1' | '2' | '4');
+    }
+  }, []);
+
+  // const handleGridLayoutChange = (layout: '1' | '2' | '4') => { 
+  //   setGridLayout(layout);
+  //   localStorage.setItem('offers-grid-layout', layout);
+  // };
 
   const filteredProducts = useMemo(() => {
     if (!products || !Array.isArray(products)) return [];
@@ -201,8 +218,22 @@ const OffersPage = () => {
     }
   };
 
+  const offersSchema = {
+    "@context": "https://schema.org",
+    "@type": "SpecialAnnouncement",
+    "name": "Ofertas de Repuestos en Repuestos Picha",
+    "description": "Descuentos increíbles en repuestos para todas las marcas de autos en Venezuela.",
+    "url": window.location.href,
+    "category": "Auto Parts"
+  };
+
   return (
     <>
+      <SEO 
+        title="Ofertas" 
+        description="Aprovecha las mejores ofertas en repuestos de autos en Venezuela. Descuentos en frenos, suspensión, motor y más."
+        structuredData={offersSchema}
+      />
       <CartModal />
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

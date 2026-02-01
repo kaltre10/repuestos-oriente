@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /profile
+Disallow: /purchases
+Disallow: /checkout
+
+Sitemap: https://repuestospicha.com/sitemap.xml

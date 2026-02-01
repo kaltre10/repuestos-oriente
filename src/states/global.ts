@@ -23,6 +23,7 @@ interface User {
   phone?: string;
   address?: string;
   profilePicture?: string;
+  role: string;
 }
 
 const getInitialUser = (): User | null => {

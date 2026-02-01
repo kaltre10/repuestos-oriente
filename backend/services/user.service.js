@@ -209,6 +209,11 @@ class UserService {
         throw new Error('Este correo electrónico no se encuentra registrado');
       }
 
+      // Check if user has a password (might be a Google user without password)
+      if (!user.password) {
+        throw new Error('Esta cuenta está vinculada con Google. Por favor, inicia sesión con Google.');
+      }
+
       // Check password
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {

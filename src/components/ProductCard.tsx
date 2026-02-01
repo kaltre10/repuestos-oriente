@@ -21,6 +21,7 @@ interface ProductCardProps {
     brand?: { name: string };
     model?: { name: string };
     stock?: number;
+    amount: number;
   };
   compact?: boolean;
 }
@@ -131,9 +132,14 @@ const ProductCard = ({ product, compact }: ProductCardProps) => {
           ) : (
             <button
               onClick={handleAddToCart}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-black py-2 sm:py-2.5 rounded-lg transition-all active:scale-95 text-[11px] sm:text-xs uppercase tracking-widest shadow-sm hover:shadow-md"
+              disabled={Number(product.amount) <= 0}
+              className={`w-full font-black py-2 sm:py-2.5 rounded-lg transition-all active:scale-95 text-[11px] sm:text-xs uppercase tracking-widest shadow-sm hover:shadow-md ${
+                Number(product.amount) <= 0 
+                  ? 'bg-gray-400 cursor-not-allowed text-white' 
+                  : 'bg-red-600 hover:bg-red-700 text-white'
+              }`}
             >
-              Comprar
+              {Number(product.amount) <= 0 ? 'Sin Stock' : 'Comprar'}
             </button>
           )}
         </div>

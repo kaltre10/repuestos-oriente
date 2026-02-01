@@ -3,6 +3,7 @@ import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import request from '../../utils/request';
 import { apiUrl } from '../../utils/utils';
 import useNotify from '../../hooks/useNotify';
+import SEO from '../../components/SEO';
 
 const Contact = () => {
   const { notify } = useNotify();
@@ -39,6 +40,10 @@ const Contact = () => {
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
+      <SEO 
+        title="Contacto" 
+        description="Ponte en contacto con Repuestos Picha. Estamos para ayudarte a encontrar los mejores repuestos para tu carro en Venezuela."
+      />
       <div className="flex items-center gap-3 mb-6">
         <FaEnvelope className="text-red-600 text-2xl" />
         <h1 className="text-2xl font-bold text-gray-800">Contacto</h1>
