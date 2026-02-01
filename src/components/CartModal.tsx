@@ -18,7 +18,7 @@ const CartModal = () => {
       />
 
       {/* Modal */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-[80%] lg:max-w-[40%] bg-white shadow-xl flex flex-col">
+      <div className="fixed right-0 top-0 h-full w-full max-w-[90%] sm:max-w-md bg-white shadow-xl flex flex-col animate-in slide-in-from-right duration-300">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-800">Carrito de Compras</h2>
@@ -39,57 +39,73 @@ const CartModal = () => {
           ) : (
             <div className="space-y-4">
               {cart.map((item) => (
-                <div key={item.id} className="flex items-center space-x-4 pb-4">
-                  <img
-                    src={item.image || '/placeholder-product.svg'}
-                    alt={item.name}
-                    className="w-16 h-16 object-cover rounded"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/placeholder-product.svg';
-                    }}
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-800">{item.name}</h3>
-                    <p className="text-sm text-gray-500">{item.category}</p>
-                    <div className="flex flex-col">
-                      {item.discount && item.discount > 0 ? (
-                        <>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-xs text-gray-400 line-through">
-                              <FormattedPrice price={Number(item.price) / (1 - (Number(item.discount) / 100))} />
-                            </span>
-                            <span className="text-[10px] font-bold text-red-600">
-                              {item.discount}% OFF
-                            </span>
-                          </div>
-                          <FormattedPrice price={item.price} className="text-red-500 font-semibold" />
-                        </>
-                      ) : (
-                        <FormattedPrice price={item.price} className="text-gray-800 font-semibold" />
-                      )}
-                    </div>
+                <div key={item.id} className="flex gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                  <div className="relative flex-shrink-0">
+                    <img
+                      src={item.image || '/placeholder-product.svg'}
+                      alt={item.name}
+                      className="w-20 h-20 object-cover rounded-lg bg-gray-50 shadow-sm border border-gray-100"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                      }}
+                    />
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => decrementQuantity(item.id)}
-                      className="cursor-pointer p-1 hover:bg-gray-100 rounded transition-colors"
-                      disabled={item.quantity <= 1}
-                    >
-                      <Minus size={16} />
-                    </button>
-                    <span className="w-8 text-center">{item.quantity}</span>
-                    <button
-                      onClick={() => incrementQuantity(item.id)}
-                      className="cursor-pointer p-1 hover:bg-gray-100 rounded transition-colors"
-                    >
-                      <Plus size={16} />
-                    </button>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="cursor-pointer p-1 hover:bg-red-100 text-red-500 rounded transition-colors ml-2"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+
+                  <div className="flex-1 min-w-0 flex flex-col justify-between">
+                    <div>
+                      <div className="flex justify-between items-start gap-2">
+                        <h3 className="font-bold text-gray-800 text-sm sm:text-base leading-tight line-clamp-2">
+                          {item.name}
+                        </h3>
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="cursor-pointer p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all active:scale-90 flex-shrink-0"
+                          title="Eliminar del carrito"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-bold">{item.category}</p>
+                    </div>
+
+                    <div className="flex items-end justify-between mt-2">
+                      <div className="flex flex-col">
+                        {item.discount && item.discount > 0 ? (
+                          <>
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <span className="text-[10px] text-gray-400 line-through">
+                                <FormattedPrice price={Number(item.price) / (1 - (Number(item.discount) / 100))} />
+                              </span>
+                              <span className="text-[10px] font-black text-red-600 bg-red-50 px-1 rounded">
+                                -{item.discount}%
+                              </span>
+                            </div>
+                            <FormattedPrice price={item.price} className="text-red-600 font-black text-base" />
+                          </>
+                        ) : (
+                          <FormattedPrice price={item.price} className="text-gray-900 font-black text-base" />
+                        )}
+                      </div>
+
+                      <div className="flex items-center bg-gray-50 border border-gray-100 rounded-lg p-0.5 shadow-sm">
+                        <button
+                          onClick={() => decrementQuantity(item.id)}
+                          className="cursor-pointer p-1 hover:bg-white hover:shadow-sm rounded transition-all disabled:opacity-30"
+                          disabled={item.quantity <= 1}
+                          title="Disminuir cantidad"
+                        >
+                          <Minus size={14} className="text-gray-500" />
+                        </button>
+                        <span className="w-8 text-center text-xs font-black text-gray-700">{item.quantity}</span>
+                        <button
+                          onClick={() => incrementQuantity(item.id)}
+                          className="cursor-pointer p-1 hover:bg-white hover:shadow-sm rounded transition-all"
+                          title="Aumentar cantidad"
+                        >
+                          <Plus size={14} className="text-gray-500" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
