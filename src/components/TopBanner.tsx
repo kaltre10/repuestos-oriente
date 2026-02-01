@@ -108,7 +108,7 @@ const TopBanner = () => {
 
     return (
         <div className="text-gray-800 text-sm">
-            <div className="mx-auto px-4 lg:px-8 flex justify-between items-center bg-gray-100 py-1">
+            <div className="mx-auto px-4 lg:px-8 flex justify-between items-center bg-gray-100 py-0">
                 <div className='flex gap-3'>
                     <MobileTop 
                         freeShippingThreshold={Number(memoizedShippingThreshold)} 

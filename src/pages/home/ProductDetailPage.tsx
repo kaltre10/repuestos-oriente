@@ -335,16 +335,18 @@ const ProductDetailPage = () => {
                       <div className="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden">
                         <button
                           onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                          className="p-2 hover:bg-gray-100 transition-colors text-gray-600 border-r border-gray-300"
+                          className="p-2 hover:bg-gray-100 transition-colors text-gray-600 border-r border-gray-300 disabled:opacity-30"
+                          disabled={Number(product.amount) <= 0}
                         >
                           <Minus size={18} />
                         </button>
                         <span className="w-12 text-center font-bold">
-                          {quantity}
+                          {Number(product.amount) <= 0 ? 0 : quantity}
                         </span>
                         <button
-                          onClick={() => setQuantity(quantity + 1)}
-                          className="p-2 hover:bg-gray-100 transition-colors text-gray-600 border-l border-gray-300"
+                          onClick={() => setQuantity(Math.min(Number(product.amount), quantity + 1))}
+                          className="p-2 hover:bg-gray-100 transition-colors text-gray-600 border-l border-gray-300 disabled:opacity-30"
+                          disabled={Number(product.amount) <= 0 || quantity >= Number(product.amount)}
                         >
                           <Plus size={18} />
                         </button>
@@ -354,10 +356,15 @@ const ProductDetailPage = () => {
                     <div className="flex gap-4">
                       <button
                         onClick={handleAddToCart}
-                        className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-red-200"
+                        disabled={Number(product.amount) <= 0}
+                        className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 font-bold rounded-xl transition-all shadow-lg ${
+                          Number(product.amount) <= 0 
+                            ? 'bg-gray-400 cursor-not-allowed text-white shadow-none' 
+                            : 'bg-red-600 hover:bg-red-700 text-white shadow-red-200'
+                        }`}
                       >
                         <ShoppingCart size={22} />
-                        Agregar al carrito
+                        {Number(product.amount) <= 0 ? 'Sin Stock' : 'Agregar al carrito'}
                       </button>
                     </div>
                   </>

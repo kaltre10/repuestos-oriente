@@ -278,9 +278,14 @@ const ProductsPage = () => {
                             ) : (
                                 <button
                                     onClick={() => handleAddToCart(product)}
-                                    className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-black px-8 py-3 rounded-lg transition-all active:scale-95 text-xs uppercase tracking-widest shadow-sm"
+                                    disabled={Number(product.amount) <= 0}
+                                    className={`w-full sm:w-auto font-black px-8 py-3 rounded-lg transition-all active:scale-95 text-xs uppercase tracking-widest shadow-sm ${
+                                        Number(product.amount) <= 0 
+                                            ? 'bg-gray-400 cursor-not-allowed text-white' 
+                                            : 'bg-red-600 hover:bg-red-700 text-white'
+                                    }`}
                                 >
-                                    Comprar
+                                    {Number(product.amount) <= 0 ? 'Sin Stock' : 'Comprar'}
                                 </button>
                             )}
                         </div>
