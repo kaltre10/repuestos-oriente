@@ -1,6 +1,7 @@
 import express from 'express';
 import { uploadReceipt, getSales, getSale, getSalesByUserId, createSale, updateSale, deleteSale, createCheckout, getStats } from '../controllers/sale.controller.js';
 import { uploadMidelware } from '../midelwares/uploadMidelware.js';
+import { validateOrderIntegrity } from '../midelwares/validateOrderIntegrity.js';
 
 const router = express.Router();
 
@@ -9,8 +10,8 @@ router.get('/stats', getStats);
 router.get('/user/:userId', getSalesByUserId);
 router.get('/:id', getSale);
 
-router.post('/', createSale);
-router.post('/checkout', uploadMidelware.single('receiptImage'), createCheckout);
+router.post('/', validateOrderIntegrity, createSale);
+router.post('/checkout', uploadMidelware.single('receiptImage'), validateOrderIntegrity, createCheckout);
 router.post('/upload-receipt', uploadMidelware.single('receiptImage'), uploadReceipt);
 router.put('/:id', updateSale);
 router.delete('/:id', deleteSale);
