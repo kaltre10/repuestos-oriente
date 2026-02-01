@@ -93,31 +93,33 @@ const OffersPage = () => {
 
             <div className="w-full sm:w-auto">
               {isInCart ? (
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center bg-gray-50 border border-gray-100 rounded-lg p-1 flex-1 sm:flex-none">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <div className="flex items-center bg-gray-50 border border-gray-100 rounded-lg p-0.5 sm:p-1 flex-1 sm:flex-none justify-between">
                     <button
                       onClick={() => decrementQuantity(product.id)}
-                      className="p-1.5 hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90"
+                      className="flex-1 sm:flex-none flex justify-center p-1.5 sm:p-2 hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90"
                       disabled={cartItem.quantity <= 1}
+                      title="Disminuir cantidad"
                     >
-                      <Minus className="size-4" />
+                      <Minus className="size-3.5 sm:size-4" />
                     </button>
-                    <span className="px-4 font-black text-sm text-gray-700">
+                    <span className="px-2 sm:px-4 font-black text-xs sm:text-sm text-gray-700 min-w-[1.5rem] sm:min-w-[3rem] text-center">
                       {cartItem.quantity}
                     </span>
                     <button
                       onClick={() => incrementQuantity(product.id)}
-                      className="p-1.5 hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90"
+                      className="flex-1 sm:flex-none flex justify-center p-1.5 sm:p-2 hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90"
+                      title="Aumentar cantidad"
                     >
-                      <Plus className="size-4" />
+                      <Plus className="size-3.5 sm:size-4" />
                     </button>
                   </div>
                   <button
                     onClick={() => removeFromCart(product.id)}
-                    className="p-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors active:scale-90"
-                    title="Eliminar"
+                    className="p-2 sm:p-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors active:scale-90 shadow-sm border border-red-100"
+                    title="Eliminar del carrito"
                   >
-                    <Trash2 className="size-4" />
+                    <Trash2 className="size-4 sm:size-5" />
                   </button>
                 </div>
               ) : (
@@ -255,7 +257,7 @@ const OffersPage = () => {
                 </button>
                 <button
                   onClick={() => setGridLayout('4')}
-                  className={`hidden sm:flex px-3 py-1 border rounded-md text-sm transition-colors ${
+                  className={`hidden md:flex px-3 py-1 border rounded-md text-sm transition-colors ${
                     gridLayout === '4'
                       ? 'bg-red-500 text-white border-red-500'
                       : 'border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -286,7 +288,7 @@ const OffersPage = () => {
                           -{product.discount}%
                         </div>
                       )}
-                      <ProductCard product={product as any} />
+                      <ProductCard product={product as any} compact={gridLayout === '4'} />
                     </div>
                   )
                 ))}

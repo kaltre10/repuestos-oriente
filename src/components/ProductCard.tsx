@@ -18,11 +18,14 @@ interface ProductCardProps {
     image: string;
     years?: string;
     images?: { image: string }[];
+    brand?: { name: string };
+    model?: { name: string };
+    stock?: number;
   };
-  onImageClick?: (imageSrc: string) => void;
+  compact?: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard = ({ product, compact }: ProductCardProps) => {
   const { notify } = useNotify();
   const navigate = useNavigate();
   const { addToCart, cart, incrementQuantity, decrementQuantity, removeFromCart } = useStore();
@@ -96,31 +99,33 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         <div className="mt-auto">
           {isInCart ? (
-            <div className="flex items-center gap-1.5">
-              <div className="flex items-center bg-gray-50 border border-gray-100 rounded-lg p-0.5 flex-1">
+            <div className={`flex items-center ${compact ? 'gap-1' : 'gap-1 sm:gap-2'}`}>
+              <div className={`flex items-center bg-gray-50 border border-gray-100 rounded-lg ${compact ? 'p-0.5' : 'p-0.5 sm:p-1'} flex-1 justify-between`}>
                 <button
                   onClick={() => decrementQuantity(product.id)}
-                  className="p-1 hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90"
+                  className={`flex-1 flex justify-center ${compact ? 'p-1' : 'p-1.5 sm:p-2'} hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90`}
                   disabled={cartItem.quantity <= 1}
+                  title="Disminuir cantidad"
                 >
-                  <Minus className="size-3 sm:size-4" />
+                  <Minus className={`${compact ? 'size-3' : 'size-3.5 sm:size-4'}`} />
                 </button>
-                <span className="px-1.5 sm:px-2 font-black text-xs sm:text-sm text-gray-700">
+                <span className={`${compact ? 'px-1 min-w-[1.2rem] text-[10px]' : 'px-1 sm:px-4 min-w-[1.5rem] sm:min-w-[3rem] text-xs sm:text-sm'} font-black text-gray-700 text-center`}>
                   {cartItem.quantity}
                 </span>
                 <button
                   onClick={() => incrementQuantity(product.id)}
-                  className="p-1 hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90"
+                  className={`flex-1 flex justify-center ${compact ? 'p-1' : 'p-1.5 sm:p-2'} hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90`}
+                  title="Aumentar cantidad"
                 >
-                  <Plus className="size-3 sm:size-4" />
+                  <Plus className={`${compact ? 'size-3' : 'size-3.5 sm:size-4'}`} />
                 </button>
               </div>
               <button
                 onClick={() => removeFromCart(product.id)}
-                className="p-1.5 sm:p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors active:scale-90"
-                title="Eliminar"
+                className={`${compact ? 'p-1.5' : 'p-2 sm:p-2.5'} bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors active:scale-90 shadow-sm border border-red-100`}
+                title="Eliminar del carrito"
               >
-                <Trash2 className="size-3.5 sm:size-4" />
+                <Trash2 className={`${compact ? 'size-3.5' : 'size-4 sm:size-5'}`} />
               </button>
             </div>
           ) : (
