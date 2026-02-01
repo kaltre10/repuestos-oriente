@@ -16,7 +16,7 @@ const BestSellers = () => {
   const navigate = useNavigate();
   const { products, loading, getProducts } = useProducts();
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high'>('popular');
-  const [gridLayout, setGridLayout] = useState<'1' | '3' | '4'>('4');
+  const [gridLayout, setGridLayout] = useState<'1' | '2' | '4'>('4');
 
   // Carga inicial de productos
   useEffect(() => {
@@ -41,13 +41,13 @@ const BestSellers = () => {
   // Load saved grid layout from localStorage on component mount
   useEffect(() => {
     const savedLayout = localStorage.getItem('bestsellers-grid-layout');
-    if (savedLayout && ['1', '3', '4'].includes(savedLayout)) {
-      setGridLayout(savedLayout as '1' | '3' | '4');
+    if (savedLayout && ['1', '2', '4'].includes(savedLayout)) {
+      setGridLayout(savedLayout as '1' | '2' | '4');
     }
   }, []);
 
   // Save grid layout to localStorage when it changes
-  const handleGridLayoutChange = (layout: '1' | '3' | '4') => {
+  const handleGridLayoutChange = (layout: '1' | '2' | '4') => {
     setGridLayout(layout);
     localStorage.setItem('bestsellers-grid-layout', layout);
   };
@@ -64,14 +64,10 @@ const BestSellers = () => {
 
   const getGridClasses = () => {
     switch (gridLayout) {
-      case '1':
-        return 'grid-cols-1';
-      case '3':
-        return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
-      case '4':
-        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
-      default:
-        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
+      case '1': return 'flex flex-col gap-6';
+      case '2': return 'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6';
+      case '4': return 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6';
+      default: return 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6';
     }
   };
 
@@ -99,8 +95,8 @@ const BestSellers = () => {
     const discountedPrice = discountPercent > 0 ? basePrice * (1 - (discountPercent / 100)) : basePrice;
 
     return (
-      <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md flex">
-        <div className="relative cursor-pointer w-48 h-48" onClick={() => navigate(`/producto/${product.id}`)}>
+      <div key={product.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row border border-gray-100">
+        <div className="relative cursor-pointer w-full sm:w-48 h-48 sm:h-auto flex-shrink-0" onClick={() => navigate(`/producto/${product.id}`)}>
           <img
             src={product.image || '/placeholder-product.svg'}
             alt={product.name}
@@ -109,71 +105,76 @@ const BestSellers = () => {
               (e.target as HTMLImageElement).src = '/placeholder-product.svg';
             }}
           />
-          <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
+          <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors"></div>
         </div>
-        <div className="flex-1 p-6 relative">
-          <p className="text-gray-500 text-sm mb-1">{product.category}</p>
-          <h3 onClick={() => navigate(`/producto/${product.id}`)} className="hover:underline cursor-pointer font-semibold text-lg mb-2 text-gray-800">{product.name}</h3>
-          <div className="flex items-center gap-2 mb-3">
-            <Rating hover={false} action={() => { }} stars={Math.round(product.rating)} />
-            <span className="text-gray-500 text-sm">({product.reviews} reseñas)</span>
+        <div className="flex-1 p-4 sm:p-5 flex flex-col">
+          <div className="flex justify-between items-start mb-1">
+            <p className="text-gray-400 text-[10px] sm:text-xs uppercase tracking-widest font-bold">{product.category}</p>
           </div>
-          <div className="flex flex-col mb-4">
-            {discountPercent > 0 ? (
-              <>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-400 line-through">
-                    <FormattedPrice price={basePrice} />
-                  </span>
-                  <span className="text-red-600 text-xs font-bold bg-red-50 px-1.5 py-0.5 rounded">
-                    {discountPercent}% OFF
-                  </span>
-                </div>
-                <FormattedPrice price={discountedPrice} className="text-red-500 font-bold text-2xl" />
-              </>
-            ) : (
-              <FormattedPrice price={basePrice} className="text-red-500 font-bold text-xl" />
-            )}
+          <h3 onClick={() => navigate(`/producto/${product.id}`)} className="cursor-pointer hover:text-red-600 transition-colors font-bold text-base sm:text-lg mb-2 text-gray-800 line-clamp-2 leading-tight">{product.name}</h3>
+          
+          <div className="flex items-center mb-4">
+            <Rating hover={false} action={() => { }} stars={Math.round(product.rating)} />
+            <span className="text-gray-400 text-xs ml-2">({product.reviews})</span>
           </div>
 
-          {/* Actions in bottom-right corner */}
-          <div className="absolute bottom-6 right-6">
-            {isInCart ? (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center bg-gray-100 rounded-lg p-1">
+          <div className="mt-auto flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              {discountPercent > 0 ? (
+                <>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-xs text-gray-400 line-through">
+                      <FormattedPrice price={basePrice} />
+                    </span>
+                    <span className="text-white text-[10px] font-black bg-red-600 px-1.5 py-0.5 rounded-sm">
+                      -{discountPercent}%
+                    </span>
+                  </div>
+                  <FormattedPrice price={discountedPrice} className="text-red-600 font-black text-2xl" />
+                </>
+              ) : (
+                <FormattedPrice price={basePrice} className="text-red-600 font-black text-xl" />
+              )}
+            </div>
+
+            <div className="w-full sm:w-auto">
+              {isInCart ? (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center bg-gray-50 border border-gray-100 rounded-lg p-1 flex-1 sm:flex-none">
+                    <button
+                      onClick={() => decrementQuantity(product.id)}
+                      className="p-1.5 hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90"
+                      disabled={cartItem.quantity <= 1}
+                    >
+                      <Minus className="size-4" />
+                    </button>
+                    <span className="px-4 font-black text-sm text-gray-700">
+                      {cartItem.quantity}
+                    </span>
+                    <button
+                      onClick={() => incrementQuantity(product.id)}
+                      className="p-1.5 hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90"
+                    >
+                      <Plus className="size-4" />
+                    </button>
+                  </div>
                   <button
-                    onClick={() => decrementQuantity(product.id)}
-                    className="p-1 hover:bg-white rounded-md transition-colors text-gray-600 disabled:opacity-50"
-                    disabled={cartItem.quantity <= 1}
+                    onClick={() => removeFromCart(product.id)}
+                    className="p-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors active:scale-90"
+                    title="Eliminar"
                   >
-                    <Minus size={18} />
-                  </button>
-                  <span className="px-3 font-bold text-sm">
-                    {cartItem.quantity}
-                  </span>
-                  <button
-                    onClick={() => incrementQuantity(product.id)}
-                    className="p-1 hover:bg-white rounded-md transition-colors text-gray-600"
-                  >
-                    <Plus size={18} />
+                    <Trash2 className="size-4" />
                   </button>
                 </div>
+              ) : (
                 <button
-                  onClick={() => removeFromCart(product.id)}
-                  className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
-                  title="Eliminar del carrito"
+                  onClick={() => handleAddToCart(product)}
+                  className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-black px-8 py-3 rounded-lg transition-all active:scale-95 text-xs uppercase tracking-widest shadow-sm"
                 >
-                  <Trash2 size={18} />
+                  Comprar
                 </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => handleAddToCart(product)}
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded transition-colors cursor-pointer"
-              >
-                Agregar al carrito
-              </button>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -225,8 +226,8 @@ const BestSellers = () => {
                 <List size={18} />
               </button>
               <button
-                onClick={() => handleGridLayoutChange('3')}
-                className={`cursor-pointer px-3 py-2 rounded-md text-sm transition-all duration-200 ${gridLayout === '3'
+                onClick={() => handleGridLayoutChange('2')}
+                className={`cursor-pointer px-3 py-2 rounded-md text-sm transition-all duration-200 ${gridLayout === '2'
                     ? 'bg-red-500 text-white shadow-md'
                     : 'text-gray-700 hover:bg-gray-100'
                   }`}
@@ -235,7 +236,7 @@ const BestSellers = () => {
               </button>
               <button
                 onClick={() => handleGridLayoutChange('4')}
-                className={`cursor-pointer px-3 py-2 rounded-md text-sm transition-all duration-200 ${gridLayout === '4'
+                className={`hidden sm:flex cursor-pointer px-3 py-2 rounded-md text-sm transition-all duration-200 ${gridLayout === '4'
                     ? 'bg-red-500 text-white shadow-md'
                     : 'text-gray-700 hover:bg-gray-100'
                   }`}

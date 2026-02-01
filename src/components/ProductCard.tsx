@@ -54,79 +54,81 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <div className="bg-white text-gray-800 rounded-lg overflow-hidden group shadow-md flex flex-col h-full">
-      <div className="relative">
+    <div className="bg-white text-gray-800 rounded-lg overflow-hidden group shadow-md flex flex-col h-full hover:shadow-lg transition-shadow">
+      <div className="relative aspect-square sm:aspect-auto sm:h-56">
         <img
           src={displayImage}
           alt={product.name}
           onError={handleImageError}
-          className="w-full h-56 object-cover cursor-pointer"
+          className="w-full h-full object-cover cursor-pointer"
         />
-        <div onClick={handleImageClick} className="cursor-pointer absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
+        <div onClick={handleImageClick} className="cursor-pointer absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors"></div>
       </div>
-      <div className="p-4 flex flex-col flex-1">
-        <h3 onClick={handleImageClick} className="hover:underline cursor-pointer font-semibold mt-1 truncate text-gray-800">{product.name}</h3>
-        <div className='flex justify-between items-center'>
-          <p className="text-gray-500 text-sm">{product.category}</p>
-          <p className='text-gray-500 text-sm'>{product.years} </p>
+      <div className="p-3 sm:p-4 flex flex-col flex-1">
+        <h3 onClick={handleImageClick} className="hover:underline cursor-pointer font-bold text-sm sm:text-base mt-1 line-clamp-2 text-gray-800 min-h-[2.5rem] sm:min-h-0">{product.name}</h3>
+        <div className='flex justify-between items-center mt-1'>
+          <p className="text-gray-500 text-[10px] sm:text-xs uppercase tracking-wider font-semibold">{product.category}</p>
+          {product.years && <p className='text-gray-500 text-[10px] sm:text-xs font-medium'>{product.years} </p>}
         </div>
-        <div className="flex items-center gap-2 mt-2">
-          <Rating hover={false} action={() => { }} stars={Math.round(product.rating)} />
-          <span className="text-gray-500 text-sm">{product.reviews} {product.reviews === 1 ? 'reseña' : 'reseñas'}</span>
+        <div className="flex items-center gap-1.5 mt-2">
+          <div className="scale-75 sm:scale-100 origin-left">
+            <Rating hover={false} action={() => { }} stars={Math.round(product.rating)} />
+          </div>
+          <span className="text-gray-400 text-[10px] sm:text-xs">({product.reviews})</span>
         </div>
-        <div className="mt-2 mb-4 flex flex-col">
+        <div className="mt-3 mb-4 flex flex-col justify-end flex-1">
           {discountPercent > 0 ? (
             <>
               <div className="flex items-center gap-2">
-                <span className="text-gray-400 text-sm line-through">
+                <span className="text-gray-400 text-xs line-through decoration-red-400/50">
                   <FormattedPrice price={basePrice} />
                 </span>
-                <span className="text-red-600 text-xs font-bold bg-red-50 px-1.5 py-0.5 rounded">
-                  {discountPercent}% OFF
+                <span className="text-white text-[10px] font-black bg-red-600 px-1.5 py-0.5 rounded-sm">
+                  -{discountPercent}%
                 </span>
               </div>
-              <FormattedPrice price={discountedPrice} className="text-red-600 font-bold text-xl leading-tight" />
+              <FormattedPrice price={discountedPrice} className="text-red-600 font-black text-lg sm:text-xl leading-tight" />
             </>
           ) : (
-            <FormattedPrice price={basePrice} className="text-red-500 font-bold text-lg" />
+            <FormattedPrice price={basePrice} className="text-red-600 font-black text-base sm:text-lg" />
           )}
         </div>
 
         <div className="mt-auto">
           {isInCart ? (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center bg-gray-100 rounded-lg p-1 flex-1">
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center bg-gray-50 border border-gray-100 rounded-lg p-0.5 flex-1">
                 <button
                   onClick={() => decrementQuantity(product.id)}
-                  className="p-1 hover:bg-white rounded-md transition-colors text-gray-600 disabled:opacity-50"
+                  className="p-1 hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90"
                   disabled={cartItem.quantity <= 1}
                 >
-                  <Minus size={18} />
+                  <Minus className="size-3 sm:size-4" />
                 </button>
-                <span className="flex-1 text-center font-bold text-sm">
+                <span className="px-1.5 sm:px-2 font-black text-xs sm:text-sm text-gray-700">
                   {cartItem.quantity}
                 </span>
                 <button
                   onClick={() => incrementQuantity(product.id)}
-                  className="p-1 hover:bg-white rounded-md transition-colors text-gray-600"
+                  className="p-1 hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-500 active:scale-90"
                 >
-                  <Plus size={18} />
+                  <Plus className="size-3 sm:size-4" />
                 </button>
               </div>
               <button
                 onClick={() => removeFromCart(product.id)}
-                className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
-                title="Eliminar del carrito"
+                className="p-1.5 sm:p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors active:scale-90"
+                title="Eliminar"
               >
-                <Trash2 size={18} />
+                <Trash2 className="size-3.5 sm:size-4" />
               </button>
             </div>
           ) : (
             <button
               onClick={handleAddToCart}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded transition-colors cursor-pointer"
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-black py-2 sm:py-2.5 rounded-lg transition-all active:scale-95 text-[11px] sm:text-xs uppercase tracking-widest shadow-sm hover:shadow-md"
             >
-              Agregar al carrito
+              Comprar
             </button>
           )}
         </div>
