@@ -3,6 +3,8 @@ export const imagesUrl = 'http://localhost:3001/images/products/';
 // export const apiUrl = 'https://server.somosdev.pw/api/v1';
 // export const imagesUrl = 'https://server.somosdev.pw/images/products/';
 
+export const GOOGLE_CLIENT_ID = "974440089899-gsherv6fnbccd278hcvdrd1pujbjq7kq.apps.googleusercontent.com"; // Reemplazar con el ID real
+
 export const bancos = [
   { "codigo": "0001", "nombre": "Banco Central de Venezuela" },
   { "codigo": "0102", "nombre": "Banco de Venezuela S.A.C.A." },

@@ -96,7 +96,7 @@ const useAuth = () => {
             if (user.role === 'admin') {
                 navigate('/admin/dashboard')
             } else {
-                navigate('/clients/purchases');
+                navigate('/clients/profile');
             }
         } catch (err: any) {
             console.log(err)
@@ -152,60 +152,40 @@ const useAuth = () => {
         }
     };
 
-    /* const handleGoogleAuth = async () => {
-      setLoading(true);
-      setError('');
-  
-      try {
-        if (!window.google) {
-          setLoading(false);
-          setError('Google Sign-In not loaded');
-          return;
-        }
-  
-        window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-          // 1. Confirmamos el uso de FedCM explícitamente
-          use_fedcm_for_prompt: true,
-          callback: async (response) => {
-            try {
-              if (response.error) throw new Error('Google authentication failed');
-  
-              const res = await request.post(`${apiUrl}/auth/google`,
-                JSON.stringify({ token: response.credential }),
-              );
-  
-              const data = await res.data;
-  
-              if (!res) {
-                throw new Error(data.message || 'Authentication failed');
-              }
-  
-              localStorage.setItem('token', data.token);
-              setUser(data.user);
-              navigate('/clients');
-            } catch (err) {
-              setError(err instanceof Error ? err.message : 'Authentication failed');
-            } finally {
-              setLoading(false);
-            }
-          },
-        });
-  
-        // 2. Google recomienda no depender demasiado de los callbacks de notificación 
-        // en FedCM, pero puedes mantenerlo así para el loading:
-        window.google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            setLoading(false);
-          }
-        });
-  
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Google authentication failed');
-        setLoading(false);
-      }
-    }; */
+    const handleGoogleAuth = async (credential: string) => {
+        setLoading(true);
+        setError('');
 
+        try {
+            const response = await request.post(`${apiUrl}/auth/google`, { token: credential });
+            const data = response.data;
+
+            if (!data || (data.status !== 200 && data.status !== 201)) {
+                throw new Error(data?.message || 'Autenticación con Google fallida');
+            }
+
+            // Store user data and token
+            localStorage.setItem('token', data.body.token);
+
+            // Save user data without password
+            const userToSave = { ...data.body.user };
+            delete userToSave.password;
+            localStorage.setItem('user', JSON.stringify(userToSave));
+
+            setUser(userToSave);
+            const user = userToSave;
+            if (user.role === 'admin') {
+                navigate('/admin/dashboard')
+            } else {
+                navigate('/clients/profile');
+            }
+        } catch (err: any) {
+            console.error('Error en Google Auth:', err);
+            setError(err?.response?.data?.message || err?.message || 'Ocurrió un error con Google');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return {
         isLogin, handleSubmit, handleInputChange,
@@ -215,7 +195,7 @@ const useAuth = () => {
         handleRemember, loading, error, setIsLogin,
         isForgotPassword, setIsForgotPassword,
         handleForgotPassword, handleResetPassword,
-        successMessage
+        successMessage, handleGoogleAuth
     }
 }
 
