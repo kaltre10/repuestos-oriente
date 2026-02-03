@@ -79,6 +79,7 @@ const mapRef = useRef<LeafletMap | null>(null);
   const [, setShowMap] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false); // Estado para loader
+  const [noResults, setNoResults] = useState(false); // Estado para "sin resultados"
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedMunicipality, setSelectedMunicipality] = useState<string>('');
@@ -235,39 +236,71 @@ const mapRef = useRef<LeafletMap | null>(null);
     setHasUnsavedChanges(true);
   };
 
-  // Función para buscar direcciones (geocoding) con múltiples resultados
+  // Función para buscar direcciones (geocoding) con múltiples resultados y lógica de búsqueda avanzada
   const searchAddress = async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
       setShowResults(false);
+      setNoResults(false);
       return;
     }
 
-    setIsSearching(true); // Iniciar loader
+    setIsSearching(true);
+    setNoResults(false);
 
     try {
-      let geoFilter = '';
-      if (selectedState) geoFilter += `, ${selectedState}`;
-      if (selectedMunicipality) geoFilter += `, ${selectedMunicipality}`;
+      // Normalización básica de la consulta
+      const normalizedQuery = query.trim()
+        .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "")
+        .replace(/\s{2,}/g, " ");
 
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + geoFilter)}&limit=15&addressdetails=1&countrycodes=ve`
-      );
-      const data = await response.json();
+      const fetchNominatim = async (q: string) => {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=15&addressdetails=1&namedetails=1&countrycodes=ve`,
+          {
+            headers: {
+              'Accept-Language': 'es'
+            }
+          }
+        );
+        return await response.json();
+      };
 
-      if (Array.isArray(data) && data.length > 0) {
-        setSearchResults(data);
+      // TIER 1: Búsqueda estructurada completa (si hay filtros seleccionados)
+      let results = [];
+      if (selectedState || selectedMunicipality) {
+        let structuredQ = normalizedQuery;
+        if (selectedMunicipality) structuredQ += `, ${selectedMunicipality}`;
+        if (selectedState) structuredQ += `, ${selectedState}`;
+        
+        results = await fetchNominatim(structuredQ);
+      }
+
+      // TIER 2: Si no hay resultados o no hay filtros, búsqueda relajada (solo con estado)
+      if (results.length === 0 && selectedState) {
+        results = await fetchNominatim(`${normalizedQuery}, ${selectedState}`);
+      }
+
+      // TIER 3: Búsqueda global en Venezuela (Fuzzy fallback)
+      if (results.length === 0) {
+        results = await fetchNominatim(normalizedQuery);
+      }
+
+      if (Array.isArray(results) && results.length > 0) {
+        setSearchResults(results);
         setShowResults(true);
+        setNoResults(false);
       } else {
         setSearchResults([]);
         setShowResults(false);
+        setNoResults(true);
       }
     } catch (error) {
       console.error('Error searching address:', error);
       setSearchResults([]);
       setShowResults(false);
     } finally {
-      setIsSearching(false); // Finalizar loader
+      setIsSearching(false);
     }
   };
 
@@ -283,12 +316,14 @@ const mapRef = useRef<LeafletMap | null>(null);
 
     // Buscar en tiempo real con debounce de 500ms
     if (value.trim()) {
+      setNoResults(false);
       window.searchTimeout = setTimeout(() => {
         searchAddress(value);
       }, 500);
     } else {
       setSearchResults([]);
       setShowResults(false);
+      setNoResults(false);
     }
   };
 
@@ -894,21 +929,35 @@ const mapRef = useRef<LeafletMap | null>(null);
                               Buscando...
                             </div>
                           </div>
-                        ) : showResults && searchResults.length > 0 && (
+                        ) : showResults && searchResults.length > 0 ? (
                           <div
                             ref={resultsContainerRef}
-                            className="absolute z-[99999] mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-2xl max-h-48 overflow-y-auto animate-in fade-in slide-in-from-top-2"
+                            className="absolute z-[99999] mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-2xl max-h-48 overflow-y-auto animate-in fade-in slide-in-from-top-2 custom-scrollbar"
                           >
                             {searchResults.map((result, index) => (
                               <div
                                 key={index}
                                 onClick={() => handleSelectAddress(result)}
-                                className="px-4 py-3 cursor-pointer hover:bg-red-50 transition-colors text-xs font-bold text-gray-700 border-b border-gray-50 last:border-b-0 flex items-start gap-2"
+                                className="px-4 py-3 cursor-pointer hover:bg-red-50 transition-colors text-xs font-bold text-gray-700 border-b border-gray-50 last:border-b-0 flex items-start gap-2 group"
                               >
-                                <MapPinLucide className="w-3 h-3 text-red-400 mt-0.5 flex-shrink-0" />
-                                <span className="whitespace-normal break-words flex-1">{result.display_name}</span>
+                                <MapPinLucide className="w-3.5 h-3.5 text-red-400 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                                <span className="whitespace-normal break-words flex-1 group-hover:text-red-700 transition-colors">{result.display_name}</span>
                               </div>
                             ))}
+                          </div>
+                        ) : noResults && searchQuery.trim() && (
+                          <div className="absolute z-[99999] mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-2xl p-6 text-center animate-in fade-in slide-in-from-top-2">
+                            <div className="flex flex-col items-center gap-3">
+                              <div className="p-3 bg-gray-50 rounded-full">
+                                <AlertCircle className="w-8 h-8 text-gray-400" />
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-sm font-black text-gray-900">Sin resultados</p>
+                                <p className="text-[10px] font-bold text-gray-500 leading-relaxed px-4">
+                                  No pudimos encontrar "{searchQuery}". Intenta con términos más generales o mueve el marcador directamente en el mapa.
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
