@@ -47,7 +47,7 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
       )}
 
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-black shadow-lg h-screen overflow-y-auto transition-transform duration-300 transform
+        fixed inset-y-0 left-0 z-50 w-64 bg-black shadow-lg h-screen flex flex-col transition-transform duration-300 transform
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:relative lg:translate-x-0
       `}>
@@ -92,7 +92,7 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
             </div>
           </div>
         </div>
-        <nav className="mt-6">
+        <nav className="flex-1 mt-6 overflow-y-auto custom-scrollbar">
           {routes.map((i, index) => {
             return <Link
               key={index}
@@ -108,15 +108,17 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
               </div>
             </Link>
           })}
+        </nav>
 
+        <div className="p-4 border-t border-gray-800">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-6 py-3 mt-4 text-red-400 hover:bg-gray-900 hover:text-red-300 transition-colors cursor-pointer"
+            className="w-full flex items-center px-6 py-3 text-red-400 hover:bg-gray-900 hover:text-red-300 transition-colors cursor-pointer rounded-lg"
           >
             <FaSignOutAlt className="mr-3" />
             Cerrar Sesión
           </button>
-        </nav>
+        </div>
       </div>
     </>
   );
