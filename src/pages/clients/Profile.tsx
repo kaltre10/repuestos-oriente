@@ -388,14 +388,22 @@ const mapRef = useRef<LeafletMap | null>(null);
     const map = useMap();
     useEffect(() => {
       const resize = () => {
-        setTimeout(() => {
-          map.invalidateSize();
-        }, 500);
+        // Ejecutar inmediatamente y después de varios intervalos para asegurar la carga en móviles
+        map.invalidateSize();
+        [100, 300, 500, 1000].forEach(delay => {
+          setTimeout(() => map.invalidateSize(), delay);
+        });
       };
       
       resize();
       window.addEventListener('resize', resize);
-      return () => window.removeEventListener('resize', resize);
+      // También ejecutar cuando cambie la orientación del dispositivo (común en móviles)
+      window.addEventListener('orientationchange', resize);
+      
+      return () => {
+        window.removeEventListener('resize', resize);
+        window.removeEventListener('orientationchange', resize);
+      };
     }, [map]);
     return null;
   };
@@ -822,7 +830,7 @@ const mapRef = useRef<LeafletMap | null>(null);
             </div>
 
             {/* Body del Modal */}
-            <div className="flex-1 p-3 md:p-6 flex flex-col overflow-hidden">
+            <div className="flex-1 p-3 md:p-6 flex flex-col overflow-y-auto custom-scrollbar">
               <div className="flex-1 flex flex-col min-h-0">
                 {/* Filtros de Estado y Municipio */}
                 <div className="grid grid-cols-2 gap-3 mb-3 flex-shrink-0">
@@ -922,12 +930,14 @@ const mapRef = useRef<LeafletMap | null>(null);
                 </div>
 
                 {/* Mapa */}
-                <div className="relative border-2 border-gray-50 rounded-2xl overflow-hidden flex-1 shadow-inner group">
+                <div className="relative border-2 border-gray-50 rounded-2xl overflow-hidden flex-1 min-h-[300px] shadow-inner group bg-[#f8f9fa]">
                   <MapContainer
                     center={location}
                     zoom={13}
                     style={{ height: '100%', width: '100%' }}
                     ref={mapRef}
+                    fadeAnimation={true}
+                    markerZoomAnimation={true}
                   >
                     <TileLayer
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -935,6 +945,9 @@ const mapRef = useRef<LeafletMap | null>(null);
                       detectRetina={true}
                       maxNativeZoom={19}
                       maxZoom={20}
+                      updateWhenIdle={false}
+                      updateWhenZooming={false}
+                      keepBuffer={4}
                     />
                     <MapEvents />
                     <MapCenterer />
