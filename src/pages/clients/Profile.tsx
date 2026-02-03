@@ -18,6 +18,33 @@ import useConfirmStore from '../../states/useConfirmStore';
 import type { Map as LeafletMap } from 'leaflet';
 import useNotify from '../../hooks/useNotify';
 
+const VENEZUELA_GEO = {
+  "Amazonas": ["Atures", "Atabapo", "Maroa", "Río Negro", "Autana", "Manapiare", "Alto Orinoco"],
+  "Anzoátegui": ["Anaco", "Aragua", "Diego Bautista Urbaneja", "Fernando de Peñalver", "Francisco del Carmen Carvajal", "Francisco de Miranda", "Guanta", "Independencia", "José Gregorio Monagas", "Juan Antonio Sotillo", "Juan Manuel Cajigal", "Libertad", "Manuel Ezequiel Bruzual", "Pedro María Freites", "Píritu", "San José de Guanipa", "San Juan de Capistrano", "Santa Ana", "Simón Bolívar", "Simón Rodríguez", "Sir Arthur McGregor"],
+  "Apure": ["Achaguas", "Biruaca", "Muñoz", "Páez", "Pedro Camejo", "Rómulo Gallegos", "San Fernando"],
+  "Aragua": ["Bolívar", "Camatagua", "Francisco Linares Alcántara", "Girardot", "José Ángel Lamas", "José Félix Ribas", "José Rafael Revenga", "Libertador", "Mario Briceño Iragorry", "Ocumare de la Costa de Oro", "San Casimiro", "San Sebastián", "Santiago Mariño", "Santos Michelena", "Sucre", "Tovar", "Urdaneta", "Zamora"],
+  "Barinas": ["Alberto Arvelo Torrealba", "Andrés Eloy Blanco", "Antonio José de Sucre", "Arismendi", "Barinas", "Bolívar", "Cruz Paredes", "Ezequiel Zamora", "Obispos", "Pedraza", "Rojas", "Sosa"],
+  "Bolívar": ["Angostura", "Caroní", "Cedeño", "El Callao", "Gran Sabana", "Heres", "Padre Pedro Chien", "Piar", "Raúl Leoni", "Roscio", "Sifontes", "Sucre"],
+  "Carabobo": ["Bejuma", "Carlos Arvelo", "Diego Ibarra", "Guacara", "Juan José Mora", "Libertador", "Los Guayos", "Miranda", "Montalbán", "Naguanagua", "Puerto Cabello", "San Diego", "San Joaquín", "Valencia"],
+  "Cojedes": ["Anzoátegui", "Falcon", "Girardot", "Lima Blanco", "Pao de San Juan Bautista", "Ricaurte", "Rómulo Gallegos", "San Carlos", "Tinaco"],
+  "Delta Amacuro": ["Antonio Díaz", "Casacoima", "Pedernales", "Tucupita"],
+  "Distrito Capital": ["Libertador"],
+  "Falcón": ["Acosta", "Bolívar", "Buchivacoa", "Cacique Manaure", "Carirubana", "Colina", "Dabajuro", "Democracia", "Falcón", "Federación", "Jacura", "Los Taques", "Mauroa", "Miranda", "Monseñor Iturriza", "Palmasola", "Petit", "Píritu", "San Francisco", "Silva", "Sucre", "Tocópero", "Unión", "Urumaco", "Zamora"],
+  "Guárico": ["Camaguán", "Chaguaramas", "El Socorro", "Francisco de Miranda", "José Félix Ribas", "José Tadeo Monagas", "Juan Germán Roscio", "Julián Mellado", "Las Mercedes", "Leonardo Infante", "Ortiz", "Pedro Zaraza", "San Gerónimo de Guayabal", "San José de Guaribe", "Santa María de Ipire"],
+  "Lara": ["Andrés Eloy Blanco", "Crespo", "Iribarren", "Jiménez", "Morán", "Palavecino", "Simón Planas", "Torres", "Urdaneta"],
+  "Mérida": ["Alberto Adriani", "Andrés Bello", "Antonio Pinto Salinas", "Aricagua", "Arzobispo Chacón", "Campo Elías", "Caracciolo Parra Olmedo", "Cardenal Quintero", "Guaraque", "Julio César Salas", "Justo Briceño", "Libertador", "Miranda", "Obispo Ramos de Lora", "Padre Noguera", "Pueblo Llano", "Rangel", "Rivas Dávila", "Santos Marquina", "Sucre", "Tovar", "Tulio Febres Cordero", "Zea"],
+  "Miranda": ["Andrés Bello", "Baruta", "Brión", "Buroz", "Carrizal", "Chacao", "Cristóbal Rojas", "El Hatillo", "Guaicaipuro", "Independencia", "Lander", "Los Salias", "Páez", "Paz Castillo", "Pedro Gual", "Plaza", "Simón Bolívar", "Sucre", "Urdaneta", "Zamora"],
+  "Monagas": ["Acosta", "Aguasay", "Bolívar", "Caripe", "Cedeño", "Ezequiel Zamora", "Libertador", "Maturín", "Piar", "Punceres", "Santa Bárbara", "Sotillo", "Uracoa"],
+  "Nueva Esparta": ["Antolín del Campo", "Arismendi", "Díaz", "García", "Gómez", "Maneiro", "Marcano", "Mariño", "Península de Macanao", "Tubores", "Villalba"],
+  "Portuguesa": ["Agua Blanca", "Araure", "Esteller", "Guanare", "Guanarito", "Monseñor José Vicente de Unda", "Ospino", "Páez", "Papelón", "San Genaro de Boconoíto", "San Rafael de Onoto", "Santa Rosalía", "Sucre", "Turén"],
+  "Sucre": ["Andrés Eloy Blanco", "Andrés Mata", "Arismendi", "Benítez", "Bermúdez", "Bolívar", "Cajigal", "Cruz Salmerón Acosta", "Libertador", "Mariño", "Mejía", "Montes", "Ribero", "Sucre", "Valdez"],
+  "Táchira": ["Andrés Bello", "Antonio Rómulo Costa", "Ayacucho", "Bolívar", "Cárdenas", "Córdoba", "Fernández Feo", "Francisco de Miranda", "García de Hevia", "Guásimos", "Independencia", "Jáuregui", "José María Vargas", "Junín", "Libertad", "Libertador", "Lobatera", "Michelena", "Panamericano", "Pedro María Ureña", "Rafael Urdaneta", "Samuel Darío Maldonado", "San Cristóbal", "San Judas Tadeo", "Seboruco", "Simón Rodríguez", "Sucre", "Torbes", "Uribante"],
+  "Trujillo": ["Andrés Bello", "Boconó", "Bolívar", "Candelaria", "Carache", "Escuque", "José Felipe Márquez Cañizales", "José Vicente Campo Elías", "La Ceiba", "Miranda", "Monte Carmelo", "Motatán", "Pampán", "Pampanito", "Rafael Rangel", "San Rafael de Carvajal", "Sucre", "Trujillo", "Urdaneta", "Valera"],
+  "Vargas": ["Vargas"],
+  "Yaracuy": ["Aristides Bastidas", "Bruwal", "Cocorote", "Independencia", "José Antonio Páez", "La Trinidad", "Manuel Monge", "Nirgua", "Peña", "San Felipe", "Sucre", "Urachiche", "Veroes", "Yaritagua"],
+  "Zulia": ["Almirante Padilla", "Baralt", "Cabimas", "Catatumbo", "Colón", "Francisco Javier Pulgar", "Jesús Enrique Lossada", "Jesús María Semprún", "La Cañada de Urdaneta", "Lagunillas", "Machiques de Perijá", "Mara", "Maracaibo", "Miranda", "Páez", "Rosario de Perijá", "San Francisco", "Santa Rita", "Simón Bolívar", "Sucre", "Valmore Rodríguez"]
+};
+
 const Profile = () => {
   const { user, setUser } = useStore();
   const { notify } = useNotify();
@@ -53,6 +80,8 @@ const mapRef = useRef<LeafletMap | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false); // Estado para loader
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [selectedState, setSelectedState] = useState<string>('');
+  const [selectedMunicipality, setSelectedMunicipality] = useState<string>('');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
 
@@ -217,8 +246,12 @@ const mapRef = useRef<LeafletMap | null>(null);
     setIsSearching(true); // Iniciar loader
 
     try {
+      let geoFilter = '';
+      if (selectedState) geoFilter += `, ${selectedState}`;
+      if (selectedMunicipality) geoFilter += `, ${selectedMunicipality}`;
+
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1&countrycodes=ve`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + geoFilter)}&limit=15&addressdetails=1&countrycodes=ve`
       );
       const data = await response.json();
 
@@ -306,13 +339,12 @@ const mapRef = useRef<LeafletMap | null>(null);
     };
   }, []);
 
+  // Activar búsqueda cuando cambian los filtros si hay texto en el buscador
   useEffect(() => {
-    if (editingAddress && mapRef.current) {
-    setTimeout(() => {
-      mapRef.current?.invalidateSize();
-    }, 300);
-  }
-  }, [editingAddress]);
+    if (searchQuery.trim() && editingAddress) {
+      searchAddress(searchQuery);
+    }
+  }, [selectedState, selectedMunicipality]);
 
   // Componente para manejar eventos del mapa
   const MapEvents = () => {
@@ -348,6 +380,23 @@ const mapRef = useRef<LeafletMap | null>(null);
         map.panTo(location);
       }
     }, [location, map]);
+    return null;
+  };
+
+  // Componente para corregir el tamaño del mapa al cargar y cuando cambia el estado
+  const ResizeMap = () => {
+    const map = useMap();
+    useEffect(() => {
+      const resize = () => {
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 500);
+      };
+      
+      resize();
+      window.addEventListener('resize', resize);
+      return () => window.removeEventListener('resize', resize);
+    }, [map]);
     return null;
   };
 
@@ -750,95 +799,130 @@ const mapRef = useRef<LeafletMap | null>(null);
 
       {/* Reutilización del Modal Existente */}
       {editingAddress && (
-        <div className="fixed inset-0 z-[5000] flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setEditingAddress(null)}>
+        <div className="fixed inset-0 z-[5000] flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div
-            className="bg-white w-full max-w-3xl rounded-[2.5rem] md:rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[95vh] flex flex-col"
-            onClick={(e) => e.stopPropagation()}
+            className="bg-white w-full max-w-2xl rounded-[2rem] md:rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 h-[85vh] md:h-[80vh] flex flex-col"
           >
             {/* Header del Modal */}
-            <div className="p-6 md:p-8 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+            <div className="p-4 md:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
               <div className="min-w-0">
-                <h2 className="text-2xl md:text-3xl font-black text-gray-900 truncate flex items-center gap-3">
-                  <div className="p-2 bg-red-100 rounded-xl">
-                    <MapPinLucide className="w-6 h-6 md:w-8 md:h-8 text-red-600" />
+                <h2 className="text-xl md:text-2xl font-black text-gray-900 truncate flex items-center gap-2">
+                  <div className="p-1.5 bg-red-100 rounded-lg">
+                    <MapPinLucide className="w-5 h-5 md:w-6 md:h-6 text-red-600" />
                   </div>
                   {formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Editar Ubicación' : 'Nueva Ubicación'}
                 </h2>
-                <p className="text-gray-500 text-sm font-medium mt-1 ml-1">
-                  {formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Modifica los detalles de tu entrega' : 'Añade un nuevo punto de envío'}
-                </p>
               </div>
               <button
                 onClick={() => setEditingAddress(null)}
-                className="p-3 hover:bg-gray-200 rounded-2xl transition-colors text-gray-500 flex-shrink-0 active:scale-90"
+                className="p-2 hover:bg-gray-200 rounded-xl transition-colors text-gray-500 flex-shrink-0 active:scale-90"
               >
-                <X className="w-6 h-6 md:w-7 md:h-7" />
+                <X className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </div>
 
             {/* Body del Modal */}
-            <div className="overflow-y-auto flex-1 p-6 md:p-8 space-y-8">
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <label className="text-sm font-black text-gray-900 ml-1 flex items-center gap-2">
-                    <FaSearch className="w-3.5 h-3.5 text-red-600" /> Buscar Dirección
-                  </label>
-                  <div className="relative z-[10000]">
-                    <div className="relative">
-                      <input
-                        ref={searchInputRef}
-                        type="text"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        placeholder="Escribe tu calle, sector o punto de referencia..."
-                        className="w-full pl-14 pr-6 py-4.5 bg-gray-50 border-transparent rounded-[1.5rem] focus:bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-bold text-gray-900 shadow-sm"
-                      />
-                      <FaSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-
-                      {/* Dropdown de resultados */}
-                      {isSearching ? (
-                        <div className="absolute z-[99999] mt-3 w-full bg-white border border-gray-100 rounded-2xl shadow-2xl p-6 text-center animate-in fade-in slide-in-from-top-2">
-                          <div className="flex items-center justify-center gap-3 text-gray-500 font-bold">
-                            <div className="w-5 h-5 border-3 border-red-600/30 border-t-red-600 rounded-full animate-spin" />
-                            Buscando...
-                          </div>
-                        </div>
-                      ) : showResults && searchResults.length > 0 && (
-                        <div
-                          ref={resultsContainerRef}
-                          className="absolute z-[99999] mt-3 w-full bg-white border border-gray-100 rounded-2xl shadow-2xl max-h-72 overflow-y-auto animate-in fade-in slide-in-from-top-2"
-                        >
-                          {searchResults.map((result, index) => (
-                            <div
-                              key={index}
-                              onClick={() => handleSelectAddress(result)}
-                              className="px-6 py-4 cursor-pointer hover:bg-red-50 transition-colors text-sm font-bold text-gray-700 border-b border-gray-50 last:border-b-0 flex items-start gap-3"
-                            >
-                              <MapPinLucide className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
-                              {result.display_name}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+            <div className="flex-1 p-3 md:p-6 flex flex-col overflow-hidden">
+              <div className="flex-1 flex flex-col min-h-0">
+                {/* Filtros de Estado y Municipio */}
+                <div className="grid grid-cols-2 gap-3 mb-3 flex-shrink-0">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider ml-1">Estado</label>
+                    <select
+                      value={selectedState}
+                      onChange={(e) => {
+                        setSelectedState(e.target.value);
+                        setSelectedMunicipality(''); // Reset municipio al cambiar estado
+                      }}
+                      className="w-full px-3 py-2 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all font-bold text-gray-900 shadow-sm text-xs appearance-none cursor-pointer"
+                    >
+                      <option value="">Todos los estados</option>
+                      {Object.keys(VENEZUELA_GEO).sort().map(state => (
+                        <option key={state} value={state}>{state}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider ml-1">Municipio</label>
+                    <select
+                      value={selectedMunicipality}
+                      onChange={(e) => setSelectedMunicipality(e.target.value)}
+                      disabled={!selectedState}
+                      className="w-full px-3 py-2 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all font-bold text-gray-900 shadow-sm text-xs appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <option value="">Todos los municipios</option>
+                      {selectedState && VENEZUELA_GEO[selectedState as keyof typeof VENEZUELA_GEO].sort().map(muni => (
+                        <option key={muni} value={muni}>{muni}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
-                {/* Resultado Seleccionado */}
-                {addressResult && (
-                  <div className="p-5 bg-green-50/50 border border-green-100 rounded-2xl flex items-start gap-4 animate-in zoom-in-95">
-                    <div className="p-2 bg-green-100 rounded-xl">
-                      <ShieldCheck className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-black text-green-700 uppercase tracking-wider mb-1">Ubicación Confirmada</p>
-                      <p className="text-sm font-bold text-green-900 leading-snug">{addressResult}</p>
+                {/* Buscador y Resultados */}
+                <div className="mb-3 md:mb-4 space-y-3 md:space-y-4 flex-shrink-0">
+                  <div className="space-y-2">
+                    <div className="relative z-[10000]">
+                      <div className="relative">
+                        <input
+                          ref={searchInputRef}
+                          type="text"
+                          value={searchQuery}
+                          onChange={handleSearchChange}
+                          onFocus={() => {
+                            if (searchQuery.trim()) {
+                              searchAddress(searchQuery);
+                            }
+                          }}
+                          placeholder="Buscar calle, sector o punto de referencia..."
+                          className="w-full pl-12 pr-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-bold text-gray-900 shadow-sm text-sm"
+                        />
+                        <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+
+                        {/* Dropdown de resultados */}
+                        {isSearching ? (
+                          <div className="absolute z-[99999] mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-2xl p-4 text-center animate-in fade-in slide-in-from-top-2">
+                            <div className="flex items-center justify-center gap-2 text-gray-500 font-bold text-xs">
+                              <div className="w-4 h-4 border-2 border-red-600/30 border-t-red-600 rounded-full animate-spin" />
+                              Buscando...
+                            </div>
+                          </div>
+                        ) : showResults && searchResults.length > 0 && (
+                          <div
+                            ref={resultsContainerRef}
+                            className="absolute z-[99999] mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-2xl max-h-48 overflow-y-auto animate-in fade-in slide-in-from-top-2"
+                          >
+                            {searchResults.map((result, index) => (
+                              <div
+                                key={index}
+                                onClick={() => handleSelectAddress(result)}
+                                className="px-4 py-3 cursor-pointer hover:bg-red-50 transition-colors text-xs font-bold text-gray-700 border-b border-gray-50 last:border-b-0 flex items-start gap-2"
+                              >
+                                <MapPinLucide className="w-3 h-3 text-red-400 mt-0.5 flex-shrink-0" />
+                                <span className="whitespace-normal break-words flex-1">{result.display_name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                )}
+
+                  {/* Resultado Seleccionado */}
+                  {addressResult && (
+                    <div className="p-3 bg-green-50/50 border border-green-100 rounded-xl flex items-center gap-3 animate-in zoom-in-95">
+                      <div className="p-1.5 bg-green-100 rounded-lg">
+                        <ShieldCheck className="w-4 h-4 text-green-600" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-black text-green-700 uppercase tracking-wider">Confirmada</p>
+                        <p className="text-xs font-bold text-green-900 whitespace-normal break-words">{addressResult}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Mapa */}
-                <div className="relative border-4 border-gray-50 rounded-[2rem] overflow-hidden h-80 shadow-inner group">
+                <div className="relative border-2 border-gray-50 rounded-2xl overflow-hidden flex-1 shadow-inner group">
                   <MapContainer
                     center={location}
                     zoom={13}
@@ -848,9 +932,13 @@ const mapRef = useRef<LeafletMap | null>(null);
                     <TileLayer
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                      detectRetina={true}
+                      maxNativeZoom={19}
+                      maxZoom={20}
                     />
                     <MapEvents />
                     <MapCenterer />
+                    <ResizeMap />
                     <Marker
                       position={location}
                       draggable={true}
@@ -868,19 +956,19 @@ const mapRef = useRef<LeafletMap | null>(null);
                       </Popup>
                     </Marker>
                   </MapContainer>
-                  <div className="absolute bottom-4 left-4 z-[1000] bg-white/90 backdrop-blur px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 shadow-sm border border-gray-100">
-                    Puedes mover el marcador
+                  <div className="absolute bottom-2 left-2 z-[1000] bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest text-gray-500 shadow-sm border border-gray-100">
+                    Mueve el marcador a tu direccion exacta
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Footer del Modal */}
-            <div className="p-6 md:p-8 bg-gray-50/50 border-t border-gray-100 flex flex-col md:flex-row gap-4">
+            <div className="bg-gray-50/50 border-t border-gray-100 flex gap-3">
               <button
                 type="button"
                 onClick={() => setEditingAddress(null)}
-                className="flex-1 px-8 py-4.5 rounded-2xl font-black text-gray-500 hover:bg-gray-200 transition-all active:scale-95"
+                className="flex-1 px-4 py-3 rounded-xl font-black text-gray-500 hover:bg-gray-200 transition-all active:scale-95 text-sm"
               >
                 Cancelar
               </button>
@@ -888,10 +976,10 @@ const mapRef = useRef<LeafletMap | null>(null);
                 type="button"
                 onClick={saveCurrentAddress}
                 disabled={!addressResult.trim()}
-                className="flex-[2] bg-gray-900 hover:bg-black text-white px-8 py-4.5 rounded-2xl font-black shadow-xl shadow-gray-200 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                className="flex-[2] bg-gray-900 hover:bg-black text-white px-4 py-3 rounded-xl font-black shadow-lg shadow-gray-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 text-sm"
               >
-                <FaSave className="w-5 h-5" />
-                {formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Actualizar Dirección' : 'Confirmar Dirección'}
+                <FaSave className="w-4 h-4" />
+                <span>{formData.addresses.some(addr => addr.id === editingAddress.id) ? 'Actualizar' : 'Confirmar'}</span>
               </button>
             </div>
           </div>
