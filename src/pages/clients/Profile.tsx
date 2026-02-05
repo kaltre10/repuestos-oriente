@@ -917,9 +917,25 @@ const mapRef = useRef<LeafletMap | null>(null);
                             }
                           }}
                           placeholder="Buscar calle, sector o punto de referencia..."
-                          className="w-full pl-12 pr-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-bold text-gray-900 shadow-sm text-sm"
+                          className="w-full pl-12 pr-12 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-bold text-gray-900 shadow-sm text-sm"
                         />
                         <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+
+                        {searchQuery && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSearchQuery('');
+                              setSearchResults([]);
+                              setShowResults(false);
+                              setNoResults(false);
+                              if (searchInputRef.current) searchInputRef.current.focus();
+                            }}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors p-1"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
 
                         {/* Dropdown de resultados */}
                         {isSearching ? (
