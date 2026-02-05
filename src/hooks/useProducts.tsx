@@ -32,6 +32,7 @@ export const useProducts = () => {
 
   const getProducts = async (filters: { year?: string, onSale?: boolean, page?: number, limit?: number, sortBy?: string, search?: string } = {}) => {
     try {
+      console.log('useProducts: getProducts llamado con filtros:', filters);
       setLoading(true)
       const { year, onSale, page = 1, limit = 20, sortBy, search } = filters;
       let url = `${apiUrl}/products`;
@@ -46,7 +47,9 @@ export const useProducts = () => {
       const queryString = params.toString();
       if (queryString) url += `?${queryString}`;
 
+      console.log('useProducts: GET request a:', url);
       const response = await request.get(url)
+      console.log('useProducts: Respuesta de getProducts recibida:', response.data.body.products.length, 'productos');
 
       const fetchedProducts = response.data.body.products.map((p: any) => ({
         ...p,
@@ -57,8 +60,10 @@ export const useProducts = () => {
       }))
 
       if (page && page > 1) {
+        console.log('useProducts: Añadiendo productos a la lista existente (paginación)');
         setProducts([...products, ...fetchedProducts]);
       } else {
+        console.log('useProducts: Reemplazando lista de productos');
         setProducts(fetchedProducts);
       }
       
@@ -68,7 +73,7 @@ export const useProducts = () => {
       };
 
     } catch (error) {
-      console.log(error)
+      console.error('useProducts: Error en getProducts:', error);
       return { products: [], pagination: { total: 0, hasMore: false } };
     } finally {
       setLoading(false)
@@ -77,13 +82,15 @@ export const useProducts = () => {
 
   const createProduct = async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
+      console.log('useProducts: Enviando POST a /products con data:', productData);
       const response = await request.post(`${apiUrl}/products`, productData);
+      console.log('useProducts: Respuesta recibida:', response.data);
       const newProduct = response.data.body.product;
       /* setProducts([products, newProduct]); */
       return newProduct;
-    } catch (err) {
+    } catch (err: any) {
+      console.error('useProducts: Error en createProduct:', err.response?.data || err.message);
       setError('Error al crear el producto');
-      console.error('Error creating product:', err);
       throw err;
     }
   };
@@ -186,7 +193,6 @@ export const useProducts = () => {
       name: 'Nombre',
       productBrand: 'Marca del producto',
       categories: 'Categorías',
-      subcategories: 'Subcategorías',
       years: 'Años',
       price: 'Precio',
       amount: 'Cantidad',
@@ -216,8 +222,8 @@ export const useProducts = () => {
       newFieldErrors.price = 'El precio debe ser mayor que cero';
     }
 
-    if (Number(formData.amount) <= 0 && !newFieldErrors.amount) {
-      newFieldErrors.amount = 'La cantidad debe ser mayor que cero';
+    if (Number(formData.amount) < 0 && !newFieldErrors.amount) {
+      newFieldErrors.amount = 'La cantidad no puede ser negativa';
     }
 
     if (Object.keys(newFieldErrors).length > 0) {
@@ -247,8 +253,10 @@ export const useProducts = () => {
         const product = await createProduct(dataToSubmit as any);
         return product.id;
       }
-    } catch (err) {
-      setFormError(editingProduct ? 'Error al actualizar el producto' : 'Error al crear el producto');
+    } catch (err: any) {
+      console.error("Error en handleSubmit de useProducts:", err);
+      const errorMessage = err.response?.data?.message || err.message || (editingProduct ? 'Error al actualizar el producto' : 'Error al crear el producto');
+      setFormError(errorMessage);
       throw err;
     } finally {
       setFormLoading(false);

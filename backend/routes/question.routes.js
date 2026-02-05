@@ -7,14 +7,15 @@ import {
   answerQuestion 
 } from '../controllers/question.controller.js';
 import validateToken from "../midelwares/validateToken.js";
+import onlyAdmin from "../midelwares/onlyAdmin.js";
 
 const router = express.Router();
 
 router.get('/product/:productId', getQuestionsByProduct);
-router.get('/client/:clientId', getQuestionsByClient);
-router.get('/all', getAllQuestions);
+router.get('/client/:clientId', validateToken, getQuestionsByClient);
+router.get('/all', [validateToken, onlyAdmin], getAllQuestions);
 
-router.put('/:id/answer',validateToken, answerQuestion);
-router.post('/',validateToken, createQuestion);
+router.put('/:id/answer', [validateToken, onlyAdmin], answerQuestion);
+router.post('/', validateToken, createQuestion);
 
 export default router;

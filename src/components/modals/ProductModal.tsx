@@ -217,15 +217,19 @@ const ProductModal = () => {
 
   const onFormSubmit = async (e: React.FormEvent) => {
      e.preventDefault();
+     console.log('ProductModal: Iniciando envío de formulario');
      try {
        const productId = await handleSubmit(e);
+       console.log('ProductModal: Resultado de handleSubmit (productId):', productId);
        if (productId) {
+         console.log('ProductModal: Subiendo imágenes para el producto:', productId);
          await handleImagesSubmit(productId);
+         console.log('ProductModal: Imágenes subidas, refrescando lista de productos');
          await getProducts();
          handleCloseForm();
        }
      } catch (error) {
-       console.error("Error submitting product and images:", error);
+       console.error("ProductModal: Error en el flujo de envío:", error);
      }
    };
 
@@ -340,7 +344,7 @@ const ProductModal = () => {
           {selectedCategories.length > 0 && (
             <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-700">
-                Subcategorías *
+                Subcategorías
               </label>
               
               <div className="flex flex-col md:flex-row gap-4">

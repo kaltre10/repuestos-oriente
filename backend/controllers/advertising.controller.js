@@ -39,6 +39,7 @@ const getAdvertisingById = asyncHandler(async (req, res) => {
 
 const createAdvertising = asyncHandler(async (req, res) => {
   const { image, link, buttonText, status } = req.body;
+  console.log("link::->>", link)
   const advertising = await advertisingService.createAdvertising({
     image,
     link,

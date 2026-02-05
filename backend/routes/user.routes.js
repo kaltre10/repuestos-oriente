@@ -1,6 +1,7 @@
 import express from 'express';
 import { googleAuth, login, register, getUser, updateUser, changePassword, deleteUser, getUsers, createUser, forgotPassword, resetPassword } from '../controllers/user.controller.js';
 import validateToken from '../midelwares/validateToken.js';
+import onlyAdmin from '../midelwares/onlyAdmin.js';
 const router = express.Router();
 
 router.post('/auth/google', googleAuth);
@@ -13,8 +14,8 @@ router.post('/auth/reset-password', resetPassword);
 
 router.get('/users/:id',validateToken, getUser);
 
-router.get('/users',validateToken, getUsers);
-router.post('/users', validateToken, createUser);
+router.get('/users',[validateToken, onlyAdmin], getUsers);
+router.post('/users', [validateToken, onlyAdmin], createUser);
 router.put('/users/:id', validateToken, updateUser);
 router.put('/users/:id/password', validateToken, changePassword);
 router.delete('/users/:id', validateToken, deleteUser);

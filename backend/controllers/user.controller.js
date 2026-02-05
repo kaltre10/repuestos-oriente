@@ -91,6 +91,15 @@ const createUser = asyncHandler(async (req, res) => {
 const getUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
+  // Security check: only allow user to see their own data or admin
+  if (Number(req.user.id) !== Number(id) && req.user.role !== 'admin') {
+    return responser.error({
+      res,
+      message: 'No tienes permiso para acceder a esta información',
+      status: 403,
+    });
+  }
+
   const user = await userService.getUserById(id);
 
   responser.success({
@@ -115,6 +124,15 @@ const getUser = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const updateData = req.body;
+
+  // Security check: only allow user to update their own data or admin
+  if (Number(req.user.id) !== Number(id) && req.user.role !== 'admin') {
+    return responser.error({
+      res,
+      message: 'No tienes permiso para actualizar esta información',
+      status: 403,
+    });
+  }
 
   const user = await userService.updateUser(id, updateData);
 
@@ -141,6 +159,15 @@ const changePassword = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { oldPassword, newPassword } = req.body;
 
+  // Security check: only allow user to change their own password
+  if (Number(req.user.id) !== Number(id)) {
+    return responser.error({
+      res,
+      message: 'No tienes permiso para cambiar esta contraseña',
+      status: 403,
+    });
+  }
+
   if (!oldPassword || !newPassword) {
     return responser.error({
       res,
@@ -160,6 +187,15 @@ const changePassword = asyncHandler(async (req, res) => {
 // Delete user
 const deleteUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
+
+  // Security check: only allow user to delete their own account or admin
+  if (Number(req.user.id) !== Number(id) && req.user.role !== 'admin') {
+    return responser.error({
+      res,
+      message: 'No tienes permiso para eliminar esta cuenta',
+      status: 403,
+    });
+  }
 
   const result = await userService.deleteUser(id);
 
@@ -206,8 +242,6 @@ const login = asyncHandler(async (req, res) => {
 // Register with email and password
 const register = asyncHandler(async (req, res) => {
   const { email, password, name } = req.body;
-
-  console.log(req.body);
 
   if (!email || !password || !name) {
     return responser.error({

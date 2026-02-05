@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import globalErrorHandler from './utils/globalErrors.js';
 import { corsOptions, startServer } from './utils/utils.js';
 import responser from './controllers/responser.js';
@@ -11,7 +13,30 @@ process.env.TZ = 'America/Caracas';
 
 import router from './routes/router.js';
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
+
+// Security Headers
+app.use(helmet({
+  crossOriginResourcePolicy: false, // Permitir cargar imágenes desde el backend en el frontend
+}));
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again after 15 minutes',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply rate limiter to all routes
+app.use(limiter);
 
 app.use(morgan('dev'));
 
@@ -21,7 +46,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static images
-app.use('/images', express.static('images'));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.get('/', (_, res) => {
   responser.success({ res, message: 'API is working' });
