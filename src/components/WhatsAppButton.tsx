@@ -1,8 +1,16 @@
 import React from 'react';
 import { SiWhatsapp } from 'react-icons/si';
 import { socials } from '../utils/utils';
+import { useLocation } from 'react-router-dom';
 
 const WhatsAppButton: React.FC = () => {
+  const location = useLocation();
+  const isAdminPath = location.pathname.startsWith('/admin');
+
+  if (isAdminPath) {
+    return null;
+  }
+
   const whatsappNumber = socials.whatsapp; // Número extraído del Footer.tsx
   const whatsappLink = `https://api.whatsapp.com/send?phone=${whatsappNumber}`;
 
@@ -11,7 +19,7 @@ const WhatsAppButton: React.FC = () => {
       href={whatsappLink}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-20 lg:bottom-[54px] right-6 z-[9999] bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:bg-[#20ba5a] transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center group"
+      className="fixed bottom-20 lg:bottom-[54px] right-6 z-[40] bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:bg-[#20ba5a] transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center group"
       aria-label="Contactar por WhatsApp"
     >
       <SiWhatsapp size={32} />

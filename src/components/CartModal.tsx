@@ -10,7 +10,7 @@ const CartModal = () => {
   if (!isCartOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex">
+    <div className="fixed inset-0 z-[1000] flex">
       {/* Overlay */}
       <div
         className="fixed inset-0 bg-black/50"
