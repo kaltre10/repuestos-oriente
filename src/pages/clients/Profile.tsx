@@ -62,6 +62,8 @@ const mapRef = useRef<LeafletMap | null>(null);
     id: string;
     address: string;
     coordinates: [number, number];
+    state?: string;
+    municipality?: string;
     primary?: boolean;
   }
 
@@ -136,13 +138,17 @@ const mapRef = useRef<LeafletMap | null>(null);
     const tempAddress: Address = {
       id: Date.now().toString(),
       address: '',
-      coordinates: [10.4806, -66.9036] // Caracas por defecto
+      coordinates: [10.4806, -66.9036], // Caracas por defecto
+      state: '',
+      municipality: ''
     };
 
     setEditingAddress(tempAddress);
     setLocation(tempAddress.coordinates);
     setAddressResult(tempAddress.address);
     setSearchQuery(tempAddress.address);
+    setSelectedState('');
+    setSelectedMunicipality('');
     setShowMap(true);
   };
 
@@ -152,6 +158,8 @@ const mapRef = useRef<LeafletMap | null>(null);
     setLocation(address.coordinates);
     setAddressResult(address.address);
     setSearchQuery(address.address);
+    setSelectedState(address.state || '');
+    setSelectedMunicipality(address.municipality || '');
     setShowMap(true);
   };
 
@@ -162,7 +170,9 @@ const mapRef = useRef<LeafletMap | null>(null);
     const updatedAddress: Address = {
       id: editingAddress.id,
       address: addressResult,
-      coordinates: location
+      coordinates: location,
+      state: selectedState,
+      municipality: selectedMunicipality
     };
 
     // Verificar si la dirección ya existe en el formData
@@ -237,7 +247,7 @@ const mapRef = useRef<LeafletMap | null>(null);
   };
 
   // Función para buscar direcciones (geocoding) con múltiples resultados y lógica de búsqueda avanzada
-  const searchAddress = async (query: string) => {
+  const searchAddress = async (query: string, limitToViewbox: boolean = false) => {
     if (!query.trim()) {
       setSearchResults([]);
       setShowResults(false);
@@ -254,17 +264,22 @@ const mapRef = useRef<LeafletMap | null>(null);
         .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "")
         .replace(/\s{2,}/g, " ");
 
-      const fetchNominatim = async (q: string) => {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=15&addressdetails=1&namedetails=1&countrycodes=ve`,
-          {
-            headers: {
-              'Accept-Language': 'es'
-            }
+      const fetchNominatim = async (q: string, extraParams: string = '') => {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=15&addressdetails=1&namedetails=1&countrycodes=ve${extraParams}`;
+        const response = await fetch(url, {
+          headers: {
+            'Accept-Language': 'es'
           }
-        );
+        });
         return await response.json();
       };
+
+      let extraParams = '';
+      if (limitToViewbox && mapRef.current) {
+        const bounds = mapRef.current.getBounds();
+        const viewbox = `${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()},${bounds.getSouth()}`;
+        extraParams = `&viewbox=${viewbox}&bounded=1`;
+      }
 
       // TIER 1: Búsqueda estructurada completa (si hay filtros seleccionados)
       let results = [];
@@ -273,17 +288,17 @@ const mapRef = useRef<LeafletMap | null>(null);
         if (selectedMunicipality) structuredQ += `, ${selectedMunicipality}`;
         if (selectedState) structuredQ += `, ${selectedState}`;
         
-        results = await fetchNominatim(structuredQ);
+        results = await fetchNominatim(structuredQ, extraParams);
       }
 
       // TIER 2: Si no hay resultados o no hay filtros, búsqueda relajada (solo con estado)
       if (results.length === 0 && selectedState) {
-        results = await fetchNominatim(`${normalizedQuery}, ${selectedState}`);
+        results = await fetchNominatim(`${normalizedQuery}, ${selectedState}`, extraParams);
       }
 
       // TIER 3: Búsqueda global en Venezuela (Fuzzy fallback)
       if (results.length === 0) {
-        results = await fetchNominatim(normalizedQuery);
+        results = await fetchNominatim(normalizedQuery, extraParams);
       }
 
       if (Array.isArray(results) && results.length > 0) {
@@ -304,6 +319,34 @@ const mapRef = useRef<LeafletMap | null>(null);
     }
   };
 
+  // Función para geocodificar y posicionar mapa basado en Estado o Municipio
+  const geocodeAndCenter = async (state: string, municipality: string = '') => {
+    try {
+      let query = '';
+      if (municipality) query = `${municipality}, ${state}, Venezuela`;
+      else query = `${state}, Venezuela`;
+
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=ve`,
+        { headers: { 'Accept-Language': 'es' } }
+      );
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        const newCoords: [number, number] = [parseFloat(lat), parseFloat(lon)];
+        setLocation(newCoords);
+        
+        // Centrar el mapa con animación
+        if (mapRef.current) {
+          mapRef.current.setView(newCoords, municipality ? 14 : 10);
+        }
+      }
+    } catch (error) {
+      console.error('Error geocoding location:', error);
+    }
+  };
+
   // Manejar cambio en el input de búsqueda con debounce
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -318,7 +361,7 @@ const mapRef = useRef<LeafletMap | null>(null);
     if (value.trim()) {
       setNoResults(false);
       window.searchTimeout = setTimeout(() => {
-        searchAddress(value);
+        searchAddress(value, true); // Pasar true para acotar a la vista actual del mapa
       }, 500);
     } else {
       setSearchResults([]);
@@ -874,8 +917,12 @@ const mapRef = useRef<LeafletMap | null>(null);
                     <select
                       value={selectedState}
                       onChange={(e) => {
-                        setSelectedState(e.target.value);
+                        const newState = e.target.value;
+                        setSelectedState(newState);
                         setSelectedMunicipality(''); // Reset municipio al cambiar estado
+                        if (newState) {
+                          geocodeAndCenter(newState);
+                        }
                       }}
                       className="w-full px-3 py-2 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all font-bold text-gray-900 shadow-sm text-xs appearance-none cursor-pointer"
                     >
@@ -889,7 +936,13 @@ const mapRef = useRef<LeafletMap | null>(null);
                     <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider ml-1">Municipio</label>
                     <select
                       value={selectedMunicipality}
-                      onChange={(e) => setSelectedMunicipality(e.target.value)}
+                      onChange={(e) => {
+                        const newMuni = e.target.value;
+                        setSelectedMunicipality(newMuni);
+                        if (newMuni && selectedState) {
+                          geocodeAndCenter(selectedState, newMuni);
+                        }
+                      }}
                       disabled={!selectedState}
                       className="w-full px-3 py-2 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all font-bold text-gray-900 shadow-sm text-xs appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
