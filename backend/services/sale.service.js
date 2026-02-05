@@ -57,7 +57,7 @@ class SaleService {
       });
 
       if (sales.length > 0) {
-        console.log('Primera venta encontrada:', JSON.stringify(sales[0], null, 2));
+        // console.log('Primera venta encontrada:', JSON.stringify(sales[0], null, 2));
       }
       
       return sales;

@@ -3,14 +3,14 @@ import responser from '../controllers/responser.js';
 
 const validateToken = (req, res, next) => {
     try {
-        console.log('--- VALIDATE TOKEN START ---');
+        // console.log('--- VALIDATE TOKEN START ---');
         // Obtener token del header Authorization
         const authorization = req.headers.authorization || '';
-        console.log('Authorization Header:', authorization ? 'Presente' : 'Ausente');
+        // console.log('Authorization Header:', authorization ? 'Presente' : 'Ausente');
         
         // Si no hay token, devolver error
         if (!authorization || !authorization.startsWith('Bearer ')) {
-            console.warn('validateToken: Token no proporcionado o formato inválido');
+            // console.warn('validateToken: Token no proporcionado o formato inválido');
             return responser.error({ res, message: 'Token no proporcionado', status: 401 });
         }
         

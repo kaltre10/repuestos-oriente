@@ -174,9 +174,9 @@ class ProductService {
 
   async createProduct(productData) {
     try {
-      console.log('ProductService.createProduct: Intentando crear en DB...');
+      // console.log('ProductService.createProduct: Intentando crear en DB...');
       const product = await Product.create(productData);
-      console.log('ProductService.createProduct: Creado con éxito en DB');
+      // console.log('ProductService.createProduct: Creado con éxito en DB');
       return product;
     } catch (error) {
       console.error('Error en ProductService.createProduct:', error.name, error.message);

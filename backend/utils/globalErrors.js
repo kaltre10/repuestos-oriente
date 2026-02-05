@@ -1,6 +1,6 @@
 // Global error handler middleware
 const globalErrorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
+  // console.error('Error:', err);
 
   // Sequelize validation error
   if (err.name === 'SequelizeValidationError') {

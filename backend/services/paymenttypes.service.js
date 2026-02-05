@@ -11,13 +11,13 @@ class PaymentTypeService {
       // Ensure properties is always an array
       return paymentTypes.map(type => {
         let properties = type.properties;
-        console.log('Raw properties from DB:', type.id, properties, typeof properties);
+        // console.log('Raw properties from DB:', type.id, properties, typeof properties);
         
         // Handle JSON string if needed
         if (typeof properties === 'string') {
           try {
             properties = JSON.parse(properties);
-            console.log('After parsing:', properties);
+            // console.log('After parsing:', properties);
           } catch (e) {
             console.error('Error parsing properties:', e);
             properties = [];
@@ -26,7 +26,7 @@ class PaymentTypeService {
         
         // Ensure properties is always an array
         properties = Array.isArray(properties) ? properties : [];
-        console.log('Final properties:', properties);
+        // console.log('Final properties:', properties);
         
         return {
           ...type,

@@ -36,7 +36,7 @@ const getOrder = asyncHandler(async (req, res) => {
 const getOrdersByBuyerId = asyncHandler(async (req, res) => {
   const { buyerId } = req.params;
   const { startDate, endDate, page = 1, limit = 20 } = req.query;
-  console.log("req.user.role", req.user.role)
+  // console.log("req.user.role", req.user.role)
   // Security check: only buyer or admin can see the orders
   if (Number(req.user.id) !== Number(buyerId) && req.user.role !== 'admin') {
     return responser.error({

@@ -43,7 +43,7 @@ export const seedModels = async () => {
       const brand = await Brand.findOne({ where: { brand: brandName } });
       
       if (!brand) {
-        console.warn(`Brand not found for seeding models: ${brandName}`);
+        // console.warn(`Brand not found for seeding models: ${brandName}`);
         continue;
       }
       
@@ -60,13 +60,13 @@ export const seedModels = async () => {
           }
         });
         
-        if (created) {
-          console.log(`Modelo creado: ${modelName} (${brandName})`);
-        }
+        // if (created) {
+        //   console.log(`Modelo creado: ${modelName} (${brandName})`);
+        // }
       }
     }
     
-    console.log('Proceso de seeding de modelos completado.');
+    // console.log('Proceso de seeding de modelos completado.');
   } catch (error) {
     console.error('Error al realizar el seeding de modelos:', error);
   }

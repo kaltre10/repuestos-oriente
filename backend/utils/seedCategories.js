@@ -115,9 +115,9 @@ export const seedCategories = async () => {
         defaults: { category: categoryName }
       });
       
-      if (created) {
-        console.log(`Categoría creada: ${categoryName}`);
-      }
+      // if (created) {
+      //   console.log(`Categoría creada: ${categoryName}`);
+      // }
 
       // Crear subcategorías para esta categoría
       for (const subcategoryName of subcategories) {
@@ -132,13 +132,13 @@ export const seedCategories = async () => {
           }
         });
 
-        if (subCreated) {
-          console.log(`  Subcategoría creada: ${subcategoryName} (Categoría: ${categoryName})`);
-        }
+        // if (subCreated) {
+        //   console.log(`  Subcategoría creada: ${subcategoryName} (Categoría: ${categoryName})`);
+        // }
       }
     }
     
-    console.log('Proceso de seeding de categorías y subcategorías completado.');
+    // console.log('Proceso de seeding de categorías y subcategorías completado.');
   } catch (error) {
     console.error('Error al realizar el seeding de categorías y subcategorías:', error);
   }

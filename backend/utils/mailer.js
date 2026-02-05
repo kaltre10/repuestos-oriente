@@ -27,7 +27,7 @@ export const sendResetPasswordEmail = async (email, token) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log(`Reset email sent to ${email}`);
+    // console.log(`Reset email sent to ${email}`);
   } catch (error) {
     console.error('Error sending reset email:', error);
     throw new Error('Error al enviar el correo de recuperación');
@@ -50,7 +50,7 @@ export const sendContactEmail = async ({ name, email, message }) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log(`Contact email sent from ${email}`);
+    // console.log(`Contact email sent from ${email}`);
   } catch (error) {
     console.error('Error sending contact email:', error);
     throw new Error('Error al enviar el correo de contacto');

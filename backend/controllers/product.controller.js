@@ -32,8 +32,8 @@ const getProduct = asyncHandler(async (req, res) => {
 });
 
 const createProduct = asyncHandler(async (req, res) => {
-  console.log('--- CREATE PRODUCT START ---');
-  console.log('Body recibido:', JSON.stringify(req.body, null, 2));
+  // console.log('--- CREATE PRODUCT START ---');
+  // console.log('Body recibido:', JSON.stringify(req.body, null, 2));
   const {
     name,
     brand,
