@@ -112,12 +112,21 @@ const updateConfig = asyncHandler(async (req, res) => {
   });
 });
 
-const deleteConfig = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const result = await configService.deleteConfig(id);
+const updateDolarFromBCV = asyncHandler(async (req, res) => {
+  const updatedConfig = await configService.updateDolarRateFromBCV();
   responser.success({
     res,
-    message: result.message,
+    message: 'Tasa del dólar actualizada desde el BCV con éxito',
+    body: { config: updatedConfig },
+  });
+});
+
+const deleteConfig = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  await configService.deleteConfig(id);
+  responser.success({
+    res,
+    message: 'Configuración eliminada con éxito',
   });
 });
 
@@ -126,5 +135,6 @@ export {
   getConfig,
   createConfig,
   updateConfig,
-  deleteConfig
+  deleteConfig,
+  updateDolarFromBCV,
 };

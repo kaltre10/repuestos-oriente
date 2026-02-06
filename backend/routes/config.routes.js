@@ -5,6 +5,7 @@ import {
   createConfig,
   updateConfig,
   deleteConfig,
+  updateDolarFromBCV,
 } from "../controllers/config.controller.js";
 import responser from "../controllers/responser.js";
 import validateToken from "../midelwares/validateToken.js";
@@ -17,6 +18,7 @@ router.get("/", (_req, res) => {
 });
 router.get("/configs", getConfigs);
 router.get("/configs/:id", getConfig);
+router.post("/update-dolar-bcv", updateDolarFromBCV);
 
 router.post("/configs", [validateToken, onlyAdmin], createConfig);
 router.put("/configs/:id", [validateToken, onlyAdmin], updateConfig);
