@@ -101,10 +101,19 @@ const getUser = asyncHandler(async (req, res) => {
   }
 
   const user = await userService.getUserById(id);
-
   responser.success({
     res,
-    body: {
+    body: { user },
+  });
+});
+
+const verifySession = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const user = await userService.getUserById(id);
+  
+  responser.success({ 
+    res,
+    body: { 
       user: {
         id: user.id,
         email: user.email,
@@ -113,9 +122,7 @@ const getUser = asyncHandler(async (req, res) => {
         address: user.address,
         profilePicture: user.profilePicture,
         role: user.role,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
+      }
     },
   });
 });
@@ -325,5 +332,6 @@ export {
   getUsers,
   createUser,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  verifySession
 };

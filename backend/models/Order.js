@@ -9,7 +9,7 @@ export default (sequelize) => {
     },
     orderNumber: {
       type: DataTypes.STRING,
-      unique: true,
+      unique: 'orderNumberUnique',
       allowNull: false,
     },
     buyerId: {

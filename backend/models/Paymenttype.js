@@ -10,7 +10,7 @@ export default (sequelize) => {
     name: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: 'paymentTypeNameUnique',
     },
     properties: {
       type: DataTypes.JSON,
