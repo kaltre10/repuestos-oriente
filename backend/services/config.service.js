@@ -128,6 +128,10 @@ class ConfigService {
     try {
       const rate = await this.fetchDolarRateFromBCV();
       
+      if (!rate || isNaN(rate)) {
+        throw new Error('El valor de la tasa obtenido no es válido');
+      }
+
       // Buscamos la primera configuración (o la más reciente)
       let config = await Config.findOne({ order: [['createdAt', 'DESC']] });
       
@@ -144,7 +148,10 @@ class ConfigService {
       
       return config;
     } catch (error) {
-      throw new Error(`Error al actualizar tasa desde BCV: ${error.message}`);
+      console.error('CRITICAL ERROR in updateDolarRateFromBCV:', error.message);
+      // No lanzamos el error para evitar crashear la app si se llama desde un contexto no controlado
+      // Pero el controlador que usa asyncHandler sí debería recibirlo si queremos que responda error
+      throw error; 
     }
   }
 }

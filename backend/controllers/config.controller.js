@@ -113,12 +113,21 @@ const updateConfig = asyncHandler(async (req, res) => {
 });
 
 const updateDolarFromBCV = asyncHandler(async (req, res) => {
-  const updatedConfig = await configService.updateDolarRateFromBCV();
-  responser.success({
-    res,
-    message: 'Tasa del dólar actualizada desde el BCV con éxito',
-    body: { config: updatedConfig },
-  });
+  try {
+    const updatedConfig = await configService.updateDolarRateFromBCV();
+    responser.success({
+      res,
+      message: 'Tasa del dólar actualizada desde el BCV con éxito',
+      body: { config: updatedConfig },
+    });
+  } catch (error) {
+    console.error('Error in updateDolarFromBCV controller:', error.message);
+    responser.error({
+      res,
+      message: `Error al actualizar la tasa: ${error.message}`,
+      status: 500,
+    });
+  }
 });
 
 const deleteConfig = asyncHandler(async (req, res) => {
