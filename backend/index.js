@@ -21,6 +21,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Configurar trust proxy para obtener la IP real detrás de cPanel/Nginx
+app.set('trust proxy', 1);
+
 // Security Headers
 app.use(helmet({
   crossOriginResourcePolicy: false, // Permitir cargar imágenes desde el backend en el frontend
@@ -29,7 +32,7 @@ app.use(helmet({
 // Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 3000, // limit each IP to 1000 requests per windowMs
+  max: 3000, // limit each IP to 3000 requests per windowMs
   message: {
     success: false,
     message: 'Demasiadas peticiones desde esta IP, por favor intente de nuevo en 15 minutos'
@@ -37,8 +40,14 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
-    // Excluir el endpoint del cron del rate limiting si tiene la clave correcta
+    // Excluir el endpoint del cron del rate limiting
     return req.path.includes('/update-dolar-bcv');
+  },
+  // Manejador personalizado para evitar crasheos por headers ya enviados
+  handler: (req, res, next, options) => {
+    if (!res.headersSent) {
+      res.status(options.statusCode).json(options.message);
+    }
   }
 });
 
