@@ -23,6 +23,24 @@ const getSales = asyncHandler(async (req, res) => {
 const getSale = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const sale = await saleService.getSaleById(id);
+
+  if (!sale) {
+    return responser.error({
+      res,
+      message: 'Venta no encontrada',
+      status: 404,
+    });
+  }
+
+  // Security check: only allow user to see their own sale or admin
+  if (Number(req.user.id) !== Number(sale.buyerId) && req.user.role !== 'admin') {
+    return responser.error({
+      res,
+      message: 'No tienes permiso para acceder a esta información',
+      status: 403,
+    });
+  }
+
   responser.success({
     res,
     body: { sale },
@@ -40,6 +58,15 @@ const getSalesByUserId = asyncHandler(async (req, res) => {
       status: 400,
     });
   }
+
+  // Security check: only allow user to see their own sales or admin
+  if (Number(req.user.id) !== Number(userId) && req.user.role !== 'admin') {
+    return responser.error({
+      res,
+      message: 'No tienes permiso para acceder a esta información',
+      status: 403,
+    });
+  }
   
   const sales = await saleService.getSalesByUserId(userId, { startDate, endDate, page, limit });
   responser.success({
@@ -52,12 +79,18 @@ const createSale = asyncHandler(async (req, res) => {
   const {
     quantity,
     status,
-    buyerId,
     paymentMethod,
     saleDate,
     productId,
     rating
   } = req.body;
+
+  let { buyerId } = req.body;
+
+  // Security: Force buyerId to be the authenticated user unless admin
+  if (req.user.role !== 'admin') {
+    buyerId = req.user.id;
+  }
 
   // Validation
   if (!quantity || !buyerId || !paymentMethod || !productId) {
@@ -165,7 +198,6 @@ const deleteSale = asyncHandler(async (req, res) => {
 const createCheckout = asyncHandler(async (req, res) => {
   let {
     items, // Array of { productId, quantity }
-    buyerId,
     clientName,
     clientEmail,
     clientPhone,
@@ -176,6 +208,13 @@ const createCheckout = asyncHandler(async (req, res) => {
     shippingMethod,
     shippingAddress
   } = req.body;
+
+  let { buyerId } = req.body;
+
+  // Security: Force buyerId to be the authenticated user unless admin
+  if (req.user.role !== 'admin') {
+    buyerId = req.user.id;
+  }
 
   // If items is sent as a string (common with FormData), parse it
   if (typeof items === 'string') {

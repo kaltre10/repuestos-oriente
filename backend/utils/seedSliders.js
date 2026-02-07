@@ -35,11 +35,11 @@ export const seedSliders = async () => {
     if (count === 0) {
       for (const sliderData of slidersToSeed) {
         await Slider.create(sliderData);
-        console.log(`Slider creado: ${sliderData.title}`);
+        // console.log(`Slider creado: ${sliderData.title}`);
       }
-      console.log('Proceso de seeding de sliders completado.');
+      // console.log('Proceso de seeding de sliders completado.');
     } else {
-      console.log('Los sliders ya existen, omitiendo seeding.');
+      // console.log('Los sliders ya existen, omitiendo seeding.');
     }
   } catch (error) {
     console.error('Error al realizar el seeding de sliders:', error);

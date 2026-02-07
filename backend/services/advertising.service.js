@@ -40,12 +40,13 @@ class AdvertisingService {
 
   async createAdvertising(data) {
     try {
-      let imageData = data.image;
+      const { image, link, buttonText, status } = data;
+      let imageData = image;
 
       // Handle base64 image if provided
-      if (data.image && data.image.startsWith('data:image')) {
-        const base64Data = data.image.replace(/^data:image\/\w+;base64,/, '');
-        const extension = data.image.split(';')[0].split('/')[1];
+      if (image && image.startsWith('data:image')) {
+        const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+        const extension = image.split(';')[0].split('/')[1];
         const fileName = `adv_${Date.now()}.${extension}`;
         const dir = path.join(process.cwd(), 'images', 'advertising');
 
@@ -58,15 +59,18 @@ class AdvertisingService {
         imageData = fileName;
       }
 
+      const isActive = status === true || status === 'true';
+
       // If status is true, deactivate all others
-      if (data.status === true || data.status === 'true') {
+      if (isActive) {
         await Advertising.update({ status: false }, { where: {} });
       }
 
       const advertising = await Advertising.create({
-        ...data,
         image: imageData,
-        status: data.status === true || data.status === 'true'
+        link,
+        buttonText: buttonText || 'Ver más',
+        status: isActive
       });
       return advertising;
     } catch (error) {
@@ -81,12 +85,13 @@ class AdvertisingService {
         throw new Error('Publicidad no encontrada');
       }
 
-      let imageData = data.image;
+      const { image, link, buttonText, status } = data;
+      let imageData = image;
 
       // Handle base64 image
-      if (data.image && data.image.startsWith('data:image')) {
-        const base64Data = data.image.replace(/^data:image\/\w+;base64,/, '');
-        const extension = data.image.split(';')[0].split('/')[1];
+      if (image && image.startsWith('data:image')) {
+        const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+        const extension = image.split(';')[0].split('/')[1];
         const fileName = `adv_${id}_${Date.now()}.${extension}`;
         const dir = path.join(process.cwd(), 'images', 'advertising');
 
@@ -108,15 +113,18 @@ class AdvertisingService {
         imageData = fileName;
       }
 
+      const isActive = status === true || status === 'true';
+
       // If status is true, deactivate all others
-      if (data.status === true || data.status === 'true') {
+      if (isActive) {
         await Advertising.update({ status: false }, { where: {} });
       }
 
       await advertising.update({
-        ...data,
         image: imageData,
-        status: data.status === true || data.status === 'true'
+        link,
+        buttonText: buttonText || advertising.buttonText,
+        status: isActive
       });
       return advertising;
     } catch (error) {

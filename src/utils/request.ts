@@ -2,6 +2,7 @@ import axios from "axios"
 const request = {
     post: async (url: string, body: any, config: any = {}) => {
         const token = localStorage.getItem('token')
+        console.log(`Request.post: ${url}`, token ? 'Token presente' : 'Token ausente');
         if (token) {
             axios.defaults.headers.post['Authorization'] = `Bearer ${token}`
         }

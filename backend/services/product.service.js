@@ -24,7 +24,7 @@ class ProductService {
 
       let products = await Product.findAll({
         where,
-        order: [['id', 'ASC']],
+        order: [['id', 'DESC']],
         include: [
           {
             model: models.ProductImage,
@@ -100,8 +100,8 @@ class ProductService {
       } else if (sortBy === 'popular') {
         processedProducts.sort((a, b) => b.rating - a.rating);
       } else {
-        // Orden predeterminado: por inserción (ID ascendente)
-        processedProducts.sort((a, b) => a.id - b.id);
+        // Orden predeterminado: por inserción (ID descendente)
+        processedProducts.sort((a, b) => b.id - a.id);
       }
 
       // Paginación en memoria
@@ -174,9 +174,15 @@ class ProductService {
 
   async createProduct(productData) {
     try {
+      // console.log('ProductService.createProduct: Intentando crear en DB...');
       const product = await Product.create(productData);
+      // console.log('ProductService.createProduct: Creado con éxito en DB');
       return product;
     } catch (error) {
+      console.error('Error en ProductService.createProduct:', error.name, error.message);
+      if (error.errors) {
+        error.errors.forEach(err => console.error('Detalle error:', err.message));
+      }
       throw new Error(`Error al crear producto: ${error.message}`);
     }
   }

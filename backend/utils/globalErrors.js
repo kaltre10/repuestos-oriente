@@ -1,6 +1,6 @@
 // Global error handler middleware
 const globalErrorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
+  // console.error('Error:', err);
 
   // Sequelize validation error
   if (err.name === 'SequelizeValidationError') {
@@ -35,10 +35,12 @@ const globalErrorHandler = (err, req, res, next) => {
   }
 
   // Generic server error
-  res.status(500).json({
-    success: false,
-    message: 'Internal server error',
-  });
+  if (!res.headersSent) {
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
 };
 
 export default globalErrorHandler;

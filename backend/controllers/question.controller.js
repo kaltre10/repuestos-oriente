@@ -6,7 +6,13 @@ const asyncHandler = (fn) => (req, res, next) => {
 };
 
 export const createQuestion = asyncHandler(async (req, res) => {
-  const { productId, questionText, clientId } = req.body;
+  const { productId, questionText } = req.body;
+  let { clientId } = req.body;
+
+  // Security: Force clientId to be the authenticated user unless admin
+  if (req.user.role !== 'admin') {
+    clientId = req.user.id;
+  }
 
   if (!productId || !questionText || !clientId) {
     return responser.error({
@@ -42,6 +48,16 @@ export const getQuestionsByProduct = asyncHandler(async (req, res) => {
 
 export const getQuestionsByClient = asyncHandler(async (req, res) => {
   const { clientId } = req.params;
+
+  // Security check: only allow user to see their own questions or admin
+  if (Number(req.user.id) !== Number(clientId) && req.user.role !== 'admin') {
+    return responser.error({
+      res,
+      message: 'No tienes permiso para acceder a esta información',
+      status: 403,
+    });
+  }
+
   const questions = await questionService.getQuestionsByClient(clientId);
 
   responser.success({

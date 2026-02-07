@@ -68,6 +68,7 @@ interface StoreState {
   setUser: (user: User | null) => void;
   logout: () => void;
   setCurrency: (currency: 'USD' | 'BS') => void;
+  verifyAuth: () => Promise<void>;
 }
 
 const useStore = create<StoreState>((set, get) => ({
@@ -75,6 +76,35 @@ const useStore = create<StoreState>((set, get) => ({
   isCartOpen: false,
   user: getInitialUser(),
   currency: (localStorage.getItem('currency') as 'USD' | 'BS') || 'USD',
+  verifyAuth: async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      set({ user: null });
+      localStorage.removeItem('user');
+      return;
+    }
+
+    try {
+      const { apiUrl } = await import('../utils/utils');
+      const { default: request } = await import('../utils/request');
+      const response = await request.get(`${apiUrl}/auth/verify`);
+      
+      if (response.data.success) {
+        const user = response.data.body.user;
+        set({ user });
+        localStorage.setItem('user', JSON.stringify(user));
+      } else {
+        set({ user: null });
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+    } catch (error) {
+      console.error('Error verifying auth:', error);
+      set({ user: null });
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+    }
+  },
   addToCart: (product) => set((state) => {
     let newCart;
     const existingItem = state.cart.find(item => item.id === product.id);

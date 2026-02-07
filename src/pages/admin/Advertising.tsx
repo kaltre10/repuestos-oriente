@@ -159,10 +159,14 @@ const Advertising = () => {
         }
     };
 
-    const getImageUrl = (image: string) => {
-        if (!image) return '';
-        if (image.startsWith('data:') || image.startsWith('http')) return image;
-        return `${apiUrl.replace('/api/v1', '')}/images/advertising/${image}`;
+    const getImageUrl = (imageName: string) => {
+        if (!imageName) return '';
+        if (imageName.startsWith('data:') || imageName.startsWith('http')) return imageName;
+        
+        // Limpiar el nombre de la imagen por si acaso viene con ruta
+        const cleanName = imageName.split('/').pop()?.split('\\').pop();
+        const base = apiUrl.split('/api/v1')[0];
+        return `${base}/images/advertising/${cleanName}`;
     };
 
     if (loading) {

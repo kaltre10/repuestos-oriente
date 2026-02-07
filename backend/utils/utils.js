@@ -6,7 +6,16 @@ import { seedModels } from './seedModels.js';
 import { seedSliders } from './seedSliders.js';
 
 export const corsOptions = {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+        // Permitir peticiones sin origen (como apps móviles, curl, o instaladores locales)
+        // o si el origen está en el FRONTEND_URL configurado
+        const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+        if (!origin || origin === allowedOrigin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
 }
 

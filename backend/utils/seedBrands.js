@@ -18,12 +18,12 @@ export const seedBrands = async () => {
         defaults: { brand: brandName }
       });
       
-      if (created) {
-        console.log(`Marca creada: ${brandName}`);
-      }
+      // if (created) {
+      //   console.log(`Marca creada: ${brandName}`);
+      // }
     }
     
-    console.log('Proceso de seeding de marcas completado.');
+    // console.log('Proceso de seeding de marcas completado.');
   } catch (error) {
     console.error('Error al realizar el seeding de marcas:', error);
   }

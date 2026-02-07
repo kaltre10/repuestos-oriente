@@ -32,6 +32,8 @@ const getProduct = asyncHandler(async (req, res) => {
 });
 
 const createProduct = asyncHandler(async (req, res) => {
+  // console.log('--- CREATE PRODUCT START ---');
+  // console.log('Body recibido:', JSON.stringify(req.body, null, 2));
   const {
     name,
     brand,
@@ -53,6 +55,7 @@ const createProduct = asyncHandler(async (req, res) => {
 
   // Validation
   if (!name || !productBrand || !categories || !years || !price || !partNumber) {
+    console.warn('createProduct: Error de validación - Campos faltantes');
     return responser.error({
       res,
       message: 'Campos requeridos: nombre, marca del producto, categorías, años, precio, número de parte',
@@ -61,6 +64,7 @@ const createProduct = asyncHandler(async (req, res) => {
   }
 
   if (amount === undefined || amount < 0) {
+    console.warn('createProduct: Error de validación - Cantidad inválida:', amount);
     return responser.error({
       res,
       message: 'La cantidad debe ser un número no negativo',
@@ -69,6 +73,7 @@ const createProduct = asyncHandler(async (req, res) => {
   }
 
   if (price <= 0) {
+    console.warn('createProduct: Error de validación - Precio inválido:', price);
     return responser.error({
       res,
       message: 'El precio debe ser mayor a 0',
@@ -95,7 +100,9 @@ const createProduct = asyncHandler(async (req, res) => {
     garantia: garantia || null
   };
 
+  console.log('createProduct: Llamando a productService.createProduct con:', JSON.stringify(productData, null, 2));
   const newProduct = await productService.createProduct(productData);
+  console.log('createProduct: Producto creado con éxito:', newProduct.id);
   responser.success({
     res,
     message: 'Producto creado con éxito',

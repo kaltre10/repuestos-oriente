@@ -51,10 +51,14 @@ const AdvertisingModal = () => {
 
     if (!isOpen || !advertising) return null;
 
-    const getImageUrl = (img: string) => {
-        if (!img) return '';
-        if (img.startsWith('data:') || img.startsWith('http')) return img;
-        return `${apiUrl.replace('/api/v1', '')}/images/advertising/${img}`;
+    const getImageUrl = (imageName: string) => {
+        if (!imageName) return '';
+        if (imageName.startsWith('data:') || imageName.startsWith('http')) return imageName;
+        
+        // Limpiar el nombre de la imagen por si acaso viene con ruta
+        const cleanName = imageName.split('/').pop()?.split('\\').pop();
+        const base = apiUrl.split('/api/v1')[0];
+        return `${base}/images/advertising/${cleanName}`;
     };
 
     const handleAction = () => {

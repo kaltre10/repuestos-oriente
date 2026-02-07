@@ -8,6 +8,7 @@ import {
 } from "../controllers/brand.controller.js";
 import responser from "../controllers/responser.js";
 import validateToken from "../midelwares/validateToken.js";
+import onlyAdmin from "../midelwares/onlyAdmin.js";
 const router = express.Router();
 
 router.get("/", (_req, res) => {
@@ -16,8 +17,8 @@ router.get("/", (_req, res) => {
 router.get("/brands", getBrands);
 router.get("/brands/:id", getBrand);
 
-router.post("/brands", validateToken, createBrand);
-router.put("/brands/:id", validateToken, updateBrand);
-router.delete("/brands/:id", validateToken, deleteBrand);
+router.post("/brands", [validateToken, onlyAdmin], createBrand);
+router.put("/brands/:id", [validateToken, onlyAdmin], updateBrand);
+router.delete("/brands/:id", [validateToken, onlyAdmin], deleteBrand);
 
 export default router;

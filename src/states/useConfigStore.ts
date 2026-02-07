@@ -367,6 +367,15 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
         categoryId 
       });
       const newSubCategory = response.data.body.subCategory;
+      
+      // Si el backend no devuelve el objeto category, lo buscamos en el estado local
+      if (!newSubCategory.category) {
+        const category = get().categories.find(c => c.id === categoryId);
+        if (category) {
+          newSubCategory.category = { category: category.category };
+        }
+      }
+
       set((state) => ({ subCategories: [newSubCategory, ...state.subCategories] }));
       return true;
     } catch (err: any) {
@@ -387,6 +396,15 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
         categoryId 
       });
       const updatedSubCategory = response.data.body.subCategory;
+
+      // Si el backend no devuelve el objeto category, lo buscamos en el estado local
+      if (!updatedSubCategory.category) {
+        const category = get().categories.find(c => c.id === categoryId);
+        if (category) {
+          updatedSubCategory.category = { category: category.category };
+        }
+      }
+
       set((state) => ({
         subCategories: state.subCategories.map(s => s.id === id ? updatedSubCategory : s)
       }));

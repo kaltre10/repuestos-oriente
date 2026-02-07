@@ -5,9 +5,9 @@ import { validateOrderIntegrity } from '../midelwares/validateOrderIntegrity.js'
 
 const router = express.Router();
 
-router.get('/', getOrders);
-router.get('/:id', getOrder);
-router.get('/buyer/:buyerId', getOrdersByBuyerId);
+router.get('/', validateToken, getOrders);
+router.get('/:id', validateToken, getOrder);
+router.get('/buyer/:buyerId', validateToken, getOrdersByBuyerId);
 
 router.post('/', validateOrderIntegrity, validateToken, createOrder);
 router.put('/:id',validateToken, updateOrder);

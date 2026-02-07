@@ -65,7 +65,7 @@ const ClientSidebar = ({ isOpen, onClose }: ClientSidebarProps) => {
           </button>
         </div>
 
-        <nav className="flex-1 mt-4">
+        <nav className="flex-1 mt-4 overflow-y-auto custom-scrollbar">
           <Link
             to="/"
             className="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-colors"
