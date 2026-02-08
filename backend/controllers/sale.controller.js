@@ -271,7 +271,10 @@ const createCheckout = asyncHandler(async (req, res) => {
   
   // Get products with their details to calculate prices with discounts and check stock
   const products = await models.Product.findAll({
-    where: { id: productIds },
+    where: { 
+      id: productIds,
+      isActive: true // Solo permitir productos activos en el checkout
+    },
     attributes: ['id', 'price', 'discount', 'amount', 'name']
   });
   

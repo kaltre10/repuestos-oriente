@@ -30,16 +30,17 @@ export const useProducts = () => {
     // getProducts(); 
   }, []);
 
-  const getProducts = async (filters: { year?: string, onSale?: boolean, page?: number, limit?: number, sortBy?: string, search?: string } = {}) => {
+  const getProducts = async (filters: { year?: string, onSale?: boolean, page?: number, limit?: number, sortBy?: string, search?: string, showInactive?: boolean } = {}) => {
     try {
       console.log('useProducts: getProducts llamado con filtros:', filters);
       setLoading(true)
-      const { year, onSale, page = 1, limit = 20, sortBy, search } = filters;
+      const { year, onSale, page = 1, limit = 20, sortBy, search, showInactive } = filters;
       let url = `${apiUrl}/products`;
       const params = new URLSearchParams();
       if (year) params.append('year', year);
       if (onSale) params.append('onSale', 'true');
       if (search) params.append('search', search);
+      if (showInactive) params.append('showInactive', 'true');
       params.append('page', page.toString());
       params.append('limit', limit.toString());
       if (sortBy) params.append('sortBy', sortBy);

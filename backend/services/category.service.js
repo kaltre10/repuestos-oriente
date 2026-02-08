@@ -11,10 +11,11 @@ class CategoryService {
       });
 
       if (onlyActive) {
-        // Obtenemos todos los productos con stock
+        // Obtenemos todos los productos con stock e isActive true
         const activeProducts = await Product.findAll({
           where: {
-            amount: { [Op.gt]: 0 }
+            amount: { [Op.gt]: 0 },
+            isActive: true
           },
           attributes: ['categories']
         });

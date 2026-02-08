@@ -25,7 +25,7 @@ const Products = () => {
   } = useProducts();
 
   useEffect(() => {
-    getProducts({ limit: 20 });
+    getProducts({ limit: 20, showInactive: true });
   }, []);
 
   if (loading) {
