@@ -35,6 +35,7 @@ export interface Product {
   freeDelivery: boolean;
   partNumber: string;
   garantia?: string;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -54,6 +55,7 @@ export interface ProductFormData {
   amount: number;
   price: number;
   freeDelivery: boolean;
+  isActive: boolean;
   partNumber: string;
   garantia: string;
   noBrand: boolean;

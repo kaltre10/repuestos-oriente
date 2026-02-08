@@ -396,18 +396,34 @@ const ProductModal = () => {
             </div>
           )}
 
-          <div className="flex items-center gap-2 py-2 bg-gray-50 p-3 rounded-md border border-gray-200">
-            <input
-              type="checkbox"
-              id="noBrand"
-              name="noBrand"
-              checked={formData.noBrand}
-              onChange={handleNoBrandChange}
-              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="noBrand" className="text-sm font-medium text-gray-700 cursor-pointer">
-              Sin marca específica
-            </label>
+          <div className="flex items-center gap-6 py-2 bg-gray-50 p-3 rounded-md border border-gray-200">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="noBrand"
+                name="noBrand"
+                checked={formData.noBrand}
+                onChange={handleNoBrandChange}
+                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              />
+              <label htmlFor="noBrand" className="text-sm font-medium text-gray-700 cursor-pointer">
+                Sin marca específica
+              </label>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="isActive"
+                name="isActive"
+                checked={formData.isActive}
+                onChange={handleInputChange}
+                className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+              />
+              <label htmlFor="isActive" className="text-sm font-medium text-gray-700 cursor-pointer">
+                Producto Activo
+              </label>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

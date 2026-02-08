@@ -393,6 +393,7 @@ const Purchases = () => {
         </div>
       ) : (
         <div className="grid gap-4 md:gap-6">
+          {/* {console.log(orders)} */}
           {orders.map((order, index) => {
             const isLastElement = index === orders.length - 1;
 
@@ -409,6 +410,7 @@ const Purchases = () => {
                     <div className="w-full md:w-32 h-24 md:h-32 flex-shrink-0 relative">
                       <div className="absolute inset-0 flex items-center justify-center">
                         {order.sales.slice(0, 3).map((item, i) => (
+                          
                           <img
                             key={item.id}
                             src={item.product.images && item.product.images.length > 0

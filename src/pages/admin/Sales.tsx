@@ -689,20 +689,23 @@ const Sales = () => {
                     </div>
                   </div>
 
-                  {selectedPurchase.receiptImage && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
+                  {selectedPurchase.receiptImage ? (
+                    <div className="mt-4 pt-4 border-t border-gray-100 text-center ">
                       <h4 className="text-sm font-medium text-gray-700 mb-2">Comprobante de Pago</h4>
+                      
                       <a
-                        href={`${apiUrl}${selectedPurchase.receiptImage}`}
+                        href={`${imagesUrl}${selectedPurchase.receiptImage}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
                       >
-                        <ImageIcon className="w-4 h-4" />
-                        Ver Comprobante
+                        <img width={200} src={`${imagesUrl}${selectedPurchase.receiptImage}`} alt="" />
                       </a>
                     </div>
-                  )}
+                  ) : <div className="mt-4 pt-4 border-t border-gray-100 text-center ">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Comprobante de Pago</h4>
+                      <p className="text-sm font-medium text-red-600">No se ha proporcionado un comprobante de pago.</p>
+                    </div>}
                 </div>
               </div>
               {/* Shipping Information */}

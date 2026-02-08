@@ -50,7 +50,8 @@ const createProduct = asyncHandler(async (req, res) => {
     price,
     freeDelivery,
     partNumber,
-    garantia
+    garantia,
+    isActive
   } = req.body;
 
   // Validation
@@ -97,7 +98,8 @@ const createProduct = asyncHandler(async (req, res) => {
     price,
     freeDelivery: freeDelivery || false,
     partNumber,
-    garantia: garantia || null
+    garantia: garantia || null,
+    isActive: isActive !== undefined ? isActive : true
   };
 
   console.log('createProduct: Llamando a productService.createProduct con:', JSON.stringify(productData, null, 2));
@@ -128,7 +130,8 @@ const updateProduct = asyncHandler(async (req, res) => {
     price,
     freeDelivery,
     partNumber,
-    garantia
+    garantia,
+    isActive
   } = req.body;
 
   // Validation for price if provided
@@ -156,7 +159,8 @@ const updateProduct = asyncHandler(async (req, res) => {
     price,
     freeDelivery,
     partNumber,
-    garantia
+    garantia,
+    isActive
   };
 
   // Validation for amount if provided
