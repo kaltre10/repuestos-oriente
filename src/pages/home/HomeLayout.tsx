@@ -10,7 +10,7 @@ const HomeLayout = () => {
     <div className="flex flex-col min-h-screen">
       <MobileBottomNav />
       <HeaderNew />
-      <main className="flex-grow pt-[120px] md:pt-[180px]">
+      <main className="flex-grow pt-[140px] md:pt-[157px]">
         <Outlet />
       </main>
       <Footer />

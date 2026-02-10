@@ -1,20 +1,39 @@
 import productService from '../services/product.service.js';
 import responser from './responser.js';
+import jwt from 'jsonwebtoken';
 
 // Async handler wrapper
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };
 
+// Helper to check if requester is admin (optional token)
+const isAdminRequest = (req) => {
+  try {
+    const authorization = req.headers.authorization || '';
+    if (!authorization || !authorization.startsWith('Bearer ')) {
+      return false;
+    }
+    const token = authorization.slice(7);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return decoded && decoded.role === 'admin';
+  } catch (error) {
+    return false;
+  }
+};
+
 const getProducts = asyncHandler(async (req, res) => {
-  const { year, onSale, page, limit, sortBy, search } = req.query;
+  const { year, onSale, page, limit, sortBy, search, showInactive } = req.query;
+  const isAdmin = isAdminRequest(req);
+  
   const { products, pagination } = await productService.getAllProducts({ 
     year, 
     onSale, 
     page: parseInt(page) || 1, 
     limit: parseInt(limit) || 20,
     sortBy,
-    search
+    search,
+    isAdmin: isAdmin && showInactive === 'true' // Only show inactive if admin AND explicitly requested
   });
   responser.success({
     res,
@@ -24,7 +43,18 @@ const getProducts = asyncHandler(async (req, res) => {
 
 const getProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  const isAdmin = isAdminRequest(req);
   const product = await productService.getProductById(id);
+
+  // If not admin and product is inactive, don't show it
+  if (!isAdmin && product && !product.isActive) {
+    return responser.error({
+      res,
+      message: 'Producto no disponible',
+      status: 404,
+    });
+  }
+
   responser.success({
     res,
     body: { product },
@@ -50,7 +80,8 @@ const createProduct = asyncHandler(async (req, res) => {
     price,
     freeDelivery,
     partNumber,
-    garantia
+    garantia,
+    isActive
   } = req.body;
 
   // Validation
@@ -97,7 +128,8 @@ const createProduct = asyncHandler(async (req, res) => {
     price,
     freeDelivery: freeDelivery || false,
     partNumber,
-    garantia: garantia || null
+    garantia: garantia || null,
+    isActive: isActive !== undefined ? isActive : true
   };
 
   console.log('createProduct: Llamando a productService.createProduct con:', JSON.stringify(productData, null, 2));
@@ -128,7 +160,8 @@ const updateProduct = asyncHandler(async (req, res) => {
     price,
     freeDelivery,
     partNumber,
-    garantia
+    garantia,
+    isActive
   } = req.body;
 
   // Validation for price if provided
@@ -156,7 +189,8 @@ const updateProduct = asyncHandler(async (req, res) => {
     price,
     freeDelivery,
     partNumber,
-    garantia
+    garantia,
+    isActive
   };
 
   // Validation for amount if provided

@@ -6,10 +6,15 @@ class ProductService {
 
   async getAllProducts(filters = {}) {
     try {
-      const { year, onSale, page = 1, limit = 20, sortBy, search } = filters;
+      const { year, onSale, page = 1, limit = 20, sortBy, search, isAdmin = false } = filters;
       
       let where = {};
       
+      // If not admin, only show active products
+      if (!isAdmin) {
+        where.isActive = true;
+      }
+
       if (onSale === 'true') {
         where.discount = {
           [Op.gt]: 0

@@ -10,7 +10,8 @@ interface Product {
   brand: string,
   partNumber: string,
   price: number,
-  amount: number
+  amount: number,
+  isActive: boolean
 }
 
 const Products = () => {
@@ -24,7 +25,7 @@ const Products = () => {
   } = useProducts();
 
   useEffect(() => {
-    getProducts({ limit: 20 });
+    getProducts({ limit: 20, showInactive: true });
   }, []);
 
   if (loading) {
@@ -74,6 +75,9 @@ const Products = () => {
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Stock
                 </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Estado
+                </th>
                 <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Acciones
                 </th>
@@ -99,6 +103,17 @@ const Products = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                     {String(product.amount)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    {product.isActive ? (
+                      <span className="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full">
+                        Activo
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded-full">
+                        Inactivo
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end gap-2">
@@ -131,7 +146,14 @@ const Products = () => {
               <div className="flex justify-between items-start">
                 <div>
                   <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">ID #{product.id}</span>
-                  <h3 className="font-bold text-gray-900 leading-tight mt-1">{product.name}</h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <h3 className="font-bold text-gray-900 leading-tight">{product.name}</h3>
+                    {product.isActive ? (
+                      <span className="w-2 h-2 rounded-full bg-green-500" title="Activo"></span>
+                    ) : (
+                      <span className="w-2 h-2 rounded-full bg-red-500" title="Inactivo"></span>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-500 mt-1">{product.brand} • {product.partNumber}</p>
                 </div>
                 <div className="flex gap-1">

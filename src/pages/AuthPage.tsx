@@ -1,15 +1,16 @@
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
-import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin, CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import useAuth from '../hooks/useAuth';
 import useStore from '../states/global';
-
-// import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png'
+import AuthPageSuccess from '../components/AuthPageSuccess';
 
 const AuthPage = () => {
   const { user } = useStore();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const { isLogin, handleSubmit, handleInputChange,
     formData, showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword,
@@ -18,7 +19,7 @@ const AuthPage = () => {
     
   // Eliminamos el useEffect que causaba el bucle de navegación duplicada
 
-  if (user) return null; // Evita el parpadeo de la página si ya hay un usuario
+  if (user) return <AuthPageSuccess />; // Evita el parpadeo de la página si ya hay un usuario
 
   document.title = `Repuestos Picha - ${isLogin ? "Login" : "Registro"}`;
   if (isForgotPassword) {

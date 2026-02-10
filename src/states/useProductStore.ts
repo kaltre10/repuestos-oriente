@@ -16,6 +16,7 @@ const initialFormData: ProductFormData = {
   amount: 0,
   price: 0,
   freeDelivery: false,
+  isActive: true,
   partNumber: '',
   garantia: '',
   noBrand: false,
