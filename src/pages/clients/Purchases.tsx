@@ -135,7 +135,26 @@ const Purchases = () => {
         rating: i,
       });
       notify.success('Reseña enviada con éxito');
-      await fetchPurchases(true); // Refresh list
+      
+      // Update local state to reflect the change immediately
+      if (selectedOrder) {
+        const updatedSales = selectedOrder.sales.map(s => 
+          s.id === item.id ? { ...s, rating: i } : s
+        );
+        setSelectedOrder({ ...selectedOrder, sales: updatedSales });
+      }
+
+      // Also update the main orders list to keep everything in sync
+      setOrders(prevOrders => prevOrders.map(order => {
+        if (order.id === selectedOrder?.id) {
+          const updatedSales = order.sales.map(s => 
+            s.id === item.id ? { ...s, rating: i } : s
+          );
+          return { ...order, sales: updatedSales };
+        }
+        return order;
+      }));
+
     } catch (err) {
       console.error('Error sending rating:', err);
       notify.error('Error al enviar la reseña');

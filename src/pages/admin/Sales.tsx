@@ -689,20 +689,40 @@ const Sales = () => {
                     </div>
                   </div>
 
-                  {selectedPurchase.receiptImage && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Comprobante de Pago</h4>
-                      <a
-                        href={`${apiUrl}${selectedPurchase.receiptImage}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
-                      >
-                        <ImageIcon className="w-4 h-4" />
-                        Ver Comprobante
-                      </a>
-                    </div>
-                  )}
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Comprobante de Pago</h4>
+                    {selectedPurchase.receiptImage ? (
+                       <div className="relative group max-w-sm">
+                         <img
+                           src={`${imagesUrl}${selectedPurchase.receiptImage}`}
+                           alt="Comprobante de pago"
+                           className="w-full h-auto max-h-64 object-contain rounded-xl border border-gray-200 bg-gray-50"
+                           onError={(e) => {
+                             (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                           }}
+                         />
+                         <a
+                           href={`${imagesUrl}${selectedPurchase.receiptImage}`}
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"
+                         >
+                           <div className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                             <ImageIcon className="w-4 h-4" />
+                             Ver pantalla completa
+                           </div>
+                         </a>
+                       </div>
+                     ) : (
+                      <div className="flex flex-col items-center justify-center py-8 px-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                          <ImageIcon className="w-6 h-6 text-gray-400" />
+                        </div>
+                        <p className="text-sm font-medium text-gray-500">No hay comprobante agregado</p>
+                        <p className="text-xs text-gray-400 mt-1">Este pedido no tiene una imagen de pago asociada</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               {/* Shipping Information */}

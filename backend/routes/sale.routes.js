@@ -11,7 +11,7 @@ router.get('/stats', [validateToken, onlyAdmin], getStats);
 router.get('/user/:userId', validateToken, getSalesByUserId);
 router.get('/:id', validateToken, getSale);
 router.delete('/:id', [validateToken, onlyAdmin], deleteSale);
-router.put('/:id', [validateToken, onlyAdmin], updateSale);
+router.put('/:id', [validateToken], updateSale);
 
 router.post('/checkout', validateToken, uploadMidelware.single('receiptImage'), createCheckout);
 router.post('/upload-receipt', validateToken, uploadMidelware.single('receiptImage'), uploadReceipt);
