@@ -225,7 +225,7 @@ const ProductModal = () => {
          console.log('ProductModal: Subiendo imágenes para el producto:', productId);
          await handleImagesSubmit(productId);
          console.log('ProductModal: Imágenes subidas, refrescando lista de productos');
-         await getProducts();
+         await getProducts({ showInactive: true });
          handleCloseForm();
        }
      } catch (error) {
